@@ -1,0 +1,2532 @@
+
+
+
+Nokia :
+ 
+ HTML :
+ ========
+1. what is diff HTML and HTML5
+	=> semantic tags  -> <header> <footer> <nav> <article> <section> <aside>
+	=> Audio/video support
+	=> local storage
+	=> canvas/SVG
+	=> Better SEO support  
+	
+2. semantic tags and why important ?
+	=> Better SEO
+	=> Better accessibility
+	=> Easy mainitannce
+	=> Screen reader friendly
+	
+3. DIff between 
+			localstorage      		session storage    			cokies
+	=> 		5-10mb					5mb							4kb
+			permanently store		till tab closed				configurable
+			can not send to server 	same can not 				but can be send to server
+			
+4. what is defer and aysnc in script loading
+	<script asysnc src=a.js></script>  =>   
+	<script defer src=a.js></script>   =>
+	
+	Feature		async			defer
+	Download	Parallel		Parallel
+	Execution	Immediately		After HTML parse
+	Order		Not maintained	Maintained
+	
+	
+
+5. diff between 
+	property 	 		width/height		New line
+	inline				No					No
+	inline block		yes					No
+	block				Yes					yes
+	
+6. what is DockType -> <!DOCTYPE html>
+	=> it tells the broser that load the standards mode(not qruiks mode)
+	
+	
+	CSS:
+	============
+	
+1. what is box model
+	=> it contains the 
+		content -> padding -> border -> margin
+		
+2.How to set box sizing in css -> makes width including padding and border
+	=> box-sizing : border-box;
+	
+3. Diff between display : none and visbility:hidden
+	feature 			display:None 		visbility: hidden
+	space Occupied 		No					Yes	
+	visible 			No 					No
+	
+	
+4. what is flex box and when to use it ?
+	=> these are used for 1D layouts (	eith row or column)
+	=> we can use display : flex	
+				  justify-content : center
+				  aligh-item : center
+				  
+			
+5. diff between flex and grid
+	feature					felxBox						grid
+	dimesion 				1D							2D
+	use case 				component layouts			page layouts
+	
+	
+6. what are the position property
+	=> 	position 			Relative To
+		static				Normal flow
+		relative			own position
+		absolute			nearest position parent
+		fixed				viewport
+		sticky 				scroll position
+		
+		
+7. what is z-index ? when it works?
+	It works only when position is	=> relative. absolute, fixed, sticky
+	
+8. what is specificity 
+	=> it is prioroty order
+		inline > ID > class > element
+		
+9. What is !important? Should we use?
+	=> Forced prioroty
+	but it breaks mainitanablity and avoid in production
+	
+10. Difference between em vs rem vs px
+
+	Unit 			Based on
+	px 				Fixed
+	em 				parent font size
+	rem 			root (html) font size
+	=> rem is prefered for responsive
+	
+11. what is Responsive design:
+	Media queries   => @media(max-width:786px){
+						.card {width: 100%}
+						}
+	Flex layouts
+	rem
+	mobile-first approach 
+	boostrap, materal library
+	
+12. how to optimizse css performce
+	=> avoid deep selector
+	=> use shortend
+	=> use transfrom isntead of top/left
+	=> minify css
+	=> avoid 
+	
+13. what is Reflow : layout change eg: width, height
+			RePaint: visual change eg: color, backGroudn color
+			
+
+14. How center a div
+	display : flex
+	justify-content : center
+	aligh-item : center
+
+15. How to make sticky header
+	=> position : sticky
+	   top: 0;
+	   
+	   
+16. how to create equal hight  cards 
+	display : flex
+	aligh-item : stretch;
+	
+17. how to hide scroll bar but allow scroll
+	:: webkit-scrollbar {
+		display : none
+		}
+		
+18. Why CSS loads before JS?
+	to avoid Flash of unstyle content
+	
+	
+
+	Java script :
+	================
+
+1. what is Hoisting :
+	variable and fucntion are moved to top of the scopre during compiltaion.
+		
+			=> Why it happens :
+				=> JS execution 2 phase
+					1.Creational  => 1. create execution content	
+									 2. Allocate memory
+									 3. fucntion and variable declaration
+					2.Executional
+	
+	Eg: console.log(a)  //undefined
+		var a = 10;
+		
+		console.log(b) // referenc error
+		let b = 20;
+		
+2. what is Temporal dead zone :
+	=> time between the variable declaration and initialization when access causes error
+		applies to:
+		let
+		const
+		
+3. Difference between == vs ===
+	==  will check for value comparision
+	=== will check for value and type of data comparision
+	
+4. what is closure 
+	=> the fucntion that are remember outer scoped varaible to local scoped even after execution
+	Eg:	fucntion outer(){
+			let count = 10;
+			return fucntion inner(){    // used in call backs, data hiding
+				count ++
+				console.log(count)
+			}
+		}
+		
+5. what is Event Loop ?
+	js is single thread but handle async using:
+	=> call stacks
+	=> web APIs
+	=> call back queue
+	=> event loop
+	
+6. what is call stack
+	=> used to track the funtion execution order
+		Eg: stack over flow happen when recursion doesn't stops.
+		
+		
+7. what is diff between undefined and null
+	feature				null 					undefined
+	meaning				intentionally empty		Not assigned
+	type 				object					undefined
+	
+	
+8. Difference between call, apply, bind
+
+	method 				Execute immidiatly 				Arguments
+	call				yes								comma separated
+	apply				yes								array
+	bind				yes 							array but return fucntion
+	
+9. what is prototype :
+	js uses prototype based inheritance
+	every object has parent proto eg: __proto__ -> prototype chain
+
+
+10. what is promise :
+	=> use for aysnc operation
+		resolve 
+		reject
+		
+11. Difference between async/await vs promise
+	async/await used to write promise way of code
+	=> cleaner code
+	=> easier error handling
+	=> readable
+	
+12. what is callback hell
+	=> Nested callbacks causing unreadbale code
+		solved using : aysn/await
+		
+13. what is debounce => exceute after dealy ends -> used in search input
+			throttling => execute at fixed interval of time  -> used in scroll events
+			
+14. shallow copy -> Object.assign()
+	deep copy  -> JSON.parse(JSON.Stringfy(obj))
+	
+	
+15. How to prevent memory leaks?
+	=> remove event listener
+	=> clear timers
+	=> avaoid global variable
+	=> avoid closures holding big data
+	
+16. diff between map and forEach
+	feature					map 			forEach
+	return value 			new array 		undefined
+	chainable 				yes 			no
+	
+	
+17. diff find and filter
+	filter 							find
+	return new array 				return first match
+	multiple values 				single value
+	
+
+18. reduce -> used to accumulate the values
+	[1,2,3,4].reduce((a,b) => a + b)
+	
+	
+19.	const str = "hello";  reverse string
+	console.log(str.split('').reverse().join(''));
+	
+20. remove dupliactes'
+	let  val  = [1,2,4,2,4,5,5,3,7]
+	let newval = [...new Set(val)]
+	console.log(newval)
+	
+	
+	
+		Angular :
+	==========================================================
+
+1. main building blocks of Angular
+	modules, components, templates, servcies, depedency injections, RxJs, Routings,
+	
+2. diff between components and modules
+
+	Component						Modules
+	UI building blocks				logical grouping
+	has html/ css					organise the components
+	control views 					bootstrap the views
+	
+3. what are decorator:
+	these are used to add the metadata
+		@Component, @Injecatble, @ngModule, @Input, @Output, @viewChild
+		
+4. what are data binding
+	interpolation
+	property bidning
+	event binding
+	two way binding
+	
+5. what is change detections
+	Angualar mechanism to update the view when the data changes.
+	trigger happens:
+		Event	
+		Http call
+		Timer
+		input change
+		
+6. diff between default and onPush change detections
+
+	Feature					Default 					onPush
+	checks 					whole component tree		only input reference change  eg: changedetection: ChangedetectionStrategy.onPush
+	performce 				slower						faster
+	used in 				normal apps					larger scale apps
+
+7. how manually trigger change detection
+
+	changedetecionRef.detectChanges()
+	markForCheck()
+	
+8. diff between Observable and promises
+	
+	Feature					Observable				promise
+	multiple values 		yes						No
+	lazy 					yes 					No
+	cancelable 				yes 					No
+	
+9. Diff between the subject and behaviour subject
+	
+	Feature					subject					BehaviouralSubject
+	initial value 			No 						Yes
+	last value replay		No 						yes	
+	
+	
+10. diff between the switchmap, merge map and concat map
+	
+	operator 					Behavious
+	switch Map					cancel the previous request    -> Search API typing:
+	merge Map 					parallel execution             -> Parallel execution (Bulk upload):
+	concat map 					sequential exceution  			-> Order important (Payment processing):
+	
+11. what is unsubscribe ? why it important ?
+	prevents :
+		memory leaks
+		performce issue
+		
+		=> can use takeUntil()
+					async pipe
+					unsubscribe()
+			
+12. how to improve the performce of Angualar
+	=> lazy load  -> Loads modules only when route accessed.
+	=> onPush
+	=> tackBy  -> Improves DOM rendering.
+	=> async pipe
+	=> AOT complilation
+	=> preloadong strategy
+	
+13. why DI is Angualr?
+	=> loose coupling
+	=> testablity
+	=> Resuablity
+	
+14.Difference between providedIn root vs module providers
+	root -> provide singleton service across the app
+	
+	
+15. how to pass data between component
+	=> @input/ @output
+	=> Shared services
+	=> Router state
+	=> Behavious subject
+	
+					
+16, diff between Activate Route and Router
+
+	ActivateRoute 					Router
+	Read the param 					Navigate routes
+	Snapchat						Navigation control
+	
+17. How to protect Routes
+	=> Auth guards
+	=> canActivate
+	=> canLoad
+	
+18. Diff Template driven and Reactive forms
+		
+		Feature					Template					Reactive
+		scalability 			Low							high
+		validation				html						ts file
+		testing					hard						easy
+		dynamic array			hard to implement			easy to implement
+	
+19. diff viewChild and content child
+	
+					ViewChild 							ContentChild
+	Can ref of 		child component templates			projected content templates
+	
+	
+20. what is ngZone ?
+	=> control angualr change detection when values trigged
+		used for performce tuning
+	
+21. what is Render2 ?
+	=> used for safe DOM manipulation
+	
+22. what is dynamic component loading ?
+	loading component at runtime.
+	
+23. APi is calling multiple times how to fix?
+	=> share reply
+	=> cache result in services
+	=> avaoid multiple subscription
+	
+	
+24. large table performce issue ?
+	=> virtual scrolling
+	=> pagination
+	=> onPush
+	=> tackBy
+	
+25. How to handle the global error handling ?
+	=> ErrorHandler
+	=> httpInterceptor
+	
+26. waht is Interceptor ?
+	=> add token
+	=> logging
+	=> error handling
+	
+	
+27. diff between Cold and Hot Observable
+
+	Cold : creates a new execution per subscriber
+			Eg: http call
+	
+	Hot : share same execution
+			Eg: subject and Websockets
+			
+	=> http observable cold by deafult, using shareReplay makes it hot
+	
+	
+28. what is shareReplay and when to use it ?
+	=> caches last emmited value and share among subscribers
+		Eg: this.http.get(url).pipe(
+				shareReply(1);
+			)
+		=> improve the performce
+		=> prevent multiple API calls.
+		
+		
+29. Types of Subject:
+
+	Type 					Behaviout
+	Subject 				No intial value
+	BehaviouralSubject		Has initial + last value
+	ReplaySubject 			Replays n values	
+	AysncSubject 			emit last value on complete
+	
+
+30. How can avoid nested subscription
+	=> we can use switch map and merge map
+	
+31. How angualr change detection works internally ?
+	=> Zone.js
+	=> trigger on async event
+	=> Traverse component tree
+	
+32. onPush => onPush reduce unneccessary checks and improve redendering performce in large application
+
+33. Angualr app slow , how to debug ?
+	=> chrome devtools
+	=> check change detection
+	=> check bundle size
+	=> identify reredner issue
+	
+	
+34. Large list slow rendering - solutions ?
+	=> trackBy
+	=> pagination
+	=> aysnc
+	=> virtual scroll
+	=> onPush
+	
+35. How to reduce bundle size ?
+	=> lazy load
+	=> tree shake
+	=> remove unused library
+	=> standalone component
+	=> compression
+	
+36. How do you structure of Angualr app
+	-> core/
+	-> shared/
+	-> auth/
+	-> features/
+	-> dashboard/
+
+37. how to manage state in Angualr	
+	=> BehaviouralSubject
+	=> NgRx
+	=> Signals
+	
+
+38. when to use NgRx ?
+	=> multiple component sharing data
+	=> complex data flow
+	=> cache management
+	
+39. How to handle the API cache ?
+	=> shareReplay
+	=> BehaviouralSubject
+	=> map cache
+	
+40. Smart vs Dumb components
+	=> smart
+			=> API call
+			=> state handling
+			
+	=> dumb 
+			=> only UI
+			=> input/output
+			
+	=> Improve the resuablity
+
+41. How do you write testable code ?
+	=> avoid tight coupling
+	=> user interfaces
+	=> use depedency injection
+	
+42. Eg for BehaviouralSubject code
+	const val$ = new BehaviouralSubject(10);
+	
+	val$.subscribe(e-> console.log(e) // 10
+	
+	
+43. API is getting call 3 times when component loads, why ?
+	=> beacuse multiple subscription are created.
+	
+
+44. How do you avoid memory leaks?
+	=> using async pipe, takeUntil pattern, unsubscribe on destroy and removing event listeners
+	
+
+45. How to design scalable Angular architecture?
+	I follow 
+	=> core/ share/ feature module structure/ smart-dumb component pattern 
+	=> centralize service
+	=> lazy load feature
+	=> modules
+	=> state management
+	
+	
+46. How to Prevent XSS (Interview Answer)
+
+✔ Escape user input
+✔ Avoid innerHTML
+✔ Use Angular built-in sanitization
+✔ Use Content Security Policy (CSP)
+✔ Validate input
+
+	=> XSS is a client-side attack where malicious scripts are injected into web pages and executed in the user's browser. It can be prevented using input sanitization and Angular’s built-in template escaping.
+
+	=> CSRF is an attack where a logged-in user's browser is tricked into sending unauthorized requests to a trusted server. It is prevented using CSRF tokens, SameSite cookies, or by using token-based authentication like JWT instead of cookies.
+	
+	
+47. what is an Angular library ?
+	=> For sharing the UI compoents, services, , directives, and utilities access multiple projects
+	=> An Angular library is a reusable package that contains:
+		=> Component
+		=> Services
+		=> Pipes
+		=> Directives
+		=> Utilities
+		
+		that can import into multiple projects
+		
+		
+	=> Example use cases:
+		Common Button Component
+		Shared Auth Service
+		Common Header/Footer
+		Custom Validators
+		
+	steps :
+			steps 1:
+				=> ng generate library shared-ui
+				
+				=> projects/
+					 └── shared-ui/
+						 └── src/
+							 └── lib/
+								 ├── shared-ui.module.ts
+								 ├── shared-ui.component.ts
+									
+			step 2 : generate component inside the library
+				=> ng g component button --project=shared-ui
+
+			step 3: Export Component From Library Module
+			
+			step 4 : ng build shared-ui  => dist/shared-ui/ -> this deployable
+			
+			step 5 : Version Your Library  
+				=> in the - projects/shared-ui/package.json -> "version" : "1.0.0"
+				
+			step 6 : Publish Internally (3 Enterprise Options)
+			
+					Option 1:  Private NPM Registry (Recommended) -> 1. Nexus
+								=> publish => npm publish
+								=> install in any project => npm install @company/shared-ui
+						
+					Option 2:  Git Based Installation (Quick Setup)
+								=> npm install git+https://github.com/company/shared-ui-lib.git
+								
+					Option 3 : Local Tar Package (Offline Mode)
+								=> npm pack -> It will create .tqz file 
+								=> npm install shared-ui-1.0.0.tgz
+
+						
+															 
+															
+			
+			Step 6: Use Library in Your Application
+				
+				import { SharedUiModule } from 'shared-ui';
+
+					@NgModule({
+					  imports: [
+						SharedUiModule
+					  ]
+					})
+					export class AppModule { }
+					
+			step 6 : Use Library Component in Any Component HTML
+				=> <lib-button></lib-button>
+
+
+48. Diff between Javascript and TypeScript
+
+	| Feature         | JavaScript        | TypeScript               |
+	| --------------- | ---------------   | ------------------------ |
+	| Typing          | Dynamic           | Static                   |
+	| Compile Step    | ❌ No             | ✅ Yes                   |
+	| Error Checking  | Runtime           | Compile time             |
+	| OOP Support     | Limited           | Strong (Interface, Enum) |
+	| Tool Support    | Basic             | Excellent (IntelliSense) |
+	| Scalability     | Hard              | Easy                     |
+	| Angular Support | ❌ Not supported  | ✅ Required              |
+
+				
+
+				
+	Core Java :
+===========================================================================================
+
+1. JDK vs JRE vs JVM
+	
+	component 		Role
+	JDK 			Developement tool + JRE			
+	JRE				JVM + library
+	JVM 			Execute byte code
+	
+2. what happens when you run java programming ?
+	=> .java -> compile -> .class -> class loader -> Byte code 	-> JVM -> execution
+	
+3. Java memory areas
+	=> Heap (Objects)
+	=> stack memory (methods)
+	=> Metaspace (Class metadata)
+	
+4. Diff between Heap and stack
+	
+		Stack 					Heap
+		thread safe 			Not thread safe
+		fast 					slower
+		methods class 			Objects stored
+		
+5. what is garbage collectors 
+	=> automatic memory cleanup of unused Objects in Heap
+	
+6. Types of Garbasge collectors
+	=> serial GC
+	=> parallel GC
+	=> G1 GC (Default)  => It balance throughput and low pause time.
+	
+	
+7. what are the meory leak in Java
+	=> when objects are not eligible for GC but not used.
+		Eg: static collections
+			listener not removed
+			cache not cleared
+			
+8. can we overide static method 
+		=> No, it is method hiding
+	
+9. diff between String, string buffer, string builder
+
+	Feature				String 			String buffer 				String builder
+	mutable 			No				yes							yes
+	thread safe 		yes 			Yes							No
+	performce			slow  			medium						faster
+	
+	
+10. why string is immutable ?
+	=> security
+	=> thread safe
+	=> string pool
+	=> hashcode caching
+	
+11. what is contract between equal() and hashCode()
+	=> if equal() -> true, hashcode must be same
+	=> used in 
+		HashMap
+		HashSet
+		
+12, diff 
+	ArrayList 							LinkedList
+	fast access							slow access
+	slow insert/ delete in middle		faster insertion
+	less memory 						more memory
+	
+13. Diff 
+	Hashmap					ConcurantHashMap
+	Not thread safe 		thread safe
+	faster					slight slower	
+	Allowes null key 		No null key
+	
+14. why hashMap allows one null
+	=> beacause hashCode not required for null
+	
+15. diff
+	Fail-fast					fail-safe
+	throws an exception 		no exception
+	ArrayList					copyOnWriteArray list
+	Eg: concuranthashMapException
+	
+	
+16. DIff
+		Sleep 					wait
+		thread class			Object classs
+		doesn't release lock	release lock
+		
+17. what is valatile keyword ?
+	=> visibility
+	=> avaoid cacheing
+	
+18. what is deadlock ?
+	=> two thread are lock eachother's resource
+		
+19. what is thread pool ?
+	=> Reuse thread
+	=> performce
+	=> Resource controll
+	
+	
+20. Funtional Interface ?
+	=> interface having one abstract method
+		=> Runnable
+		=> Comparator
+		
+21. app is slow, what you check ?
+	=> GC logic
+	=> thread dump
+	=> BD calls
+	=> memory leaks
+	=> CPU usage
+	
+22. what is class loader heirarchy ?
+	=> Bootstrap
+	=> Extension
+	=> Application
+	
+23. what is Escape Analysis ?
+	=> JVM analysis the object 	allocation to imrpove the performce
+		=> on stack instead of heap
+		=> remove synchronisation
+		
+24. How to moniter the memory issue in production ?
+	=> Jconsole
+	=> virtual VM
+	=> Heap dump
+	=> thread dump -> jstack command to get running threads info in cmd line
+	
+25. what is young gen and old gen 
+	young -> short lived object
+	old -> long lived object
+	
+26. what is forkJoinpool
+	=> used for parallel processing	
+		Eg: parallel streams
+		
+	
+27. what is Reflection API ?
+	=> RunTime class inspection
+	=> method invocations
+	
+	used In :
+		=> Spring
+		=> Hibernate
+		
+	=> disadvancatge of Reflections 
+		=> performce overhead
+		=> security risk
+		=> memory leaks
+		
+28. Diff between	
+	Serialization				Externalization
+	Automatic					manual control
+	less control				more control
+	
+	
+29. why ConcurrentHashMap faster than Hashtable ?
+ 		=> No global lock
+		=> bucket level locking
+		
+		
+30, what is weak HashMap ?
+	=> entries are removed when key is garbage collected 
+	used for :
+		cache
+		
+		
+31. what happens internally when springBoot app start
+	=> Main class run -> @SpringBootApplication
+	=> Auto configuration
+	=> component scanning
+	=> bean creation
+	=> Embded server starts
+	=> Appilication ready event fired
+	
+	
+32.What is autoconfiguration ?
+	=> Springboot automatically configured beans based on 	
+		=> classpath
+		=> propeties
+		=> conditions
+		
+		
+33. stereo type annotations
+	@Component	
+	@Service
+	@Repository -> tanslate db execution
+	
+	
+34. How SpringBoot interact with JPA interanally ?
+	=> Hibernate
+	=> Data Source
+	=> EntityManagerFactory
+	=> TransctionManager
+	
+	Auto configuration via
+		spring.datasource.*
+		spring.jpa.*
+		
+		
+35. How @Transctional works internally ?
+	=> AOP will create proxy around method
+	=> Intercept the method
+	=> Begin transction
+	=> commit/ roll back
+	
+	
+36. why sometimes @Transctional will not work ?
+	=> internal method call
+	=> private method
+	=> final method
+	=> same class invocations
+	
+	
+37. RunTimeException 			-> Roll back
+	Checked/compile time Exception -> No roll back
+	
+	
+38. What is second level cache ?
+	=> Hibernate cache across the session
+	
+39. How do you version API's ?
+	=> URL versioing
+	=> header versioning
+	=> param versioning
+	
+	
+	
+40. Integration of Microservice to open source software system :
+	common open source software system
+		Messaging		-> kafka, RabbidMQ
+		Cache 			-> Redis, EH cache
+		API gateway 	-> Nginx
+		logging 		-> ELK
+		
+		
+		so, connecting your sprinboot Microservcie to open source platfrom, to send, receive, process, moniter, or stored the data
+		Eg: publish event to Kafka
+			store data in Redis cache
+			
+		=> for Network Management system :
+			your springboot app will communicate with NMS platform to fetch metrics, send alerts, push data, or automate network operations
+			Eg: openNMS
+			
+		
+41. Code Review :
+	=> code quality  (unnecessary loops, multiple database queries, input validation and sensitive data handling)
+	=> security aspects
+	=> Maintainbility
+	=> performce consideration
+	=> Functionality & Business Logic
+	=> code readability and clean code
+	=> Exception handling
+	=> Test coverage
+	
+	=> Reusability and Scalability
+	=> Naming conventions
+	=> code duplication
+	 
+	
+42. Ethernet :
+	it is communication protocal that defines how data transmitted over wired networkd using cable such LAN cable
+	
+	
+43. Swing :
+	swing is a part of java foundation class that privide componets to create platforms independent desktop based apps
+	
+	
+44. what is live lock ?
+	=> live lock is situation where threads are active and running, but no actual progress is made beacsue they keep resposnidng each other.
+		=> Threads are not blocked
+		=> threads are not waiting
+		=> CPU is being used
+		=> but no work is getting completed
+		
+	=> How to prevent :
+		=> add random time for retrying
+		=> limit retry attempt
+		=> better lock strategy
+		=> avoid busy waiting.  wait(), notify()
+		
+45. What is Parrallel streams :
+	=> allow stream operation to run parallel using multiple threads to improve performce for large appln
+	Eg: list.parallelStream().forEach(n-> sout(n))  => Note : order is not guaranteed.
+		=> improve CPU usage								 use forEachOrdered() if order needed
+		=> multiple threads
+		=> faster heavy loads.
+		
+
+45. Diff between :
+
+	DeadLock 							Live Lock
+	thread are blocked					thread are running
+	waiting forever						actively retrying
+	No CPU usage						High CPU usage
+	Resource locked						No Resource lock
+	
+	
+46. Both Comparable and Comparator are used for object sorting in Java.
+	=> Comparable Inteface:
+	
+		=> used to define natural ordering sort
+		=> has only one method -> compareTo(Object o)
+		
+			Eg: class Employee implemets Comarable<Employee>{
+			
+				priavte Integer id;
+				private Sring name;
+				
+				Employee(Integer id, String name){
+					this.id = id;
+					this.name = name;
+				}
+				
+				public int compareTo(Employee e){
+					return this.id = e.id;
+				}
+				}
+				
+	=> Comparator Interface
+		=> Used to define external sorting logic
+		=> create mutliple sorting logics
+		=> have one method -> compare(Object o1, Object o2);
+		
+		Eg: public class NameComparator implemets Comparator<Employee>{
+		
+			public int compare(Employee e1, Employee e2){
+				return e1.name.compareTo(e2.name);
+			}
+		}
+		
+		
+47. FlatMap : examples
+	Eg 1: 
+		List<List<String>> list = Arrays.asList(
+                Arrays.asList("java", "python"),
+                Arrays.asList("Angular", "react"),
+                Arrays.asList("js", "php")
+        );
+
+        list.stream().flatMap(l-> l.stream()).forEach(n-> System.out.println(n));
+		
+	Eg 2 :
+	 List<List<Integer>> numbers = Arrays.asList(
+                Arrays.asList(1, 2, 3),
+                Arrays.asList(3, 4, 5),
+                Arrays.asList(5, 6, 7)
+        );
+
+        List<Integer> num = numbers.stream().flatMap(l-> l.stream()).distinct().collect(Collectors.toList());
+
+        System.out.println(num);
+		
+		
+48. Java 17 feature :
+	=> Sealed class
+	=> Records (FINAL) -> USed to create immutable data class automatically
+		Eg: public Record Employee(int id, String name);
+	=> Text Blocks (FINAL) -> multip line string without \n 
+		Eg: String json = """ 
+				{
+					"name":"Ram"
+				}
+			"""
+		
+	=> Encapsulation -> Improved performance
+	=> Switch Expression
+	
+	
+49. Java 21 features :
+	=> Virtual Threads (FINAL) -> It make highily scalable concurant application
+		Benefits :
+			=> millions of thread
+			=> less memory usage
+			=> ideal of Rest API
+			=> Perfect for micorservcue
+			
+	=> Record Patterns (FINAL) -> Destructure records objects easily
+	
+	=> String Templates 
+		Eg: String name = "Ram";
+			String msge = STR."Hello \{name}"
+	=> Unnamed Classes & Instance Main
+		Eg : void main(){
+				sout("");
+			}
+			
+50. Records :
+	=> A Records is used to create a data carrier class that automatically provides: or creating immutable data objects.
+		=> Constrotor
+		=> Getters
+		=> equals()
+		=> hashCode()
+		=> toString()
+		=> immutable fields
+	
+51. List<String> list = Arrays.asList("apple", "avacado", "banana", "brinjal", "cat");
+        System.out.println(list.stream().collect(Collectors.groupingBy(n-> n.charAt(0))));
+		
+		o/p : {a=[apple, avacado], b=[banana, brinjal], c=[cat]}
+		
+		
+52. String s1 = "ABC";
+    String s2 = "ACD";
+
+    String s3 = s1.concat(s2);
+
+        Set<String> s4 = new HashSet<>();
+
+
+        System.out.println(Arrays.stream(s3.split(""))
+                .collect(Collectors.groupingBy(Function.identity(),Collectors.counting()))
+                .entrySet()
+                .stream().filter(ele-> ele.getValue() > 1)
+                .map(e-> e.getKey())
+                .collect(Collectors.joining()));  // AC
+				
+				
+53. Find indices whose sum equals target.
+
+	Example
+	[2,7,11,15], target=9
+		
+		int arr[] = {2,17,11,7}; // target=9
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = i+1; j < arr.length; j++) {
+                if(arr[i] + arr[j] == 9){
+                    System.out.println(arr[i]  + " " + arr[j]);
+                }
+            }
+        }
+		
+		
+54. count the character frequency and print them in acsending of their values
+
+		Eg:  String str = "banana";
+			 Arrays.stream(str.split(""))
+                .collect(Collectors.groupingBy(Function. identity(), Collectors.counting()))
+                .entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
+                .forEach(n-> System.out.println(n));
+				
+				
+55. print all the subtring of given string
+
+	 String str = "ABC";
+
+        for (int i = 0; i < str.length(); i++) {
+            for (int j = i+1; j <= str.length(); j++) {
+                System.out.println(str.substring(i,j));
+            }
+        }  
+		   o/p  A
+				AB
+				ABC
+				B
+				BC
+				C
+	
+56. You want to fetch 20 records starting from the 5th row and return only first name and last name.
+
+	SELECT first_name, last_name
+	FROM users
+	LIMIT 20 OFFSET 4;
+	
+57. What is Lookups
+	=> Lookup means quickly finding a value or record using a key or reference.
+	
+		eg 1: Programming Example (Java Map Lookup)
+				Map<Integer, String> map = new HashMap<>();
+				map.put(101, "Manju");
+				map.put(102, "Rahul");
+
+				// Lookup
+				System.out.println(map.get(101));
+				
+		eg 2: Database Lookup Example (SQL)
+			SELECT name 
+			FROM employee 
+			WHERE emp_id = 101;
+			
+			👉 emp_id = 101 is the lookup key
+			
+			
+58. How Springboot App works and do thing internally automatically
+	
+		Simulating in plain java as below :
+		
+		🚀 SpringBootSimulator.java
+			
+			import java.util.*;
+
+			class HelloController {
+
+				public String hello() {
+					return "Hello World from Spring Boot Simulation";
+				}
+			}
+
+		public class SpringBootSimulator {
+
+			public static void main(String[] args) {
+
+				System.out.println("Starting Application...");
+
+				// Step 1: Create IOC Container
+				Map<String, Object> container = new HashMap<>();
+
+				// Step 2: Create Bean
+				HelloController controller = new HelloController();
+				container.put("helloController", controller);
+
+				// Step 3: URL Mapping
+				Map<String, String> urlMapping = new HashMap<>();
+				urlMapping.put("/hello", "helloController");
+
+				// Step 4: Simulate Request
+				String requestUrl = "/hello";
+
+				HelloController bean =
+						(HelloController) container.get(urlMapping.get(requestUrl));
+
+				String response = bean.hello();
+
+				System.out.println("Response: " + response);
+		}
+	}
+
+	
+		=> ⭐ Architecture Diagram Explanation (Tell Verbally)
+			
+				Main Class
+					↓
+				ApplicationContext Created
+					↓
+				Component Scan
+					↓
+				Bean Creation
+					↓
+				Dependency Injection
+					↓
+				Embedded Server Startup
+					↓
+				DispatcherServlet Mapping
+					↓
+				Controller Execution
+
+
+59. If multiple interfaces have the same default method and a class implements both, Java will NOT automatically choose one. 
+	
+	=> It causes compile-time error.
+	
+	=> Choose One Interface Explicitly
+		
+		class Test implements A, B {
+			@Override
+			public void show() {
+				A.super.show();   // Calls A's method
+			}
+		}
+		
+60. Pre-Processor and Post-Processor diff
+	=> Pre-Processor : 
+		1. 👉 A Pre-Processor is something that executes BEFORE the main logic/action/request is processed.
+			Examples:
+				Authentication check
+				Request validation
+				Logging request data
+				Adding headers
+				
+	==> Post-Processor : 👉 A Post-Processor runs AFTER the main logic/action/request is completed.
+			Used for:
+				Logging response
+				Modifying response
+				Cleanup tasks
+				Auditing
+
+
+61. ✅ What is @ConfigProperty?
+			
+	==> @ConfigProperty is used to read configuration values from external sources like :
+		application.properties
+		environemnt varibale
+		system properties
+		
+
+62. ✅ What is CompletableFuture?
+	==>  CompletableFuture is java classs used to perform asyncrnous , non blobking, opeartion ans handle result when they become avaibale
+	
+	=>  ✔ Non-blocking
+		✔ Callback based
+		✔ Better performance
+		
+	=> ✅ Important Methods (Interview Must-Know)
+		1. runAsync() → No Return Value
+		2. supplyAsync() → Returns Value
+		3. thenApply() → Transform Result
+		4. thenAccept() → Consume Result
+		5. thenRun() → No Input No Output
+
+
+63. ✅ What is Saga Pattern?
+	==> Saga pattern is used to manage distiurbited transction across the multiple micorsevices by using  a sequential local transction	
+	
+		✅ Flow (Choreography)
+			Order Service
+				↓ (OrderCreated Event)
+			Payment Service
+				↓ (PaymentCompleted Event)
+			Inventory Service
+			
+		❌ Failure Case
+			Inventory Failed
+			  ↓
+			Payment Service → Refund Event
+			  ↓
+			Order Service → Cancel Order
+			
+			
+64. OOPS:
+	==> Encapsulation – Data Hiding & Protection
+		-> Encapsulation means wrapping data (variables) and methods into a single unit (class) 
+			and restricting direct access to the data
+			
+			Eg: Bank Account
+					You cannot directly access balance
+					You must use deposit() / withdraw()
+					
+			✅ Benefits
+				Improves security
+				Controls how data is modified
+				Easier maintenance
+				
+	==> Inheritance – Code Reusability
+		-> Inheritance allows a child class to acquire properties and behavior of a parent class.
+			
+			Eg: Bank Account
+					you have Gold accont class have some intrest calculate method
+					same can used in Slilver account class
+			
+	==> Polymorphism – One Thing, Many Forms
+		-> Same method name but different behavior depending on the object.
+				
+				Types :
+					Compile-time (Method Overloading)
+  					Run-time (Method Overriding)
+					
+			Eg : Payment Method
+					pay() → Card
+					pay() → UPI
+					pay() → Cash
+	
+	==> Abstraction – Hide Implementation Details
+		-> Showing only essential features and hiding internal logic.
+			
+			payment and sendSMS these will just give us methods, 
+			not expose the implementation
+			
+65. 🔹 Why static methods cannot be overridden?
+			Overriding depends on runtime polymorphism, and:
+			Static methods belong to the class
+			They are resolved at compile time, not runtime
+			So dynamic method dispatch does NOT apply to static methods.
+			
+		🔹 What actually happens? → Method Hiding
+			If a child class defines a static method with the same signature as a static method in the parent class, it is called method hiding, not overriding.
+			
+66. 🔹 How ExecutorService Works in Java (Step-by-Step)
+	
+	==> ExecutorService is part of the java.util.concurrent package and is used to manage and execute multiple threads efficiently 
+		without creating threads manually.
+			
+		1️. Problem Without ExecutorService
+			❌ Problems:
+				Too many threads → OutOfMemoryError
+				No control over thread lifecycle
+				Poor performance due to frequent thread creation
+			
+		2️. What ExecutorService Does
+				ExecutorService:
+				Creates a thread pool
+				Accepts tasks (Runnable / Callable)
+				Assigns tasks to available threads
+				Manages queueing, reuse, and shutdown
+		
+		
+67. JOINS in SQL
+
+	=> 1️. INNER JOIN – Matching Records Only
+		=> Returns rows only when there is a match in both tables.
+		
+	=> 2️. LEFT JOIN (LEFT OUTER JOIN)
+		=> Returns all rows from left table + matching rows from right table.
+	
+	=> 3. RIGHT JOIN (RIGHT OUTER JOIN)
+		=> Returns all rows from right table + matching rows from left table.
+		
+	=> 4. FULL JOIN (FULL OUTER JOIN)
+		=> Returns all records from both tables
+		   Non-matching rows contain NULL
+		   
+	=> 5. CROSS JOIN – Cartesian Product
+		=> Returns all possible combinations.
+	
+	=> 6. SELF JOIN in SQL (with Real-Time Examples)
+	
+		=> A SELF JOIN is when a table is joined with itself.
+			-> when table having emp_id,  name, manager_id
+			
+			Eg : SELECT 
+					e.name AS employee,
+					m.name AS manager
+				FROM Employee e
+				LEFT JOIN Employee m
+				ON e.manager_id = m.emp_id;
+
+		
+	🎯 Real-Time Interview Use Cases
+		INNER JOIN → Active users with orders
+		LEFT JOIN → Customers without orders
+		RIGHT JOIN → Products not sold
+		SELF JOIN → Employee-Manager hierarchy
+		FULL JOIN → Data reconciliation
+		
+68. How do you handle configuration changes without redeploying all services?
+
+	=> Centralized Configuration Server (Most Common)
+	
+		How it works
+			Store configs in Git / Vault / S3
+			All services read config from a central config server
+			Config changes do not require redeployment
+		
+	=> Dynamic Refresh (@RefreshScope)
+	
+		Allows beans to reload configuration at runtime.
+			@RefreshScope
+			@Component
+			public class PaymentConfig {
+				@Value("${payment.timeout}")
+				private int timeout;
+			}
+			
+	=> Environment Variables (Container-Friendly)
+			Very common in Docker & Kubernetes.
+	
+	=> Feature Flags / Toggles (Business Config)
+	
+		if(featureFlagService.isEnabled("NEW_PAYMENT_FLOW")) {
+			newFlow();
+			} else {
+				oldFlow();
+		}
+		
+	=> Database-Stored Configuration
+	
+69. How do you trace a single request across multiple microservices?
+
+	=> ✅ Solution: Distributed Tracing
+			Key Idea
+				Generate a unique Trace ID for each request
+				Pass it across all microservices
+				Collect timing & metadata
+				Visualize the complete request flow
+
+70. How do you secure service-to-service communication?
+	=> JWT and OAuth 2.0 (Client Credentials Flow)
+	=> API Gateway as Security Gatekeeper
+	=> Service Mesh (Zero-Trust Model)
+		=> Service mesh automates security without code changes.
+			What it provides
+				Automatic mTLS
+				Identity-based access
+				Traffic policies
+				✔ Strongest security model
+				✔ Transparent to developers
+					
+				
+71. How many String Objects will be created for String s1 = new String("ankit");
+	=> ✅ Answer: 2 String objects are created
+	
+		-> "ankit" ->  This literal is checked in the String Constant Pool.
+					   If "ankit" is not already present, one object is created in the SCP.
+				
+		-> new String("ankit") -> The new keyword always creates a new object in the heap.
+	
+72. 🔹 What is a Page Object ?
+
+	=> A page object is java class that represent one web page (screen) of application
+		
+	=> It contains:
+		Locators (buttons, inputs, links)
+		Page-level actions (click, type, submit)
+		Business methods related to that page
+	
+	=> 🎯 Purpose of Page Objects
+			1️. Separation of Concerns
+				Test classes → test flow & validation
+				Page classes → UI elements & actions
+				
+73. Your Spring Boot app works locally but fails after deployment. What do you check first?
+
+	=> Application Logs (Most Important)
+	=> Environment & Configuration Mismatch
+	=> Port & Server Configuration
+	=> Database Connectivity
+	=> Packaging & Build Issues
+	=> External Dependencies
+	=> Java & Runtime Version Mismatch
+	=> Security & CORS Issues (If UI works locally)
+	=> Enable actuator health
+	
+
+74. | Feature     | HashMap    	| LinkedHashMap        | TreeMap        |
+	| ----------- | ----------  | -----------------    | -------------- |
+	| Ordering    | ❌ No       | ✅ Insertion order   | ✅ Sorted order |
+	| Internal DS | Hash Table  | Hash Table + DLL     | Red-Black Tree |
+	| Performance | ⭐ Fastest  | ⭐⭐ Medium         | ⭐ Slowest      |
+	| Null Key    | ✅ One      | ✅ One              | ❌ Not allowed  |
+	| Null Values | ✅ Allowed  | ✅ Allowed          | ✅ Allowed      |
+	| Thread-safe | ❌ No       | ❌ No               | ❌ No           |
+	
+	=> HashMap fails when order or thread safety is required, 
+	=> LinkedHashMap fails in memory-critical systems, 
+	=> TreeMap fails with null keys, bad comparators, or when high performance is needed.
+	
+	
+	
+75. Behaviour of  HashMap in Multi-threaded env.
+	=> 👉 HashMap is NOT thread-safe.
+			Using it concurrently without synchronization can lead to data corruption, 
+			lost updates, exceptions, and (in older Java) infinite loops.
+			
+	🔴 What goes wrong with HashMap in multi-threading?
+		1. Data Inconsistency (Lost Updates)
+		2. Internal Structure Corruption (Very Dangerous)
+		3. ConcurrentModificationException (Fail-Fast)
+		4. Visibility Issues
+		5. NullPointerException (Rare but Real) => During concurrent resize, a thread may read a partially updated bucket.
+		
+
+76. 🔹 What is Method Hiding in Java?
+
+	=> Method hiding happens when a subclass declares a static method with the same name and parameters 
+		as a static method in the parent class.
+		
+		class Parent {
+			static void show() {
+				System.out.println("Parent show()");
+			}
+		}
+
+		class Child extends Parent {
+			static void show() {
+				System.out.println("Child show()");
+			}
+		}
+	
+	
+77. What is @Lazy?
+
+	=> 🔍 What @Lazy Changes 
+			Bean is NOT created at startup
+			Bean is created only when first requested
+			Improves startup performance
+	
+	
+==============================================================
+
+Round 2:
+1). Angualr and javascript coding questions :	
+
+1. Create a custom validators to check pass strength
+	Eg : this.userGroup = this.fb.group({
+			username  : ['', Validators.required, Validators.pattern("")],
+			password : ['', [this.strongPasswordValidator()]]
+		})
+		
+		 strongPasswordValidator(){
+			return (control: AbstractControl)=> {
+			  const value = control.value;
+			  if(!value){
+				return null;
+			  }
+
+			  const strong = 
+			  /[A_Z]/.test(value) &&
+			  /[a-z]/.test(value) &&
+			  /[0-9]/.test(value) &&
+			  value.length >= 8;
+
+			  return strong;
+
+			};
+		}
+		
+2. How do you add FormControls dynamically?  coding later
+
+3. How to auto populate form data from api
+
+	=> this.form.patchValue(apiResponse) 
+	
+	=> Method			Behavior
+	   setValue			Requires all fields
+	   patchValue		Partial update allowed
+	
+4. How to reset the form but keeping default values ?
+	=> this.form.reset({
+		county : "India";
+	})
+	
+5.	|Operator  | Use Case             |
+	| --------- | ----------------------- |
+	| switchMap | Search box autocomplete |
+	| mergeMap  | Parallel API calls      |
+	| concatMap | Ordered API execution   |
+	
+6. How to cancel prvious HTTP call when typing into input box
+
+	=>  this.searchBox.valueChnages.pipe(
+		debounrcTime(300),
+		switchMap(value => this.api.search(value)),
+		).subscribe();
+		
+7. Handle API error without breaking stream
+
+	=> pipe(
+		catchError(err-> {
+			return of([]);
+		})
+	)
+	
+8. Share API result across the components => get coding the chatGPT
+	shareReply() 
+	
+9. How do you manage shared state withiut NgRx ?
+
+	=> private dataSubject = new BehaviorSubject(null);
+	=> data$ = this.dataSubject.asObservable();
+
+	=> setData(val : any){
+		this.dataSubject.next(val);
+		}
+		
+	| Subject                    | BehaviorSubject     |
+	| -------------------------- | ------------------- |
+	| No initial value           | Needs initial value |
+	| Late subscribers miss data | Gets last value     |
+	
+10. How does NgRX works internally ?
+	=> Component → Action → Reducer → Store → Selector → Component
+
+11. How to create custom directive for allowOnlyNumbner in input
+
+	=> @HostListener('input', ['$event'])
+		onInput(event:any) {
+		  event.target.value =
+			event.target.value.replace(/[^0-9]/g,'');
+		}
+	
+	=> <input type="text" appOnlyNumber placeholder="Enter numbers only">
+	
+12.HighLight element color on Hover
+
+	=> @HostListerner('mouseenetr')
+		onEnter(){
+			this.el.nativeElement.style.background = 'yellow';
+		}
+		
+13. custom pipe to transform date as DD/MM/YYYY
+	=> @Pipe({
+		name : 'customDate'
+	   })
+	    export class customPipe implements PipeTransform{
+			transform(value: any) {
+				const d = new Date();
+				return `${d.getDate}/${d.getMonth}/${d.getFullYear};`
+			}
+		}
+		
+	=> {{ today | customDate }}
+	
+14. Example for @output()
+		
+	=> @Output() messageEvent = new EventEmitter();
+	   sendData(){
+		this.messageEvent.emit("Hello parent!")
+	   }
+	   
+	   <app-child (messageEvent)="receiveMessage($event)"></app-child>
+	   
+	   => in child component
+		receiveMessage(data:String){
+			console.log(data);
+		}
+		
+15. load component dynamically on button click
+
+	=> @ViewChild('container', {read:ViewContaierRef})
+		container! : ViewContaierRef;
+		
+		load(){
+			this.concatiner.createComponent(UserComponent)
+		}
+16. track By examples
+	=> <div *ngfor="let item of items; trackBy:trackId"></div>
+	
+	=> trackId(index:number, item:any){
+			return item.id;
+	   }
+	   
+17. form value changes causing multiple apis call - how to fix
+	
+	=> deBpunceTime
+	=> distnctUntillChange
+	
+18. dashboard hits the same API 5 times > - how to fix
+	=> this.http.get().pipe(
+		shareReplay(1);  
+	)
+	=> shareReplay will caches the last emmision value and prevents the dupliacte HTTP executions
+	
+	
+19. App becomes slow after navigate the multiple pages
+	=> data$ = new Subject();
+	
+		onDestroy(){
+			this.data$.complete();
+		}
+		
+		
+20. UI Not Updating After API Response
+	=> Because of UI doesnt't refresh
+		=> onPush changeDetection + mutated Object
+		
+		Eg: this.user.name = "Roy"  ❌ Wrong
+			this.user = {...this.user, name:'Roy'}; ✅ Correct
+			
+21. API flooding ?
+	=> typing search box send api request for every key press
+	
+		Eg : valueChnages.pipe(
+			debounrcTime(300),
+			distinctUntilChnage(),
+			switchMap(val -> api.search(val))
+		)
+
+22. API Race Condition Bug
+	=> user switch filter faster -> wrong data appears
+		
+	✅ Fix => use switchMap (cancel previous request)
+	
+23. Dynamic Component Memory Leak
+
+	=> container.destroy()
+	
+24. Micro Frontend Angular App Communication
+	=> custom events
+	=> shared Store
+	=> shared service worker
+	
+25. switchMap Output
+	of(1,2,3).pipe(
+		switchMap(val -> val * 10);
+	).subscribe( val -> console.log(val))
+	
+	
+26. dynamic form fields
+	=> this.form.push(
+		new FomrControl('',[]);
+		)
+		
+27. Global Error Handling using HTTp interceptor
+	=> intercept(req,next){
+		return next.handle(req).pipe(
+			catchError(err-> {
+				alert("something went wrong!")
+				return throwErr(err)
+			})
+		)
+	}
+	
+28. how do you expose and consume and communicate Api ?
+	=> Using Rest Controllers we are exposing APIs
+	
+	=> Using RestTemple, webclient, Feign Client we consume API
+	
+	=> communication 2 ways -> sync and async
+	
+29. DIff between RestTemplate and Webclient
+	
+	Rest Template = Request → Thread waits → Response arrives → Continue
+	Web Client = Request → Thread free → Response callback → Process
+
+	
+	
+30. DDL v/s DML real time use case	
+
+	=> DDL (Data Definition Language) is used to define or modify database structure (schema).
+	
+	| Command  | Purpose                             |
+	| -------- | ----------------------------------- |
+	| CREATE   | Create table/database               |
+	| ALTER    | Modify table structure              |
+	| DROP     | Delete table                        |
+	| TRUNCATE | Remove all rows (structure remains) |
+	
+	DML (Data Manipulation Language) is used to manipulate actual table data.
+	
+	| Command | Purpose     |
+	| ------- | ----------- |
+	| INSERT  | Add data    |
+	| UPDATE  | Modify data |
+	| DELETE  | Remove data |
+	| SELECT  | Fetch data  |
+
+
+	
+	
+31. Views, procedures, triigers
+
+	👉 What is a View?
+	=> These are used to fetch the data from table, a vtirual table can be created using sql queries.
+	=> not used to store only fetch
+	
+	👉 What is Stored Procedure?
+	=> A Stored Procedure is a precompiled block of SQL logic stored in database.
+	
+	👉 What is Trigger?
+	=> A Trigger is SQL block of code that automatically excute when an event accurs
+		Events:
+			INSERT
+			UPDATE 
+			DELETE
+			
+
+32. Where does the Kafka stores the data ?
+
+	=> kafka stores the data on the disk(file system) of the Kafka Broker servers.
+	
+	Internally 
+	-> Each Topic -> split into Partition
+	-> Each Partion -> stored as log files on disk
+	
+	=> Kafka is disk-based (not memory based like Redis)
+	
+	
+33. How does Kafka maintain version ?
+
+	=> Kafka does not use the work version -> it uses Offset
+	=> Each message has a unique sequentail offset number
+	Eg:
+		Partition-0
+		--------------
+		Offset 0 → Order Created
+		Offset 1 → Payment Done
+		Offset 2 → Order Shipped
+		
+		=> Kafka knows which message alreay consumed and what is next
+		
+34. How long does kafka keep data ?
+	
+	=> Kafka keeps the data based on Retention policy:
+		2 types 
+			1. Time based retention -> can configured -> eg: log.retention.hours = 168  ->  once 168 hours done -> Old segments are deleted automatically
+			2. size based retention -> can configured -> eg: log.retention.bytes = 10GB ->  If topic exceeds 10GB → old data deleted
+			
+	
+35. Kafka Architecture :
+
+	Producer
+		↓
+	Kafka Broker (Disk Storage)
+		↓
+	Consumer
+
+36. how does kafka handle backup/safety ?
+	=> Replication factor
+		-> replication.factor = 3
+		
+		| Question                | Answer                       |
+		| ----------------------- | ---------------------------- |
+		| Where stored?           | Broker disk (log segments)   |
+		| How version maintained? | Using OFFSET                 |
+		| How long stored?        | Retention policy (time/size) |
+		| Physical location?      | Broker server file system    |
+		| Backup?                 | Replication factor           |
+		
+	=> when you'll get memory execption in kafka ?
+			1. Broker-Side Memory Issues (Most Critical)
+			
+				❌ Huge Message Size -> Producer sends messages larger than broker limits
+				❌ Too Many Partitions -> ~2,000–4,000 partitions per broker (depends on RAM)
+				❌ High Fetch/Produce Throughput -> Large batches + slow disk/network
+				
+			2. Consumer-Side Memory Exceptions
+				-> Too many records loaded into memory at once
+			3. Log Retention & Disk Backpressure
+		
+37. which design pattern you worked on ?
+	🔹 1) Singleton Design Pattern (Most Common)
+		=> In Spring, Beans are Singleton by default.
+		
+				Example:  Spring creates only one object of this class and reuses it.
+				
+					=> Service classes
+					=> Repository classes
+					=> Configuration classes
+					=> Utility classes
+
+	🔹 2) Factory Design Pattern (Very Important)
+		=> Used when object creation logic should be hidden.
+		=> We used Factory pattern to create different service implementations dynamically.
+		
+				Example:
+					In your project:
+						👉 Payment Service
+						👉 Notification Service
+						👉 Report Generator
+						
+	🔹 3) Builder Design Pattern
+			
+		=> Used when object has many fields.
+		
+				Example:
+					DTO / Request Object creation
+					User user = User.builder()
+						.name("Roy")
+						.age(25)
+						.city("Bangalore")
+						.build();
+						
+	🔹 5) Observer Pattern
+		=> Used in:
+			Kafka consumers
+			Event listeners
+			Spring Application Events
+			
+			Example:
+				Producer publishes event
+				Multiple consumers listen to it.
+
+38. what is volatile key word ? can valatile ensure thread safety ?
+
+	==> The valatile keyword ensure visbility of changes to varible across threads.
+	==> Note :  No guarrantee thread safety or atomicity
+		
+		
+39. ✅ What is AWS Lambda ?
+
+	==> AWS lambda is serverless compute service by AWS, that let's you run code without managing servers
+	
+	==> You only:
+	
+			=> Upload your code
+			=> Configure a trigger
+			=> AWS automatically handles scaling, provisioning, patching, and infrastructure
+			
+	==> 🔗 How AWS Lambda Integrates With Other AWS Services
+	
+			==> AWS Lambda is event-driven, meaning it is triggered by other AWS services.
+				 
+				Eg : Client → API Gateway → Lambda → Response
+					 File Upload → S3 Event → Lambda
+				 
+40. ✅ What are Runnable and Callable Interfaces in Java?
+
+	==> 👉 YES — Both Runnable and Callable are Functional Interfaces ✅
+	
+	==> Runnable : void run();
+	
+			📌 Key Points
+				✔ Does NOT return result
+				✔ Cannot throw checked exception
+				✔ Used with Thread class or ExecutorService
+				✔ Old and simple interface
+				
+			Eg : class MyTask implements Runnable {
+					public void run() {
+						System.out.println("Task running...");
+					}
+				}
+
+				public class Main {
+					public static void main(String[] args) {
+						Thread t = new Thread(new MyTask());
+						t.start();
+					}
+					}
+	==> Callable Interface : V call() throws Exception;
+	
+			📌 Key Points
+				✔ Returns a result
+				✔ Can throw checked exception
+				✔ Used with ExecutorService
+				✔ Introduced in Java 5
+				
+				
+41. ✅ What is Intrinsic Lock in Java?
+
+	==> An intrinis lock is the internal moniter lock that every java object has, 
+		which automatically aquired and released when a tread enters and exit syncronized block
+		
+		EG : 🧠 Key Points
+				✔ Every Java object has one intrinsic lock
+				✔ Managed automatically by JVM
+				✔ Used by synchronized
+				✔ Only one thread can hold it at a time
+				✔ Ensures mutual exclusion + visibility
+				
+	==> class Counter {
+	
+			public synchronized void increment() {
+					System.out.println("Thread safe operation");
+				}
+			}
+			
+			When thread enters increment():
+			👉 Acquires intrinsic lock of Counter object (this)
+			👉 Executes method
+			👉 Releases lock after completion
+
+42. ✅ What is Race Condition?
+	==> A race condtion happens when multiple threads compete to update shared data without proper synchronization,
+		causing unpredicatble output
+		
+	==> to avoid this we can synchronized keyword 
+		Eg :
+		public void increment() {
+			synchronized(this) {
+				count++;
+			}
+		}
+		
+43. End-to-end flow of how an Entity class eventually becomes a table in the database (JPA → Hibernate → SQL)
+
+	==> When Spring Boot starts, it scans entity classes and passes metadata to Hibernate through JPA. 
+		Hibernate generates SQL based on entity mappings and ddl-auto configuration, 
+		and executes it via JDBC to create database tables.
+
+	
+44. 🧠 Internal Working for @Repository
+
+	==> It:
+		1️. Creates proxy around class
+		2️. Adds exception translation interceptor
+		3️. Catches DB exceptions
+		4️. Converts to Spring standard exceptions
+		
+		
+45. What happens if both @Service and @Repository are used on the same class
+		
+		@Service
+		@Repository
+		public class UserServiceRepository {
+		}
+
+	==> | Aspect                | Result                         |
+		| --------------------- | ------------------------------ |
+		| Bean Creation         | One bean only                  |
+		| App Crash             | ❌ No                           |
+		| Exception Translation | ✅ Yes (because of @Repository) |
+		| Recommended           | ❌ No                           |
+		
+		
+46. Why ConcurrentHashMap exists and when to use it ?
+	==> ✅ Why ConcurrentHashMap Was Introduced
+
+			To provide:
+			✔ Thread safety
+			✔ High concurrency
+			✔ Better performance
+			✔ Lock-free reads
+			✔ Fine-grained locking
+			
+47. Global exception handler
+
+	@RestControllerAdvice
+	public class GlobalExceptionHandler {
+
+		@ExceptionHandler(Exception.class)
+		public ResponseEntity<String> handleGenericException(Exception ex) {
+
+			return new ResponseEntity<>(
+					"Internal Server Error",
+					HttpStatus.INTERNAL_SERVER_ERROR
+			);
+		}
+	}
+
+
+========================================
+
+	=== Java script ============
+
+1. 	console.log('A');
+	setTimeout(() => console.log('B'), 0);
+	Promise.resolve().then(() => console.log('C'));
+	console.log('D');
+	
+	o/p: A, D, B, C
+	
+2. for(var i=0;i<3;i++){
+		setTimeout(() => console.log(i), 1000);
+	} // 3,3,3,   but If use let it will become local variable 1,2,3
+	
+	
+3. how do you use this inside Object'
+	=> const obj = {
+		name : "manju",
+		getName(){
+		return console.log(this.name);
+	  }
+	}
+	obj.getName();
+	
+	
+4. How to write api without Http
+	Eg: fetch("")
+		.then(
+			res => console.log(res)
+		)
+		.catch(err-> {
+			console.log(err)
+		})
+		
+5. PromiseAll() -> It will take array of promise and return single promise out of it 
+	let p1 = Promise.resolve(10);
+	let p2 = Promise.resolve(12);
+	let p3 = Promise.resolve(15);
+
+	Promise.all([p1,p2,p3]).then(
+	  res => console.log(res) // [10,12,15]
+	).catch(err => {
+	  console.log(err);
+	})
+	
+	if one of the promise faile Eg: let p2 = Promise.reject(12);
+	=> it will go to error section and print only 12
+	
+6. const arr = [1, [2, [3, 4]], 5];
+
+	function flattenArray(array){
+	  let result = []
+	  array.forEach(element => {
+		if(Array.isArray(element)){
+		   result = result.concat(flattenArray(element));
+		}else{
+		  result.push(element)
+		}
+	  });
+	   return result;
+	}
+	console.log(flattenArray(arr)); //[1,2,3,4,5]
+	
+7. remove duplicate key's object in given array
+	=> let arr = [
+		 {id:1,name:'A'},
+		 {id:2,name:'B'},
+		 {id:1,name:'C'}
+		]
+		
+		let newMap = new Map();
+		arr.forEach(item => {
+			if(!newMap.has(item.id)){
+				newMap.set(item.id, Item)
+			}
+		})
+		
+		console.log(Array.from(newMap.values()))
+	 
+	
+
+
+2. Stream API questions
+3. DSA
+
+1. move all zoros at the end and sort remaing elements in ascending order
+
+	=> int[] arr = {22, 12, 45, 0, 0, 60, 0};
+			int j = 0;
+			
+			 for (int i = 0; i < arr.length; i++) {
+				if(arr[i] != 0){
+					int temp = arr[i];
+					arr[i] = arr[j];
+					arr[j] = temp;
+					
+					j++
+					
+				}
+			 }
+			 
+			 Arrays.sort(arr,0,j)
+			 
+			 (or)
+			 
+			int[] arr = {22, 12, 45, 0, 0, 60, 0};
+			int[] newArray = new int[arr.length];
+			int k = 0;
+			for (int i = 0; i < arr.length; i++) {
+				if(arr[i] != 0){
+					newArray[k++] = arr[i];
+				}
+			}
+			Arrays.sort(newArray, 0, k);
+			Arrays.stream(newArray).forEach(n-> System.out.println(n));
+			
+			 
+2. get all the substring in given string
+	  String s1 = "ABC";
+        
+        for (int i = 0; i < s1.length(); i++) {
+            for (int j = i+1; j <= s1.length(); j++) {
+                System.out.println(s1.substring(i,j));
+            }
+        }
+		
+3. get only duplicates in given strings
+
+	  String s1 = "ABC";
+      String s2 = "ADC";
+
+        System.out.println(Arrays.stream(s1.concat(s2).split(""))
+                .collect(Collectors.groupingBy(Function.identity(),Collectors.counting()))
+                .entrySet()
+                .stream()
+				.filter(n-> n.getValue() > 1)
+                .map(n-> n.getKey())
+                .collect(Collectors.joining()));
+				
+4. Find the vowels count
+
+	 String s = "manju";
+              List<Character> list = List.of('a','e','i','o','u');
+
+                int count  = 0;
+                for (int i = 0; i < s.length(); i++) {
+    
+                    char ch = toLowerCase(s.charAt(i));
+                    if(list.contains(ch)){
+                        count ++;
+                    }
+                }
+
+                 System.out.println(count);
+				 
+		(or)
+		
+		String s = "manju";
+        List<Character> vowels = List.of('a','e','i','o','u');
+        List<String> newList = Arrays.stream(s.split(""))
+                .filter(n -> vowels.contains(n.charAt(0))) // n.charAt(0) -> will convert string to char to compare with each vowels
+                .collect(Collectors.toList());
+        System.out.println(newList);
+
+	
+	
+5. frequency of char in given string without streams
+	 String s = "manjunath";
+              Map<Character, Integer> map = new HashMap();
+                for (int i = 0; i < s.length(); i++) {
+                    map.put(s.charAt(i), map.getOrDefault(s.charAt(i),0)+ 1);
+                }
+                System.out.println(map);
+				
+	=> with streams	
+		  System.out.println(Arrays.stream(s.split("")).collect(Collectors.groupingBy(Function.identity(), Collectors.counting())));
+				
+6. remove duplicates from given array
+
+		int[] array = {10,20,30,10,40,50,20};
+        System.out.println(Arrays.stream(array).distinct().boxed().collect(Collectors.toList()));
+		
+7. leap year 
+
+	int year = 2024;
+
+        if( (year % 400 == 0) || (year % 4 == 0 ) && (year % 100 != 0)){
+            System.out.println("leap year");
+        }else{
+            System.out.println("No a leap year");
+        }
+		
+8. count accurance of char in string
+	        String s = "programming";
+			char ch = 'g';
+			int count = 0;
+
+			for(char item : s.toCharArray()){
+			   if(item == ch){
+				   count++;
+			   }
+			}
+			
+			System.out.println(count);
+
+9. sum of givem number
+	  int num = 12345;
+        int sum = 0;
+        while (num!= 0){
+            int digit = num %10;
+            sum = sum + digit;
+            num = num/10;
+        }
+        System.out.println(sum);
+		
+	=> with stream
+	
+		int num = 12345;
+        int sum = Arrays.stream((String.valueOf(num).split(""))).mapToInt(Integer::parseInt).sum();
+        System.out.println(sum);
+	
+10. find the sum of given array or number
+
+	    List<Integer> list = List.of(10,20,40);
+        System.out.println(list.stream().mapToInt(Integer::intValue).sum());
+
+        int arr[] = {10,20,40};
+        System.out.println(Arrays.stream(arr).boxed().mapToInt(Integer::intValue).sum());
+
+        int num = 12345;
+        System.out.println(Arrays.stream(String.valueOf(num).split("")).mapToInt(Integer::parseInt).sum());
+		
+11. sort the number Array method or streams
+
+	    int arr[] = {10,5,20,60,40};
+		Arrays.sort(arr);
+        System.out.println(Arrays.stream(arr).boxed().sorted().collect(Collectors.toList()));
+		
+12. Merge two array using Strams
+
+	 int[] arr1 = {1, 2, 3};
+        int[] arr2 = {4, 5, 6};
+
+        int[] array = IntStream.concat(
+                Arrays.stream(arr1),
+                Arrays.stream(arr2)
+        ).toArray();
+		
+13. find the maximun occuring of char in given string
+	String s = "manjunath";
+    Map<Character, Integer> map = new HashMap<>();
+
+    for (char ch : s.toCharArray()){
+        map.put(ch, map.getOrDefault(ch,0) + 1);
+    }
+
+        System.out.println(map);
+
+
+        char maxChar = ' ';
+        int maxCount = 0;
+
+        for(Map.Entry<Character, Integer> entry : map.entrySet()) {
+
+            if(entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                maxChar = entry.getKey();
+            }
+        }
+
+        System.out.println("Max occurring char: " + maxChar);
+        System.out.println("Count: " + maxCount);
+		
+		
+14.   int arr[] = {2,17,11,7}; // target=9
+
+        for (int i = 0; i < arr.length; i++) {
+
+            for (int j = i+1; j < arr.length; j++) {
+
+                if(arr[i] + arr[j] == 9){
+                    System.out.println(arr[i]  + " " + arr[j]);
+                }
+            }
+
+        }
+
+15. add array element one after other in new array
+
+		int arr1[] = {1,2,3,4,5};
+        int arr2[] = {6,7,8};
+
+        int arr3[] = new int[arr1.length + arr2.length];
+
+        int i = 0, j=0, k=0;
+
+        while (i < arr1.length && j < arr2.length){
+            arr3[k++] = arr1[i++];
+            arr3[k++] = arr2[j++];
+        }
+
+        // Copy remaining elements (if any)
+        while(i < arr1.length){
+            arr3[k++] = arr1[i++];
+        }
+
+        while (j < arr2.length){
+            arr3[k++] = arr2[j++];
+        }
+
+        Arrays.stream(arr3).forEach(n-> System.out.println(n)); //[1, 6, 2, 7, 3, 8, 4, 9, 5]
+		
+		(or)
+		
+		int arr1[] = {1,2,3,4,5};
+        int arr2[] = {6,7,8};
+
+        List<Integer>  list = new ArrayList<>(arr1.length + arr2.length);
+        int i=0, j=0;
+        while (i < arr1.length && j < arr2.length){
+            list.add(arr1[i++]);
+            list.add(arr2[j++]);
+        }
+        list.forEach(n-> System.out.println(n));
+		
+16. Meeting points of elements in given arrays
+
+        int[] arr1 = {1, 2, 13, 4, 5};
+        int[] arr2 = {6, 13, 9};
+
+        List<Integer> list = Arrays.stream(arr1).filter(x -> Arrays.stream(arr2).anyMatch(y -> y == x))
+                .boxed()
+                .collect(Collectors.toList());
+
+        System.out.println(list);
+
+
+        for (int i : arr1){
+            for (int j : arr2){
+                if(i == j){
+                    System.out.println(i);
+                }
+            }
+        }
+	
+17.  String str = "java is my tech";
+     System.out.println(Arrays.stream(str.split(" ")).map(l-> new StringBuffer(l).reverse().toString()).collect(Collectors.joining(" ")));
+	 
+	 (or)
+	 
+	    String str = "java is my tech";
+        String[] list = str.split(" ");
+        String revString = "";
+        for (String li : list){
+            revString = revString + " "+ new StringBuffer(li).reverse().toString();
+        }
+        System.out.println(revString);
+		
+		
+18. count the each word length 
+	
+		String str = "java is my tech";
+        System.out.println(Arrays.stream(str.split(" ")).collect(Collectors.toMap(l-> l, l-> l.length())));
+		
+19. get the max length word in given string
+
+	    String str = "java1 is my tech1";
+        System.out.println(Arrays.stream(str.split(" ")).max(Comparator.comparing(String::length)).get());
+
+20. Finding average salary using Streams
+			double averageSalary =
+				employees.stream()
+						 .mapToDouble(Employee::getSalary)
+						 .average()
+						 .orElse(0.0);
+
+				System.out.println(averageSalary);
+				
+21. Find out all the numbers starting with 1 using stream function
+	
+		 List<Integer> list = List.of(11, 18, 20, 24, 85, 66, 13);
+		 System.out.println(list.stream().filter(l-> String.valueOf(l).startsWith("1")).collect(Collectors.toList()));
+
+22. compare two array order not important
+
+
+		int[] arr1 = {3, 2, 5, 7};
+		int[] arr2 = {2, 3, 5, 7};
+
+		Arrays.sort(arr1);
+		Arrays.sort(arr2);
+
+		boolean isSame = Arrays.equals(arr1, arr2);
+
+		System.out.println(isSame);
+		
+23. Find the special char in given string
+
+		String str = "Java@123#Dev!";
+
+		for (char ch : str.toCharArray()) {
+
+			if (!Character.isLetterOrDigit(ch)) {
+				System.out.print(ch + " ");
+			}
+		} 
+		
+24. Convert 1st half to Lowercase and 2nd half to uppercase
+		 
+		String str = "JaVaProGraM";
+        int mid = str.length()/2;
+        String firstHalf = str.substring(0, mid).toLowerCase();
+        String secondHalf = str.substring(mid, str.length()).toUpperCase();
+        System.out.println(firstHalf + secondHalf);
+
+
+25. Get the highest paid Employee on each dept 
+
+		List<Empolyee> emp = List.of(
+            new Empolyee(20, "abc", 5000,"IT"),
+            new Empolyee(21, "xyz", 6000,"HR"),
+            new Empolyee(22, "pqr", 3000,"HR"),
+            new Empolyee(23, "nmc", 4000,"IT")
+		);
+
+
+        Map<String, Optional<Empolyee>> collect = emp.stream().collect(Collectors.groupingBy(Empolyee::getDept,
+                Collectors.maxBy(Comparator.comparingDouble(Empolyee::getSalary))));
+
+        collect.forEach( (a, b) -> System.out.println(a + " => "  + b.get().getName() ));
+		
+26. Find the words starting with vowels
+		String str = "Urrah! java my code is working!";
+		
+        System.out.println(Arrays.stream(str.split(" "))
+                .filter(w -> "AEIOUaeiou".indexOf(w.charAt(0)) != -1)
+                .collect(Collectors.toList()));
+				
+27.  get the employee details for each dept
+		 List<Empolyee> emp = List.of(
+            new Empolyee(20, "abc", 5000,"IT"),
+            new Empolyee(21, "xyz", 6000,"HR"),
+            new Empolyee(22, "pqr", 3000,"HR"),
+            new Empolyee(23, "nmc", 4000,"IT")
+		);
+
+        Map<String, List<Empolyee>> deptMap = emp.stream().collect(Collectors.groupingBy(Empolyee::getDept));
+
+        deptMap.forEach((dept, empList) -> {
+
+            System.out.println("Department: " + dept);
+
+            empList.forEach(emp1 ->
+                    System.out.println("Name: " + emp1.getName()
+                            + ", Salary: " + emp1.getSalary())
+            );
+
+            System.out.println();
+        });
+		
+28. get the employee who earn above average salary
+
+			double average = emp.stream().mapToDouble(Empolyee::getSalary).average().orElse(0);
+			emp.stream().filter(l-> l.getSalary() > average).forEach(l-> System.out.println(l.getName()));
+
+
+29. If you add a null value to an empty Set, what will be the size?
+
+        Set<Integer> set = new HashSet<>();
+        set.add(null);
+        System.out.println(set.size());	//1  same for List aswell
+
+
+		
+== Introduction ====
+	
+Hi, I’m Roy. I have around 5.5 years of experience as a Full Stack Developer working mainly with Angular and Spring Boot.
+Currently, I’m working on an insurance domain product where I build scalable frontend modules using Angular 
+and Nx UI components and develop backend microservices using Spring Boot, Hibernate, and REST APIs.
+
+My key responsibilities include designing reusable UI components, handling complex reactive forms, responsiveness apps using bootstrap
+integrating APIs, implementing business logic, optimizing performance, and ensuring secure communication between services.
+
+I also have experience with Docker for containerizing applications and basic AWS services like EC2 and S3 for deployment.
+
+(GAF's score => where we call API to get the rsting of vehicle information )
+
+
+	
+	
+	
