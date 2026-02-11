@@ -1732,6 +1732,15 @@ Nokia :
 			ThreadLocal misuse
 			Caches without size limit
 	=> Close Resources Properly
+
+92. What Are Atomic Variables in Java?
+
+	=> They allow thread-safe operations without using synchronized blocks or locks.
+	Eg : AtomicInteger count = new AtomicInteger(0);
+		This operation is:
+			✔ Thread-safe
+			✔ Lock-free
+			✔ Faster than synchronized
 	
 ==============================================================
 
@@ -2340,7 +2349,233 @@ Round 2:
 	
 
 
-2. Stream API questions
+2. Stream API questions :
+
+1. String str = "this is a test. This test is only a test." Output: [test=3, is=3, this=2, a=2, only=1] using java 8 stream api
+
+	=> solution : String str = "this is a test. This test is only a test.";
+			      Map<String, Long> collect = Arrays.stream(str.split(" ")).collect(groupingBy(Function.identity(), counting()));
+
+	
+	
+
+2. String input = "swiss";
+
+	==> solution :
+			String input = "swiss";
+			String s = Arrays.stream(input.split("")).collect(groupingBy(Function.identity(), counting())).entrySet().stream().filter(n -> n.getValue() == 1).map(Map.Entry::getKey).findFirst().orElse("");
+			System.out.println(s);
+
+ 
+3. Collectors.groupingBy() and Collectors.partitioningBy()?
+
+4. String input="a-1,b-2,c-3,a-4,b-5,c-6,a-7";
+ 
+	o/p	a[1, 4, 7]
+		b[2, 5]
+		c[3, 6]
+		
+	=> solution : Map<String, List<Integer>> collect = Arrays.stream(input.split(","))
+                .map(n -> n.split("-"))
+                .collect(groupingBy(key -> key[0], mapping(key -> Integer.parseInt(key[1])
+                        , toList())));
+
+        System.out.println(collect);
+		
+ 
+5.Streams question to solve on Arrays.asList("Pen", "Eraser", "Note Book", "Pen", "Pencil", "Stapler", "Note Book", "Pencil"); -- find the string which are repeated multiple times
+
+	        Set<String> repeatedVlaues = new HashSet<String>();
+			List<String> list = items.stream().filter(item -> !repeatedVlaues.add(item)).toList();
+			System.out.println(list);
+
+6. int arr[] = {4,5,6,7,0,1,2} target value =0
+		1. use rotate and Sorting.
+		2. And After only find zero value position.
+		3. What is the pivot value in here.
+		4. find the mid index value.
+		these 4 are related to that program.
+		
+		
+	1. Solution : System.out.println(Arrays.stream(arr).min().orElseThrow());
+	
+	Mid index value:
+	
+		=> Arrays.stream(arr).skip(arr.length/2).findFirst().orElseThrow();
+	
+	
+7. Increase sal by 20% who are in HR dept
+	EMP - EMPID,EMPNAME
+	DEPT - DEPTID,DEPTNAME
+	EMP_DEPT - EMPID,DEPTID
+	EMPSAL - EMPID,SAL
+	
+	=> solution :
+		  List<Employee> list = Arrays.asList(
+                new Employee("abc", 1000, "male", "3"),
+                new Employee("xyz", 3000, "female", "5"),
+                new Employee("pqr", 2000, "male", "4")
+        );
+        System.out.println(list.stream().filter(n-> n.getDept.contains("IT)).map(n -> n.getSalary() * 1.2).collect(Collectors.toList()));
+		
+	
+8. To find dept name which has employee getting highest salary.
+
+		     List<Employee> list = Arrays.asList(
+                new Employee("abc", 1000, "male", "3", "IT"),
+                new Employee("xyz", 3000, "female", "5","HR"),
+                new Employee("pqr", 2000, "male", "4","Dev")
+        );
+
+        System.out.println(list.stream().max(Comparator.comparing(Employee::getSalary)).map(Employee::getDept).orElse(""));
+
+
+9. Java Program to figure out sum of second lowest and second highest number from an Array
+
+	Solution :	List<Integer> numbers = List.of(5, 1, 9, 2, 8, 3);
+        Integer collect = numbers.stream().distinct().sorted().collect(collectingAndThen(toList(), a -> a.get(1) + a.get(a.size() - 2)));
+
+10. I want to filter the employee list based on the dept_name.
+	solution :  List<Employee> collect = list.stream().sorted(Comparator.comparing(Employee::getDept)).collect(toList());
+
+11. In the Java layer, I want to filter the employee list using the Stream API, selecting only those with experience of 3, 5, or 7 years.
+
+	solution :  List<Employee> collect  = list.stream().filter(n-> n.getExp() == "3" || n.getExp() == "5")
+                .collect(Collectors.toList());
+				
+
+12. List<String> list = Arrays.asList("java", "spring", "JavaScript", "core java", "python");
+
+	Solution : List<String> collect = list.stream().filter(n-> n.toLowerCase().contains("java")).collect(Collectors.toList());
+	
+13. nput - [1,3,2,3,4,5,5,1,5,5,6]
+		output - 
+		1-2
+		3-2
+		5-4
+		
+	Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Function.identity(), counting()));
+	
+
+14.. List<Integer> list = Arrays.asList(2,17,5,17,20,2); -> get the lis of duplicate element into new array
+
+	Solution :   Set<Integer> set = new HashSet<>();
+				 List<Integer> collect = list.stream().filter(n -> !set.add(n)).collect(toList());
+				 
+				 
+15. .int[] array = {1, 2, 4, 4, 5, 6, 2, 3, 4, 3, 4, 6}; Find The frequency of each number using stream api
+
+Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Function.identity(), counting()));
+
+
+16. print number 1 - 100 withut for loop
+
+		    static int n = 1;
+			public static void main(String[] args) {
+				printNumbers();
+			}
+
+			public static void printNumbers(){
+
+				if(n > 10){
+					return;
+				}
+				System.out.println(n++);
+				printNumbers();
+			}
+			
+			
+17. find the third highest number in given list
+
+	    List<Integer> list = List.of(1,4,2,6,8,4,8,7,4,9);
+        Integer num = list.stream().distinct().sorted(Comparator.reverseOrder()).skip(2).findFirst().orElse(0);
+        System.out.println(num);
+		
+		
+18. get the 3rd Higest salary in given EMployee Object
+
+       Optional<Integer> first = list.stream().map(Employee::getSalary).distinct().sorted(Comparator.reverseOrder()).skip(2).findFirst();
+       System.out.println(first);
+	   
+19. Remove duplicates Employee based on salary
+	
+	  List<Employee> list = Arrays.asList(
+                new Employee("manju", 5000, "male", "3", "IT"),
+                new Employee("Teju", 5000, "female", "2", "DEV"),
+                new Employee("Ram", 2000, "male", "7", "QA"),
+                new Employee("Ram", 7000, "male", "7", "QA"),
+                new Employee("Ram", 9000, "male", "7", "QA")
+        );
+
+       list.stream().collect(toMap(Employee::getSalary, e-> e, (e1,e2)-> e1)).values().stream().toList();
+
+20. Find and print duplicate numbers in a list
+
+		  List<Integer> list = List.of(1,4,7,9,3,5,7,2,2);
+		  
+	    List<Integer> collect = list.stream().collect(groupingBy(Function.identity(), counting()))
+                .entrySet().stream().filter(n -> n.getValue() > 1)
+                .map(n -> n.getKey()).collect(toList());
+
+        System.out.println(collect);
+		
+		
+21. Partition numbers into even and odd using streams
+
+	    List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        Map<Boolean, List<Integer>> collect = numbers.stream().collect(partitioningBy(n -> n % 2 == 0));
+        System.out.println(collect.get(false));
+        System.out.println(collect.get(true));
+
+
+
+22. Filter palindrome words from a list using streams
+
+      List<String> words = Arrays.asList("madam", "racecar", "hello", "level", "world", "radar");
+        List<String> collect = words.stream().filter(word -> isPalindromeWord(word)).collect(toList());
+        System.out.println(collect);
+		}
+
+		public static  boolean isPalindromeWord(String word){
+			String reversed = new StringBuffer(word).reverse().toString();
+			return word.equals(reversed);
+		}
+		
+23. Sort employees by name using streams
+
+		  list.stream().sorted(Comparator.comparing(Employee::getName, String.CASE_INSENSITIVE_ORDER)).forEach(n->
+               System.out.println(n.getName()));
+			   
+24. Sort employees by name and salary using streams
+
+	    List<Employee> collect = list.stream().sorted(Comparator.comparing(Employee::getName, String::compareToIgnoreCase).thenComparing(Employee::getSalary)).collect(toList());
+        collect.forEach(n-> System.out.println(n.getName()));
+		
+25. Find the average salary in each department
+
+	    Map<String, Double> collect = list.stream()
+                .collect(groupingBy(Employee::getDept, averagingInt(Employee::getSalary)));
+        System.out.println(collect);
+		
+26. Find highest and lowest paid employee in each department
+
+	min => Map<String, Employee> collect = list.stream().collect(groupingBy(Employee::getDept, collectingAndThen(minBy(Comparator.comparing(Employee::getSalary)), Optional::get)));
+        collect.forEach((n,n1) -> System.out.println(n + " " + n1.getName() ));
+		
+	max =>list.stream().collect(Collectors.groupingBy(Employee::getDept, Collectors.collectingAndThen(Collectors.maxBy(Comparator.comparing(Employee::getSalary)),Optional::get)));
+	
+
+27. Group names by first letter and count them
+
+        Map<Character, Long> result =
+                list.stream()
+                        .collect(Collectors.groupingBy(
+                                obj -> Character.toUpperCase(obj.getName().charAt(0)),
+                                Collectors.counting()
+                        ));
+
+        System.out.println(result);
+
 3. DSA
 
 1. move all zoros at the end and sort remaing elements in ascending order
@@ -2749,4 +2984,5 @@ I also have experience with Docker for containerizing applications and basic AWS
 	
 	
 	
+
 
