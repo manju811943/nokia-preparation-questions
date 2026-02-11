@@ -1512,7 +1512,226 @@ Nokia :
 			Bean is NOT created at startup
 			Bean is created only when first requested
 			Improves startup performance
+
+
+78. why lambda inroduced ?
+
+	=> Lambdas were introduced to reduce boilerplate code, enable functional programming, 
+		support the Streams API, and make Java code more readable, expressive, and 
+		scalable—especially for collections and concurrency.
+		
+	Advanctages :
+	1. Enable Functional Programming in Java
+	2. Better Support for Streams API
+	3. Cleaner Concurrency Code
+	4. Encourage Declarative Programming  : employees.stream()
+											 .filter(e -> e.getAge() > 30)
+											 .toList();
+	5. Reuse via Functional Interfaces
+	6. Improve Readability & Maintainability.
 	
+	
+79. Peek() method in streams
+	=> the peek() in java stream method is mainly used for debugging, logging or monitering elements 
+	   while a stream pipeline is executing, without modifying the streams
+	
+	Eg : Stream<T> peek(Consumer<? super T> action)
+	
+			1. It performs the given action on each element
+			2. Returns the same stream
+			3. It is an intermediate operation
+			4. Executes only when a terminal operation is called
+			
+		Eg:	employees.stream()
+			.peek(e -> System.out.println("Original: " + e))
+			.filter(e -> e.getSalary() > 50000)
+			.peek(e -> System.out.println("After filter: " + e))
+			.map(Employee::getName)
+			.peek(name -> System.out.println("Mapped name: " + name))
+			.toList();
+			
+80. Can Optional be null?
+	=> An Optional reference can be null, but it should never be null in practice. 
+		If it is, the design is wrong and defeats the purpose of using Optional
+		
+
+81. How to Make a Class Serializable ? just make implements your class to Serializable (Marker interface)
+	=> import java.io.Serializable;
+
+		class Employee implements Serializable {
+			int id;
+			String name;
+			double salary;
+		}
+		
+	Eg : 🔹 Serialize (Object → File)
+	
+			ObjectOutputStream oos =
+				new ObjectOutputStream(new FileOutputStream("emp.ser"));
+			oos.writeObject(emp);
+			oos.close();
+			
+		🔹 Deserialize (File → Object)
+		
+		ObjectInputStream ois =
+			new ObjectInputStream(new FileInputStream("emp.ser"));
+		Employee emp = (Employee) ois.readObject();
+		ois.close();
+		
+		👉 JVM checks this marker to decide behavior.
+		
+82. Why default methods were introduced ? how multiple default method conflicts are resolved ?
+
+	=>  Default methods were introduced to evolve interfaces without breaking existing code and 
+		to support Java 8 features like Streams and Lambdas. Conflicts are resolved by overriding 
+		the method or explicitly calling the desired interface’s default implementation.
+		
+	=> default method not required to override in implemented class 
+	=> static method can not be overridden
+	=> abstract methods in interface are have to implenent in class but not required abstract class
+	
+	
+83. What is Method Hiding in Java?
+
+	=> Method hiding happens when a child class defines a static method with the same 
+	   signature as a static method in the parent class.
+	   
+84. HashMap and ConcurrentHashMap regarding null keys and null values:
+	
+	=> 1️. HashMap
+		✅ Allows one null key
+		✅ Allows multiple null values
+		❌ Not thread-safe
+		
+		Eg : HashMap<String, String> map = new HashMap<>();
+		
+			 map.put(null, "Hello");     // ✅ allowed (only one null key)
+			 map.put("A", null);         // ✅ allowed
+			 map.put("B", null);         // ✅ allowed
+			 
+		=> Why only one null key?
+			Because keys must be unique. Since null == null, only one null key is possible.
+			
+	=> 2️. ConcurrentHashMap
+		❌ Does NOT allow null key
+		❌ Does NOT allow null value
+		✅ Thread-safe
+			 
+		=> ConcurrentHashMap<String, String> map = new ConcurrentHashMap<>();
+		
+			map.put(null, "Hello");   // ❌ Throws NullPointerException
+			map.put("A", null);       // ❌ Throws NullPointerException
+			
+	=> HashMap allows one null key and multiple null values, whereas ConcurrentHashMap does not allow any 
+		null key or null value because it avoids ambiguity during concurrent access.
+		
+
+85. Key difference between get() and load()
+
+	| Method   | Who Calls It?    | Purpose                  |
+	| -------- | ---------------- | ------------------------ |
+	| `get()`  | You              | Retrieve value           |
+	| `load()` | Cache internally | Create value when absent |
+	
+	
+86. Hibernate Cache Types ?
+
+	✅ First-Level Cache (L1) :
+		-> Enabled by default
+		-> Session-level
+		-> Cannot be disabled
+		-> 	Not configurable
+			👉 No tuning required.
+			
+	✅ Second-Level Cache (L2)
+		-> SessionFactory-level
+		-> Shared across sessions
+		-> Optional
+		-> Requires provider (Ehcache, Caffeine, Infinispan, Hazelcast, etc.)
+		    👉 This is what we usually tune.
+
+	=> What Should You Cache?
+
+		-> Not everything should be cached. Cache only:
+
+		✅ Good Candidates (Ideal for Cache)
+
+		✔ Read-mostly data
+		✔ Rarely updated data
+		✔ Small lookup/reference tables
+		✔ Data used frequently
+		✔ Data shared across users
+		
+		
+87. mvn clean install 
+
+	=> 1️. clean
+		-> Deletes the target/ directory.
+		-> Removes previously compiled classes, JARs, and build artifacts.
+		-> Ensures the build starts fresh.
+
+	=> 2️.install
+		-> Runs the full default build lifecycle up to install, which includes:
+		-> validate – checks the project structure
+		-> compile – compiles source code
+		-> test – runs unit tests
+		-> package – creates the JAR/WAR file
+		
+88. How to Improve Code Coverage (Correct Way)
+
+	=> Check the coverage report -> you'll know which whcih line/branch/method covered, which are missing try to coverage
+	=> Write tests for uncovered code 
+	=> Cover edge cases -> null checks, exception handle, catch block, else condition
+	=> Mock external dependencies -> db, API call, External services
+	=> Remove dead code
+	
+89. How do you verify a method is called twice in Mockito?
+	✔ times()
+			@Test
+			void shouldCallMethodTwice() {
+				MyService service = new MyService(dependency);
+
+				service.process();
+				service.process();
+
+				verify(dependency, times(2)).save();
+			}
+			
+	✔ At least twice : verify(mockObject, atLeast(2)).someMethod();
+	✔ At most twice : verify(mockObject, atMost(2)).someMethod();
+	✔ Never called : verify(mockObject, never()).someMethod();
+
+	
+90. How do you verify a method is called twice in Mockito? 
+
+	=> We use PowerMock when normal Mockito cannot mock certain things.
+	
+		1. Static Methods
+			Eg: public class Utils {
+				public static String getValue() {
+					return "real";
+				}
+			}
+			
+			PowerMockito.mockStatic(Utils.class);
+			when(Utils.getValue()).thenReturn("mocked");
+
+		2. Private Methods
+		3. Final Classes / Final Methods (Older Mockito versions)
+		
+		Note : with latest version of Mockito can mock most of mocking in the abive cases
+		
+91. How to Make Sure GC Works Properly
+
+	=> Remove Unused References
+	=> Avoid Memory Leaks
+		Common causes:
+			Static collections holding objects
+			Listeners not removed
+			Unclosed resources
+			ThreadLocal misuse
+			Caches without size limit
+	=> Close Resources Properly
 	
 ==============================================================
 
@@ -2530,3 +2749,4 @@ I also have experience with Docker for containerizing applications and basic AWS
 	
 	
 	
+
