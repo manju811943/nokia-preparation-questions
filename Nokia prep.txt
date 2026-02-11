@@ -478,7 +478,23 @@ CSS:
 	
 35. How to reduce bundle size ?
 	=> lazy load
-	=> tree shake
+	=> tree shake : Tree shaking removes unused imports, functions, services, and modules from the production build.
+
+			Eg : ❌ Bad (may include unused service)
+					@NgModule({
+					  providers: [MyService]
+					})
+					export class AppModule {}
+
+				✅ Best practice (tree-shakeable)
+					@Injectable({
+					  providedIn: 'root'
+					})
+					export class MyService {}
+					✔ If MyService is never used → removed automatically
+
+		=> It works by default in production builds.  => ng build --configuration production
+
 	=> remove unused library
 	=> standalone component
 	=> compression
@@ -519,7 +535,7 @@ CSS:
 
 41. How do you write testable code ?
 	=> avoid tight coupling
-	=> user interfaces
+	=> use interfaces
 	=> use depedency injection
 	
 42. Eg for BehaviouralSubject code
@@ -528,7 +544,7 @@ CSS:
 	val$.subscribe(e-> console.log(e) // 10
 	
 	
-43. API is getting call 3 times when component loads, why ?
+43. API is getting callled 3 times when component loads, why ?
 	=> beacuse multiple subscription are created.
 	
 
@@ -546,14 +562,13 @@ CSS:
 	
 	
 46. How to Prevent XSS (Interview Answer)
+	✔ Escape user input
+	✔ Avoid innerHTML
+	✔ Use Angular built-in sanitization
+	✔ Use Content Security Policy (CSP)
+	✔ Validate input
 
-✔ Escape user input
-✔ Avoid innerHTML
-✔ Use Angular built-in sanitization
-✔ Use Content Security Policy (CSP)
-✔ Validate input
-
-	=> XSS is a client-side attack where malicious scripts are injected into web pages and executed in the user's browser. It can be prevented using input sanitization and Angular’s built-in template escaping.
+	=> XSS (Cross-Site Scripting) is a client-side attack where malicious scripts are injected into web pages and executed in the user's browser. It can be prevented using input sanitization and Angular’s built-in template escaping.
 
 	=> CSRF is an attack where a logged-in user's browser is tricked into sending unauthorized requests to a trusted server. It is prevented using CSRF tokens, SameSite cookies, or by using token-based authentication like JWT instead of cookies.
 	
@@ -2984,6 +2999,7 @@ I also have experience with Docker for containerizing applications and basic AWS
 	
 	
 	
+
 
 
 
