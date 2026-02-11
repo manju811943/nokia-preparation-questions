@@ -42,11 +42,11 @@ Nokia :
 	block				Yes					yes
 	
 6. what is DockType -> <!DOCTYPE html>
-	=> it tells the broser that load the standards mode(not qruiks mode)
+	=> it tells the browser that load the standards mode(not qruiks mode)
 	
 	
-	CSS:
-	============
+CSS:
+============================================================================
 	
 1. what is box model
 	=> it contains the 
@@ -62,7 +62,7 @@ Nokia :
 	
 	
 4. what is flex box and when to use it ?
-	=> these are used for 1D layouts (	eith row or column)
+	=> these are used for 1D layouts (	eithr row or column)
 	=> we can use display : flex	
 				  justify-content : center
 				  aligh-item : center
@@ -119,7 +119,7 @@ Nokia :
 	=> avoid 
 	
 13. what is Reflow : layout change eg: width, height
-			RePaint: visual change eg: color, backGroudn color
+			RePaint: visual change eg: color, back-ground color
 			
 
 14. How center a div
@@ -287,7 +287,7 @@ Nokia :
 		@Component, @Injecatble, @ngModule, @Input, @Output, @viewChild
 		
 4. what are data binding
-	interpolation
+	string interpolation
 	property bidning
 	event binding
 	two way binding
@@ -307,8 +307,8 @@ Nokia :
 	performce 				slower						faster
 	used in 				normal apps					larger scale apps
 
-7. how manually trigger change detection
 
+7. how manually trigger change detection
 	changedetecionRef.detectChanges()
 	markForCheck()
 	
@@ -2984,5 +2984,6 @@ I also have experience with Docker for containerizing applications and basic AWS
 	
 	
 	
+
 
 
