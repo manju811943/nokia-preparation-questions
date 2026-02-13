@@ -1756,7 +1756,225 @@ CSS:
 			✔ Thread-safe
 			✔ Lock-free
 			✔ Faster than synchronized
+
+93. Different OOME messages point to different root causes.
+
+| Error Message                        | Meaning                    |
+| ------------------------------------ | -------------------------- |
+| `Java heap space`                    | Heap memory exhausted      |
+| `GC overhead limit exceeded`         | Too much time spent in GC  |
+| `Metaspace`                          | Class metadata memory full |
+| `Unable to create new native thread` | OS thread limit reached    |
+| `Direct buffer memory`               | NIO direct memory leak     |
+
+	🔟 Quick Checklist
 	
+	✔ Identify OOME type
+	✔ Capture heap dump = enable heap dump and GC logging
+	✔ Analyze dominator tree
+	✔ Fix memory leak = fix code issues like unbounded collections or unclosed resources
+	✔ Tune JVM (last step)
+	✔ Add monitoring = to prevent recurrence.
+
+94.How do you avoid performance issues caused by synchronization?
+
+1️⃣ Understand Why Synchronization Hurts Performance
+Synchronization can cause:
+	Thread contention (threads waiting on locks)
+	Context switching overhead
+	Reduced parallelism
+	Risk of deadlocks
+	=> Goal: Minimize locking, not eliminate thread safety
+
+2️⃣ Reduce Lock Scope (Most Important)
+❌ Bad (large synchronized block):
+		public synchronized void process() {
+	    validate();
+	    calculate();
+	    save();
+		}	
+✅ Good (lock only critical section):
+		public void process() {
+	    validate();
+	    synchronized (this) {
+	        calculate();
+	    }
+	    save();
+		}
+✔ Less time holding lock
+✔ Higher throughput
+
+3️⃣ Prefer Concurrent Collections
+Map<String, Integer> map = new ConcurrentHashMap<>();
+Why it’s faster
+	Lock striping
+	Non-blocking reads
+	Fine-grained locking
+
+4️⃣ Use Atomic Classes Instead of synchronized
+❌ Bad
+	synchronized(this) {
+	    count++;
+	}
+
+✅ Good(lock free, Highly scalable)
+AtomicInteger count = new AtomicInteger();
+count.incrementAndGet();
+
+5️⃣ Use Executor Framework Instead of Manual Synchronization
+✅ Good
+	ExecutorService executor = Executors.newFixedThreadPool(10);
+	executor.submit(() -> process());
+
+		✔ Thread reuse
+		✔ Less contention
+		✔ Controlled concurrency
+6️⃣ Avoid Nested Locks (Deadlock Prevention)
+❌ Bad
+	synchronized(lock1) {
+	    synchronized(lock2) {
+	    }
+	}
+
+✅ Lock ordering or single lock strategy
+✔ Avoid deadlocks
+✔ Predictable performance
+
+95. What are different ways to ensure thread safety in Java?
+	=> Ensuring thread safety in Java means making sure that shared data remains consistent and correct when accessed by multiple threads concurrently
+
+ 1️⃣ Synchronization (synchronized keyword)
+	=> Method-level synchronization
+	=> Block-level synchronization (preferred)
+
+ 2️⃣ Atomic Variables (Lock-Free)
+	AtomicInteger count = new AtomicInteger();
+	count.incrementAndGet();
+
+		✔ Uses CAS (Compare-And-Swap)
+		✔ Very fast for simple operations
+		❌ Not suitable for complex logic
+
+ 3️⃣ Volatile Keyword (Visibility Guarantee)
+	private volatile boolean running = true
+
+		✔ Guarantees visibility across threads
+		❌ Does not ensure atomicity
+		
+		Use when
+		Single variable
+		No compound operations
+
+ 4️⃣ Immutable Objects (Best Practice)
+		public final class User {
+	    private final String name;
+	    private final int age;
+	
+	    public User(String name, int age) {
+	        this.name = name;
+	        this.age = age;
+	    }
+		}
+✔ No synchronization needed
+✔ Naturally thread-safe
+
+ 5️⃣ Thread-Safe Collections 
+	Map<String, String> map = new ConcurrentHashMap<>();
+
+ 6️⃣ Executor Framework (Controlled Concurrency)
+	ExecutorService executor = Executors.newFixedThreadPool(5);
+	executor.submit(() -> process());
+
+	✔ Thread reuse
+	✔ Reduces synchronization errors
+
+96. What is ThreadLocal and where is it used?
+	=> ThreadLocal is a Java utility class that allows you to create thread-confined variables—each thread accessing the variable gets its own independent copy, 		even though the variable is declared as a single static or instance field
+	=> 👉 In simple words:
+		Same variable name, different value per thread.	
+
+	📌 Why do we need ThreadLocal?
+			=> Without ThreadLocal, you would need:
+					synchronized
+					locks
+					complex concurrency handling
+			=> ThreadLocal solves:
+					Race conditions
+					Shared mutable state problems
+					Performance issues from synchronization
+
+97. Why does Hashtable not allow null keys or values?
+
+=> Hashtable does not allow null keys or values to avoid ambiguity during retrieval and to maintain thread safety in a legacy synchronized design.
+	Allowing null would make it impossible to distinguish between:
+		-> a missing key, and
+		-> a key explicitly mapped to null.
+
+	| Feature      | Hashtable             | HashMap              |
+	| ------------ | --------------------  | -------------------- |
+	| Null key     | ❌ Not allowed        | ✔ One allowed       |
+	| Null values  | ❌ Not allowed        | ✔ Multiple allowed  |
+	| Thread-safe  | ✔ Yes (synchronized)  | ❌ No               |
+	| Legacy class | ✔ Yes                 | ❌ No               |
+
+=> Example:
+		Hashtable<String, String> table = new Hashtable<>();
+		table.put("A", null); // NullPointerException
+		
+		HashMap<String, String> map = new HashMap<>();
+		map.put("A", null); // Works
+
+=> Modern Replacement Recommendation
+
+		❌ Avoid using Hashtable today
+		✅ Use:
+			ConcurrentHashMap → thread-safe + high performance
+			Collections.synchronizedMap(new HashMap<>()) → legacy-compatible
+			Map<String, String> map = new ConcurrentHashMap<>();
+
+	Note: ConcurrentHashMap also does not allow nulls — for similar ambiguity reasons.
+
+98. diff between the construcotr and Setter injection :
+=> Eg: Constructor Injection 
+		@Component
+		public class OrderService {
+		
+		private final PaymentService paymentService;
+		
+		public OrderService(PaymentService paymentService) {
+			this.paymentService = paymentService;
+		}
+		}
+
+
+	| Aspect                | Constructor Injection   | Setter Injection      |
+	| --------------------- | ----------------------- | --------------------- |
+	| Injection Time        | At object creation      | After object creation |
+	| Dependency            | Mandatory               | Optional              |
+	| Immutability          | ✔ Supported             | ❌ Not supported       |
+	| Null Safety           | ✔ Guaranteed            | ❌ Risk                |
+	| Testing               | Easy (constructor args) | Slightly harder       |
+	| Circular Dependency   | ❌ Not allowed           | ✔ Possible            |
+	| Recommended by Spring | ✔ Yes                   | ❌ Less preferred      |
+
+99. How do you find the longest substring without repeating characters in Java?
+	=> 
+		String s = "ababcbb";
+
+		        Map<Character, Integer> map = new HashMap<>();
+		        int left = 0, max = 0;
+		        for (int i = 0; i < s.length(); i++) {
+		            char c = s.charAt(i);
+		            if (map.containsKey(c)) {
+		                left = Math.max(left, map.get(c) + 1);
+		            }
+		
+		            map.put(c, i);
+		            max = Math.max(max, i - left + 1);
+		        }
+		        System.out.println(max); //3
+		        }
+
 ==============================================================
 
 Round 2:
@@ -2999,6 +3217,7 @@ I also have experience with Docker for containerizing applications and basic AWS
 	
 	
 	
+
 
 
 
