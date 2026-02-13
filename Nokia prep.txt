@@ -2179,6 +2179,89 @@ count.incrementAndGet();
 	| `Callable` | ✔ Yes        | ✔ Yes             	| Tasks that return results |
 
 
+113. How do you debug a production issue?
+
+👉 1st thing I will undertsand the issue from which layer ? 
+		App?
+		DB?
+		Network?
+		External dependency?
+
+1️⃣ First: Stabilize the System (Before Debugging)
+	Goal: Stop the blast radius.
+		✔ Check severity (P0 / P1 / P2)
+		✔ Reduce traffic if needed (rate limiting / feature flag off)
+		✔ Roll back if a safe version exists
+		✔ Communicate status (incident channel)
+	Rule: Stability first, investigation second
+
+2️⃣ Understand the Symptoms (Not the Assumptions)
+	Ask:
+		What is failing? (API, UI, batch job)
+	Since when?
+		Is it intermittent or constant?
+		Which users / regions / tenants?
+		Any recent deployments or config changes?
+	📌 Never assume the root cause early
+
+3️⃣ Check Observability Signals (Most Important)
+	🔍 Logs
+			Error stack traces
+			Correlation / request IDs
+			Time patterns
+	📊 Metrics
+			CPU, memory, GC
+			DB connections
+			Thread pool usage
+			Latency, error rate
+=> Preferred order
+	Configuration change
+	Feature flag off
+	Rollback
+	Hotfix (only if unavoidable)
+	❌ Avoid risky refactors during incidents
+
+=> Post-Incident Actions (Interview Gold)
+	✔ Root Cause Analysis (RCA)
+	✔ Add missing logs/metrics
+	✔ Add alerts
+	✔ Write regression tests
+	✔ Improve runbooks
+
+114. How do you improve performance of existing code?
+	1️⃣ Measure First (Never Guess)
+		Rule: If you can’t measure it, you can’t improve it.
+	=> What to check
+			Response time (p95 / p99)
+			Throughput (RPS)
+			CPU, memory, GC
+			DB latency
+			Thread pool usage
+
+	2️⃣ Find the Real Bottleneck (80/20 Rule)
+			Most performance issues come from:
+				DB queries
+				I/O (network, file)
+				Blocking calls
+				Excessive object creation
+		👉 Optimize the top 20% code paths that consume 80% time.
+
+	3️⃣ Database Optimizations (Biggest Wins)
+			Common fixes
+				✔ Add missing indexes
+				✔ Fix N+1 queries
+				✔ Avoid SELECT *
+				✔ Use pagination
+				✔ Reduce round trips
+
+	4️⃣ Reduce Unnecessary Work
+			Code-level improvements
+				Remove redundant loops
+				Avoid repeated calculations
+				Cache expensive results
+				Replace nested loops with maps/sets
+				Avoid heavy logging in hot paths
+
 ==============================================================
 
 Round 2:
@@ -3013,7 +3096,19 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 
         System.out.println(result);
 
-3. DSA
+28. Fetch employee names based on department
+	     Map<String, List<String>> collect = list.stream()
+                .collect(Collectors.groupingBy(Empolyee::getDept,Collectors.mapping(Empolyee::getName,Collectors.toList())));
+
+        System.out.println(collect); // {Dev=[pqr], HR=[xyz], IT=[abc]}
+
+29. Find employees earning the same salary
+	 Map<Integer, List<Empolyee>> collect = list.stream()
+                .collect(Collectors.groupingBy(Empolyee::getSalary));
+
+    System.out.println(collect); //{2000=[entity.Empolyee@4f023edb, entity.Empolyee@3a71f4dd], 3000=[entity.Empolyee@7adf9f5f], 1000=[entity.Empolyee@85ede7b
+
+3. ================================ DSA =================================================
 
 1. move all zoros at the end and sort remaing elements in ascending order
 
@@ -3421,6 +3516,7 @@ I also have experience with Docker for containerizing applications and basic AWS
 	
 	
 	
+
 
 
 
