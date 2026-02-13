@@ -1975,6 +1975,82 @@ count.incrementAndGet();
 		        System.out.println(max); //3
 		        }
 
+100. Your application throws OutOfMemoryError due to Strings. Why does this happen?
+	🔍 Why do Strings cause OutOfMemoryError?
+
+	1️⃣ Too Many String Objects Created (Most Common)
+		while (true) {
+	    	String s = new String("hello");
+		}
+
+	2️⃣ Excessive String Concatenation (+ in loops)
+		String result = "";
+		for (int i = 0; i < 1_000_000; i++) {
+		    result += i;
+		}
+
+	3️⃣ String Pool Misuse (intern() abuse)
+		for (int i = 0; i < 1_000_000; i++) {
+	   		 String s = new String("user" + i).intern();
+		}
+
+	4️⃣ Reading Large Files / Responses into a String
+		String data = new String(Files.readAllBytes(path));
+
+	🛠 How to Fix String-Related OOME
+		✔ Use StringBuilder / StringBuffer
+		✔ Avoid intern() unless necessary
+		✔ Add eviction (LRU) to caches
+		✔ Stream large data instead of loading fully
+		✔ Remove unused references
+		✔ Tune heap size after fixing leaks
+
+	🎯 Interview-Ready Answer (Perfect)
+		An OutOfMemoryError due to Strings happens when too many String objects are created or retained, often due to excessive concatenation, misuse of String 		intern, storing Strings in long-lived collections, or loading large data into memory. Since Strings are immutable, each modification creates a new 				object, leading to high memory usage and heap exhaustion.
+
+101 : How would you optimize heavy string concatenation inside loops?
+
+	=> Bad : Every time we concat It will create new object in heap
+			String result = "";
+			for (int i = 0; i < 1_000_000; i++) {
+			    result += i;
+			}
+
+	=> Best Solution: Use  StringBuffer (Single Thread : thread safe) / StringBuilder (Multi-threaded:not thread safe) 
+		
+		StringBuffer sb = new StringBuffer(); or StringBuilder sb = new StringBuilder(1_000_000);
+		for (int i = 0; i < 1_000_000; i++) {
+		    sb.append(i);
+		}
+
+102. Sorting millions of objects — Comparable or Comparator? Why?
+
+	| Aspect                  | Comparable            | Comparator         |
+	| ----------------------- | -------------------   | ------------------ |
+	| Where logic lives       | Inside entity         | Outside entity     |
+	| Method                  | `compareTo()`         | `compare()`        |
+	| Flexibility             | ❌ One natural order  | ✔ Multiple orders  |
+	| Performance             | ⚠️ Tightly coupled    | ✔ More optimizable |
+	| Best for large datasets | ❌                    | ✔                  |
+
+103. How do you avoid ConcurrentModificationException?
+
+	To avoid ConcurrentModificationException, I modify collections using the iterator’s remove() method, use removeIf() in Java 8+, or use concurrent collections 	like CopyOnWriteArrayList or ConcurrentHashMap in multi-threaded environments. The key is not to structurally modify a collection directly while iterating 		over it.
+
+104. When would you choose TreeMap over HashMap in real systems ?
+
+	👉 Choose TreeMap when you need sorted, ordered, or range-based access to keys.
+		Use HashMap when you only need fast lookups with no ordering guarantees.
+
+105. | Map Type                | Thread-Safe?     |
+	 | ----------------------- | --------------   |
+	 | `HashMap`               | ❌ No           |
+	 | `TreeMap`               | ❌ No           |
+	 | `Hashtable`             | ✔ Yes (legacy)  |
+	 | `ConcurrentHashMap`     | ✔ Yes           |
+	 | `ConcurrentSkipListMap` | ✔ Yes (sorted)  |
+
+
 ==============================================================
 
 Round 2:
@@ -3217,6 +3293,7 @@ I also have experience with Docker for containerizing applications and basic AWS
 	
 	
 	
+
 
 
 
