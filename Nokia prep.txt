@@ -1,6 +1,4 @@
 
-
-
 Nokia :
  
  HTML :
@@ -2050,6 +2048,136 @@ count.incrementAndGet();
 	 | `ConcurrentHashMap`     | ✔ Yes           |
 	 | `ConcurrentSkipListMap` | ✔ Yes (sorted)  |
 
+106. Session management in Spring Boot
+
+	=> In Spring Boot, session management is used to maintain user state across requests using HttpSession. By default, sessions are stored in server memory and 		tracked via cookies. For scalable systems, Spring Session is used with external stores like Redis. Spring Security also uses sessions to store 					authentication data, while modern microservices often use stateless JWT-based session management.
+
+107. diff between primary and composite key? and how to define ?
+
+	1️⃣ Primary Key
+		🔹 What it is
+			A Primary Key (PK) is a column (or set of columns) that:
+			Uniquely identifies each row in a table
+			Cannot be NULL
+			Is usually single-column
+
+			Eg:	CREATE TABLE employee (
+				  emp_id INT PRIMARY KEY,
+				  name VARCHAR(100),
+				  email VARCHAR(100)
+				);
+
+	2️⃣ Composite Key
+		🔹 What it is
+			A Composite Key is a primary key made up of more than one column.
+				👉 Used when no single column is unique, but combination is unique.
+				🔹 Example
+					(order_id, product_id)
+					(student_id, course_id)
+
+				Eg : CREATE TABLE order_item (
+					  order_id INT,
+					  product_id INT,
+					  quantity INT,
+					  PRIMARY KEY (order_id, product_id)
+					);
+
+	=>  Key Differences (Interview Table)
+			| Aspect         | Primary Key | Composite Key              |
+			| -------------- | ----------- | -------------------------- |
+			| Columns        | Single      | Multiple                   |
+			| Uniqueness     | One column  | Combination                |
+			| Null allowed   | ❌ No        | ❌ No                    |
+			| JPA annotation | `@Id`       | `@EmbeddedId` / `@IdClass` |
+			| Complexity     | Simple      | More complex               |
+
+108. Handling failures & retries without duplication (Idempotency)
+	✅ 1. Idempotency Key (Most Common – REST APIs) -> need to pass idempotent key in header
+		Server logic
+			Check if key exists
+				If exists → return stored response
+				If not → process request & store result
+			Storage options
+				Database
+				Redis (preferred)
+				Cache with TTL
+	
+	✅ 2. Database Constraints (Natural Idempotency)
+			Use unique constraints to prevent duplicates.
+			UNIQUE (order_id, request_id)
+
+	✅	3. Use put instead of Post wherever we can 
+
+	✅ 4. Message-Based Idempotency (Kafka / MQ)
+			In async systems:
+				Message may be delivered more than once
+				Consumer must deduplicate
+					Strategy
+						Store processed messageId
+						Ignore duplicates
+
+	=> Best Practices (Interview Gold)
+		✔ Always use Idempotency-Key for POST APIs
+		✔ Store result, not just the key
+		✔ Use TTL to avoid infinite growth
+		✔ Combine DB constraints + idempotency keys
+		✔ Make consumers idempotent in async systems
+
+🧠 Interview-Ready Answer (Perfect)
+		To handle failures and retries without duplication, we use idempotency. The client sends a unique idempotency key with each request, and the server 			stores and reuses the result for repeated requests instead of reprocessing. This prevents duplicate side effects during retries and is essential in 			payment, order, and distributed systems.
+
+109. Database connection pool suddenly gets exhausted. How do you identify and fix it?
+	=> When a database connection pool gets exhausted, 
+		1. I first confirm it using pool metrics
+		2. Then I check for unclosed connections
+		3. long-running queries
+		4. oversized transaction scopes
+		5. I align thread pools with connection pool size
+		6. enable leak detection, and analyze slow queries or thread dumps.
+
+110. Lazy loading works locally but fails in production. What’s missing?
+	🔴 Open Session In View (OSIV) difference
+			Local environment → OSIV enabled
+			Production → OSIV disabled
+			OSIV keeps the Hibernate session open until the view (response) is rendered.
+	
+	=> Local (default behavior)
+		 spring.jpa.open-in-view=true
+
+	=> Production (best practice)  : generally in production it should disabled, and properly handle the lazy data
+		spring.jpa.open-in-view=false
+			✔ Better performance
+			✔ Cleaner architecture
+			❌ Lazy loading must be handled correctly
+
+	=> Lazy loading requires an active session, which usually means:
+			@Transactional method
+			Or eager fetching
+			Or DTO mapping inside transaction
+
+111. Thread-safe cache – what will you use?
+	=>  Use ConcurrentHashMap for simple in-memory caching, 
+	=>  Caffeine for production-grade, high-performance caching.
+	=>  Redis : Distributed Thread-Safe Cache
+
+112. When would you use Thread vs Runnable vs Callable in real code?
+	1. Thread : Rarely Used in Real Code
+		❌ Why it’s discouraged
+			Tight coupling (task = thread)
+			No return value
+			No checked exception handling
+			Poor scalability
+			Hard to manage lifecycle
+
+	2. Runnable – Most Common (Fire-and-Forget) -> Logging, background cleanup, sending emails
+	3. Callable – When You Need a Result (Most Powerful) -> DB calls, External api calls.
+
+	| Option     | Return Value | Checked Exception 	| Best Use                  |
+	| ---------- | ------------ | ----------------- 	| ------------------------- |
+	| `Thread`   | ❌ No         | ❌ No              | Very rare / demos         |
+	| `Runnable` | ❌ No         | ❌ No              | Fire-and-forget tasks     |
+	| `Callable` | ✔ Yes        | ✔ Yes             	| Tasks that return results |
+
 
 ==============================================================
 
@@ -3293,6 +3421,7 @@ I also have experience with Docker for containerizing applications and basic AWS
 	
 	
 	
+
 
 
 
