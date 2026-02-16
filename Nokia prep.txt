@@ -2524,6 +2524,351 @@ count.incrementAndGet();
 				Registered as a bean
 				Automatically participates in PersistenceExceptionTranslation
 
+
+125.  what are the components of Kafka ?
+	🔹 Core Kafka Components :
+	
+	1. Producer :
+		Publishes (writes) records to Kafka topics
+		Responsible for:
+			Choosing topic & partition
+			Serialization
+			Retries & acknowledgements.
+			
+	2. Consumer :
+		Subscribes to topics and reads records
+			Works in consumer groups
+		Responsible for:
+			Offset management
+			Message processing
+			
+	3. Topic :
+		A logical stream of data
+		Identified by a name
+		Data is written and read only via topics
+		
+	4. Partition :
+			Topics are split into partitions
+		Enables:
+			Parallelism
+			Scalability
+			Each partition is an ordered, immutable log
+			
+	5. Broker
+		Kafka server that:
+			Stores data
+			Serves producers & consumers
+		=> A Kafka cluster has multiple brokers.
+		
+	6. Kafka Cluster :
+		=> A group of brokers working together
+		Provides:
+			Load balancing
+			Fault tolerance
+			High availability
+			
+	7. Offset :
+		A unique sequence number per partition
+		Identifies a consumer’s position in the log
+		
+	8. Consumer Group :
+		=> Logical group of consumers
+		Kafka ensures:
+			One partition → one consumer in a group
+			Enables horizontal scaling
+			
+	9. Replication :
+		Each partition has replicas
+			Leader replica
+			Follower replicas
+		=> Ensures fault tolerance
+		
+	10. Leader & Follower :
+			Leader: Handles all reads/writes
+			Followers: Replicate leader’s data
+	
+		
+126. 🔹 What are equals() and hashCode()?
+
+	=> Both methods come from java.lang.Object and are heavily used by hash-based collections like HashMap, HashSet, Hashtable.
+	
+	| Method       | Purpose                                                         | return type |
+	| ------------ | --------------------------------------------------------------- |	---------- |
+	| `equals()`   | Checks **logical equality** (content comparison)                |	boolean     |
+	| `hashCode()` | Helps Java **quickly locate objects** in hash-based collections |	int         |
+	
+	👉 Rule:
+	If two objects are equal according to equals(), they must have the same hashCode().
+	
+	=> 🔹 How hashCode() works INTERNALLY 🧠
+			When you add an object to a HashMap / HashSet:
+				Java calls hashCode()
+				Hash code is converted into a bucket index
+				Object is stored in that bucket
+			
+	=> 🔹 How equals() works INTERNALLY 🧠
+			Used only when needed:
+				Java first checks hashCode()
+				If hashCodes are different → objects are NOT equal
+				If hashCodes are same → Java calls equals()
+			
+		=> if (obj1.hashCode() == obj2.hashCode()) {
+				obj1.equals(obj2);
+			}
+			
+	🔹 Contract Between equals() and hashCode() 📜
+			Java enforces this contract:
+				1️. If a.equals(b) is true
+				➡️ a.hashCode() == b.hashCode() must be true
+
+				2️. If hashCode() is same
+				➡️ equals() may be true or false
+
+				❌ Breaking this contract causes bugs in HashMap / HashSet
+				
+	==> ✔️ Statement 1 : If equals() returns true, then hashCode() must be the same
+	==> ✔️ Statement 1 : If two objects have the same hashCode, equals() may return true or false
+	
+	
+
+127. 🔹 Runnable vs Callable :
+
+		| Feature      | Runnable | Callable |
+		| ------------ | -------- | -------- |
+		| Return value | ❌ No     | ✅ Yes    |
+		| Exception    | ❌ No     | ✅ Yes    |
+		| Method       | `run()`  | `call()` |
+
+
+128. 🔹 Core Components of ExecutorService 🧠
+		1️. Task :
+			Runnable → no result
+			Callable<V> → returns result & can throw exception
+			
+		2. Thread Pool :
+			A set of reusable worker threads
+			Types:
+				Fixed thread pool
+				Cached thread pool
+				Single thread executor
+				Scheduled executor
+				
+		3. Task Queue :
+				Holds tasks when all threads are busy
+				FIFO by default
+				
+129. what is dead lock and How to AVOID Deadlock ✅ (MOST IMPORTANT)
+
+	=> A deadlock occurs when two or more threads are permanently blocked, each waiting for a resource held by the other
+	
+		👉 None of the threads can proceed
+		👉 Application appears hung forever
+		
+	=> 🔹 How to AVOID Deadlock ✅ (MOST IMPORTANT)
+	
+	1. Use tryLock() (Timeout-based locking) :
+	
+		Lock lock1 = new ReentrantLock();
+		Lock lock2 = new ReentrantLock();
+
+		if (lock1.tryLock()) {
+			try {
+				if (lock2.tryLock()) {
+					try {
+						// work
+					} finally {
+						lock2.unlock();
+					}
+				}
+			} finally {
+				lock1.unlock();
+			}
+		}
+
+	2. Minimize Lock Scope :
+		synchronized(this) {
+			// only critical code
+		}
+	
+	3. Avoid Nested Locks (if possible) :
+		synchronized(a) {
+			synchronized(b) { }
+		}
+
+	4. Use Higher-Level Concurrency APIs :
+		=> ExecutorService
+		=> ConcurrentHashMap
+		=> BlockingQueue
+		
+130. Can we synchronize constructor?
+		=> A constructor’s job is to create and initialize an object.
+		=> During constructor execution:
+				The object is not fully created
+				The monitor lock (this) does not yet exist safely
+				No other thread can access the object until construction finishes
+				
+			=> So synchronization makes no sense here
+			
+		=> but, use a synchronized block inside constructor
+		
+131. 🔥 synchronized vs ReentrantLock :
+
+	🔹 What is synchronized :
+		=> synchronized is a Java keyword that provides implicit locking using the JVM’s intrinsic (monitor) lock.
+		
+		Eg:	synchronized void increment() {
+				count++;
+			}
+			
+		=> Lock is automatically acquired & released
+		=> Simple and safe
+		=> Managed entirely by JVM
+		
+	🔹 What is ReentrantLock :
+		=> ReentrantLock is a class from java.util.concurrent.locks package that provides explicit locking with advanced features.
+		
+		Eg : Lock lock = new ReentrantLock();
+
+			lock.lock();
+			try {
+				count++;
+			} finally {
+				lock.unlock();
+			}
+			
+			=> Locking is manual
+			=> More control
+			=> More powerful
+
+132. CompletableFuture vs @Async ?
+
+	🔹 What is @Async?
+			@Async is a Spring annotation used to run a method asynchronously in a separate thread.
+
+		Eg :	@Async
+				public void sendEmail() {
+					// runs in background thread
+				}
+
+		🔍 How it works internally
+			=> Spring creates a proxy
+			=> Method is submitted to a TaskExecutor
+			=> Caller thread does not wait
+			
+	🔹 What is CompletableFuture?
+			CompletableFuture is a Java 8 concurrency API for asynchronous programming with chaining.
+
+			CompletableFuture
+				.supplyAsync(() -> getUser())
+				.thenApply(user -> user.getEmail())
+				.thenAccept(System.out::println);
+
+			🔍 How it works
+				=> Executes tasks asynchronously
+				=> Supports non-blocking pipelines
+				=> Can combine multiple async tasks
+				
+
+133. PUT vs PATCH :
+
+		| Aspect      | **PUT**                 | **PATCH**                 |  PUT : If a field is missing → it may be deleted or reset
+		| ----------- | ----------------------- | ------------------------- |  PATCH : updates only specified fields
+		| Purpose     | Replace entire resource | Partially update resource |		   Unmentioned fields remain unchanged
+		| Update type | Full update             | Partial update            |
+		| Idempotent  | ✅ Yes                   | ✅ Yes (usually)           |
+		| Payload     | Complete object         | Only changed fields       |
+		| Risk        | Can overwrite fields    | Safer for partial changes |
+						
+		🔹 REST Best Practices (Important)
+
+		| Scenario             | Recommended |
+		| -------------------- | ----------- |
+		| Update full resource | PUT         |
+		| Update single field  | PATCH       |
+		| Toggle status        | PATCH       |
+		| Reset entire object  | PUT         |
+		
+
+134. What is an Indexes ?
+
+		🔹 What is an Index?
+		=> An index is a data structure used by a database to quickly locate rows without scanning the entire table.
+		
+		
+		🔹 Pros of Indexes ✅
+			1. Faster SELECT Queries
+			2. Faster Sorting & Filtering
+			3. Faster JOIN Operations
+			4. Enforces Uniqueness
+			
+		🔹 Cons of Indexes ❌
+			1. Slower INSERT / UPDATE / DELETE : Every data change must update indexes.
+			2. Extra Storage Space :
+				=> Indexes consume disk & memory
+				=> Large tables → large indexes
+			3. Over-Indexing Hurts Performance
+			4. Maintenance Cost
+	
+135. Simplest & Correct Interview Version of Overiding equlas() and hashCode()
+
+	public class Employee{
+		private int id;
+		private String name;
+		
+		@Override
+		public boolean equals(Object obj){
+			if(this == obj){
+				return true;
+			}
+			
+			if(!(Obj isntance Employee)){
+				return false;
+			}
+			
+			Employee e = (Employee) obj;
+			return id == e.id && name.equals(e.name);
+		}
+		
+		@Override
+		public int hashCode(){
+			return id + name.hashCode();
+		}
+		
+	}
+	
+	
+136. SOLID is a set of 5 object-oriented design principles that help you build clean, maintainable, and scalable software:
+
+	1. SRP – Single Responsibility Principle : SRP means one class should handle one responsibility
+	2. OCP – Open–Closed Principle : Classes should be open for extension but closed for modification
+	3. LSP – Liskov Substitution Principle : Objects of a subclass should be replaceable with objects of the superclass.
+	4. ISP – Interface Segregation Principle : Clients should not be forced to implement methods they do not use.
+	5. DIP – Dependency Inversion Principle : High-level modules should not depend on low-level modules. Both should depend on abstractions.
+		
+	
+137. LSP Violation Example (Bird)  :
+
+	❌ Wrong Design
+		class Bird {
+			void fly() { }
+		}
+
+		class Penguin extends Bird {
+			@Override
+			void fly() {
+				throw new UnsupportedOperationException();
+			}
+		}
+
+		Usage :
+			Bird bird = new Penguin();
+			bird.fly(); // 💥 Runtime error
+
+		🚨 Penguin is not substitutable for Bird
+		🚨 Violates LSP
+
+
+
 ==============================================================
 
 Round 2:
@@ -3778,6 +4123,7 @@ I also have experience with Docker for containerizing applications and basic AWS
 	
 	
 	
+
 
 
 
