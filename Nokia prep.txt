@@ -2262,6 +2262,268 @@ count.incrementAndGet();
 				Replace nested loops with maps/sets
 				Avoid heavy logging in hot paths
 
+115. => Spring Framework 7.0.2 — released in December 2025.
+	 => Spring Boot 4.0.2 — released January 22, 2026.
+	 📌 Notes on Versions
+		The 3.5.x series (e.g., 3.5.10 from January 2026) is also available and widely used, but 4.0.2 is the most recent overall.
+		
+116. Spring Framework vs Spring Boot:
+
+🔹 Spring Framework = This is the core framework:
+		=> Dependency Injection (IoC)
+		=> Spring MVC
+		=> WebFlux
+		=> Data access
+		=> Transaction management
+		=> Core infrastructure
+	It is the foundation. 
+	
+
+🔹 Spring Boot :  This is a convention-over-configuration layer built on top of Spring Framework.
+		It provides:
+			=> Auto-configuration
+			=> Embedded servers (Tomcat, Jetty, etc.)
+			=> Starter dependencies
+			=> Production-ready features (Actuator)
+			=> Simplified setup
+			=> Spring Boot uses a specific version of Spring Framework internally.
+			
+🔹 Think of It Like This
+		=> Spring Framework = Engine
+		=> Spring Boot = Car built around that engine
+		
+		=> The engine can be upgraded even if the car model hasn't been refreshed yet.
+		
+117. Why is Java 17 the minimum for Spring Boot 3.x?
+
+	=> Because Spring Boot 3.x aligns with modern Java and Jakarta EE, and Java 17 is the first 
+	   strong Long-Term Support (LTS) release that fully supports those changes.
+	   
+	=> Spring Boot 3.x
+		=> is built on Spring Framework 6.x
+		=> Spring Framework 6 requires Java 17+.
+        => So spring Boot 3 automatically inherits that requirement.  
+		
+	=> Java 17 is the First “Modern Baseline” LTS
+	
+	=> Java 17 Enables Framework Improvements
+			Java 17 gives Spring:
+				✅ Records (for DTOs)
+					=> Cleaner immutable models.
+				✅ Sealed Classes
+					=> Better domain modeling.
+				✅ Pattern Matching
+					=> Cleaner internal framework code.
+				✅ Stronger Encapsulation (JPMS improvements)
+				✅ Performance improvements (JVM + GC)
+				✅ Better Native Image support (GraalVM)
+				
+				Spring Boot 3 also improved:
+					AOT (Ahead-of-Time compilation)
+					Native image support
+					
+118. what is specific challenges you faced with jakartha namespace migration(javax to jakarta ?)
+	=> this is exactly where most real-world pain happened during Spring Boot 2 → 3 upgrades.(The migration from javax.* to jakarta)
+	
+	=> Jakarta used for : It provided standard APIs for:
+			=> Servlets (web)
+			=> JPA (database ORM)
+			=> Bean Validation
+			=> JMS (messaging)
+			=> Transactions
+			=> Dependency Injection
+			
+			some of example for where all we used jakarta
+			1. jakarta.transaction.Transactional
+			2. jakarta.validation.constraints.NotNull  -> @NotNull, constraints (DTO class)
+			3. jakarta.persistence.Entity
+			   jakarta.persistence.Id
+			4. jakarta.servlet.HttpServlet
+	
+	1. Dependency Compatibility Hell (Biggest Problem)
+		eg : Some libraries were still compiled against javax.*.
+			 => javax.persistence.Entity = ClassNotFoundException: javax.persistence.Entity
+			 => if your app uses Spring Boot 3 (jakarta) will not find javax
+				
+				Real Pain:
+					=> Older versions of Hibernate
+					=> Old Spring Cloud releases
+					=> Custom internal shared libraries
+					=> Old Swagger/OpenAPI libraries
+					👉 You had to upgrade everything.
+					
+						
+		
+119. Explain the internal working of the Stream API pipeline. How does Lazy Evaluation work?
+
+	=> 1️. What Is a Stream Pipeline?
+		List<String> names = List.of("John", "Jane", "Adam", "Eve");
+
+		names.stream()
+			 .filter(n -> n.startsWith("J"))
+			 .map(String::toUpperCase)
+			 .forEach(System.out::println);
+			 
+	=> Pipeline has 3 parts:
+			1. Source → names.stream()
+			2. Intermediate operations → filter(), map()
+			3. Terminal operation → forEach()
+			=> Nothing runs until the terminal operation executes.
+	
+	=> Think of it like building a chain:
+			=> Source → FilterStage → MapStage → TerminalStage
+			
+			=> No data flows yet.
+				=> This is why it is called lazy.
+				
+120. findFirst() returns Optional<T> because a stream may be empty, and Java avoids returning null. 
+		For primitive streams, it returns specialized Optional types like OptionalInt.
+		
+121. Genearate 6 digit OTP
+	
+		=> SecureRandom random  = new SecureRandom();
+		int otp = 100000 + random.nextInt(900000);
+		System.out.println(otp)
+		
+121. Coding Challenge: How would you write a Stream to count employees and sort them by salary (descending) and then name (alphabetically)?
+
+	=>  long count = list.stream().count();
+        System.out.println(count);
+        List<Employee> sorted = list.stream().sorted(Comparator.comparing(Employee::getSalary).reversed().thenComparing(Employee::getName)).toList();
+		sorted.forEach(n-> System.out.println(n.getName()));
+		
+122. which design pattern have actually implemeneted in context of microservices ?
+
+		1. API Gateway Pattern
+			💡 Purpose :
+				Provides a single entry point for all clients
+				Handles routing, authentication, load balancing, and protocol translation
+
+	🔹 Implementation :
+			=> Use Spring Cloud Gateway or Netflix Zuul
+
+				Example:
+				Client → API Gateway → Service A
+									 → Service B
+
+				Features: rate limiting, request aggregation, authentication, logging
+				
+		2. Circuit Breaker Pattern :
+			💡 Purpose
+				Prevents cascading failures
+				Fails fast when a downstream service is unavailable
+
+		🔹 Implementation
+			=> Use Resilience4j or Spring Cloud Circuit Breaker
+				Example:
+
+					@CircuitBreaker(name = "employeeService", fallbackMethod = "fallbackEmployees")
+					public List<Employee> getEmployees() {
+						return restTemplate.getForObject("http://employee-service/employees", List.class);
+					}
+
+					public List<Employee> fallbackEmployees(Throwable t) {
+						return List.of(); // return empty list as fallback
+					}
+					
+		3. Service Discovery Pattern :
+				💡 Purpose
+					Services register themselves dynamically
+					Clients discover services without hardcoding URLs
+
+		🔹 Implementation
+			=> Use Eureka, Consul, or Zookeeper
+				Example:
+					Employee Service registers with Eureka
+					Payroll Service queries Eureka to find Employee Service
+	
+		4. Saga Pattern / Distributed Transaction
+				💡 Purpose
+					Ensure data consistency across multiple microservices
+					Avoid distributed 2PC (slow & brittle)
+
+		🔹 Implementation :
+				Orchestration-based Sagas: Spring Boot + Camunda/Zeebe
+				Choreography-based Sagas: Kafka / Event-driven approach
+				
+123. 🔄 Sync vs Async (Synchronous vs Asynchronous) :
+
+	=> In a synchronous call, the client sends a request and waits for the response before continuing.
+			Example:
+			A standard REST API call:
+				Service A → calls Service B
+				Service A waits
+				Service B responds
+				Service A continues
+			Characteristics:
+				Blocking
+				Immediate response required
+				Simple request–response pattern
+				Tight coupling (Service A depends on Service B being available)
+				
+	=> In an asynchronous model, the client sends a message and does not wait for an immediate response.
+			Example:
+			Using a message broker like Apache Kafka or RabbitMQ:
+				Service A publishes a message
+				Service A continues immediately
+				Service B processes the message later
+			Characteristics:
+				Non-blocking
+				Event-driven
+				Loose coupling
+				Better resilience
+				
+	==> when to use Kafka/RabbitMQ(Async) :
+		1. Decoupling services:
+			Services should not fail just because another service is down.
+			Example:
+				Order Service publishes "OrderCreated"
+				Inventory, Email, Billing consume it independently.
+				
+		2.High throughput / scalability
+			Apache Kafka is especially good for:
+				Millions of events
+				Event streaming
+				Real-time analytics
+				Log aggregation
+				
+124. how do differ from @RestController, @Service, @Repository differ in terms of Application context ?
+	=> All three:
+		@RestController
+		@Service
+		@Repository
+			=> Are Spring-managed components.
+			=> they are detected during the component scanning and registred as beans in application context.
+			
+	1. @RestController : @Controller + @ResponseBody
+			📌 Purpose
+					Used in the web layer to handle HTTP requests.
+					
+			📦 What happens in ApplicationContext?
+					Registered as a bean
+					Registered with Spring MVC’s HandlerMapping
+					Methods are mapped to HTTP endpoints
+					Responses are automatically serialized (JSON/XML)
+	2. @Service
+			@Service is a specialization of @Component
+			📌 Purpose
+				Represents business logic layer.
+				
+			📦 What happens in ApplicationContext?
+				Registered as a bean
+				No additional behavior by default
+				Used for semantic clarity
+			
+	3. @Repository
+			Also a specialization of @Component
+			=> But this one has extra behavior.
+
+			📌 Purpose
+				Represents data access layer.
+			📦 What happens in ApplicationContext?
+				Registered as a bean
+				Automatically participates in PersistenceExceptionTranslation
+
 ==============================================================
 
 Round 2:
@@ -3516,6 +3778,7 @@ I also have experience with Docker for containerizing applications and basic AWS
 	
 	
 	
+
 
 
 
