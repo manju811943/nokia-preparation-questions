@@ -4121,8 +4121,13 @@ I also have experience with Docker for containerizing applications and basic AWS
 
 
 	
+Tell me about a challenging issue you faced in a project
+How do you handle production incidents?
+How do you manage tight deadlines?
+How do you handle disagreements with teammates?
+Have you worked with clients directly?
 	
-	
+
 
 
 
