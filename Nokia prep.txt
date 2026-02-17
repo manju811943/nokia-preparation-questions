@@ -3304,6 +3304,32 @@ steams	2. System.out.println(Arrays.stream(arr1)
 				,Optional::get))));
 
 
+151. Find the max and min length of string in given array :
+
+	   List<String> list = Arrays.asList("java", "microserives", "python");
+       System.out.println(list.stream().max(Comparator.comparingInt(String::length)).orElse(""));
+       System.out.println(list.stream().min(Comparator.comparing(String::length)).orElse(""));
+
+
+152. Java Memory Model :
+		Java Memory Model defines the rules by which threads interact through memory, 
+		ensuring visibility, ordering, and atomicity in concurrent Java programs.
+
+153. What is a Thread Dump? How Do You Analyze It? 
+		=> A thread dump is a snapshot of all threads in a Java process at a specific moment.
+		=> It shows what each thread is doing, its state, and locks it holds or is waiting for.
+
+	=> Thread dumps are one of the most powerful production debugging tools for:
+			1. Application hangs
+			2. High CPU usage
+			3. Deadlocks
+			4. Performance bottlenecks
+
+	=> How to Take a Thread Dump
+			-> Using jstack
+				 jstack <pid>
+			-> Kill signal (Linux)
+				 kill -3 <pid>
 
 ==============================================================
 
@@ -4563,6 +4589,7 @@ How do you manage tight deadlines?
 How do you handle disagreements with teammates?
 Have you worked with clients directly?
 	
+
 
 
 
