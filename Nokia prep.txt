@@ -2868,6 +2868,442 @@ count.incrementAndGet();
 		🚨 Violates LSP
 
 
+138. 🧵 Thread Life Cycle in Java :
+
+	=> In Java, a thread goes through several well-defined states during its lifetime. 
+		These states are defined in the Thread.State enum.
+	
+	1. NEW :
+		=> A thread is in the NEW state after it is created but before it is started.
+		=> It has not yet begun execution.
+
+		=> Thread t = new Thread();
+			✔ Thread object created
+			❌ start() not called yet
+		
+	2. RUNNABLE :
+		=> After calling start(), the thread moves to RUNNABLE.
+		=> It is ready to run and waiting for CPU time.
+		=> It may be running or ready to run (Java does not distinguish between ready and running).
+
+		=> t.start();
+			✔ Eligible for execution
+			✔ Controlled by the thread scheduler
+		
+	3. BLOCKED :
+		=> A thread enters BLOCKED state when it is waiting to acquire a monitor lock.
+		=> Happens when trying to enter a synchronized block/method that is already locked by another thread.
+
+			synchronized(obj) {
+			   // critical section
+			}
+
+			✔ Waiting for lock
+			❌ Cannot proceed until lock is available
+			
+			
+	4. WAITING :
+		=> The thread waits indefinitely until another thread performs a specific action.
+		=> Triggered by methods like:
+
+			wait()
+			join()
+			LockSupport.park()
+
+			✔ No CPU usage
+			✔ Waiting for notification
+			
+	5. TIMED_WAITING :
+		=> The thread waits for a specified amount of time.
+
+		=> Triggered by:
+			sleep(1000)
+			wait(1000)
+			join(1000)
+
+			✔ Waiting with timeout
+			✔ Automatically returns after time expires
+			
+	6. TERMINATED
+		=> The thread enters TERMINATED after execution completes.
+		=> It cannot be restarted.
+
+			=> // run() method finishes
+
+			✔ Thread is dead
+			❌ Cannot call start() again
+			
+	🎯 Important Notes :
+		=> A thread can move between RUNNABLE ↔ BLOCKED/WAITING/TIMED_WAITING multiple times.
+		=> Once in TERMINATED, it cannot restart.
+		=> The thread scheduler controls execution order.
+		
+		
+139. 🔥 Difference Between volatile and synchronized in Java ?
+
+	✅  volatile :
+			What it does:
+				=> Ensures visibility of variable changes across threads.
+				=> Prevents instruction reordering.
+				=> Does NOT provide locking.
+				=> Does NOT guarantee atomicity.
+
+			Example:
+				=> volatile boolean flag = false;
+
+				If Thread A changes flag = true,
+				Thread B immediately sees the updated value.
+
+			❌ But This Is Not Safe:
+				volatile int count = 0;
+				count++;   // Not atomic!
+				=> Still causes race conditions.
+				
+	✅ synchronized :
+			What it does:
+			=> Provides mutual exclusion (locking).
+			=> Ensures only one thread executes the block/method at a time.
+			=> Guarantees visibility + atomicity.
+
+			Example:
+				synchronized void increment() {
+					count++;
+				}
+
+				✔ Thread-safe
+				✔ No race condition
+				
+
+140. If I want to write a thread safe code, what all things I should consider ?
+
+	=> Writing thread-safe code is not just about adding synchronized. It’s about designing your code 
+	   so that multiple threads can access shared data safely without causing race conditions, 
+	   visibility issues, or deadlocks.
+	   
+	 ✅ Identify Shared Mutable State (Most Important) :
+			Ask yourself:
+				=> Is this variable accessed by multiple threads?
+				=> Can it change (mutable)?
+				=> Is it read + written by different threads?
+				
+			👉 If yes, it needs protection.
+				eg: int count = 0;   // Shared + Mutable = Risky
+				
+				
+	✅ Prefer Immutability (Best Strategy) :
+			=> Immutable objects are automatically thread-safe.
+
+			Eg:	final class User {
+					private final String name;
+					private final int age;
+
+					public User(String name, int age) {
+						this.name = name;
+						this.age = age;
+					}
+				}
+				
+				✔ No setters
+				✔ All fields final
+				✔ No synchronization needed
+
+			💡 Best practice: Make classes immutable whenever possible.
+			
+			
+	✅ Use Proper Synchronization for Shared Data :
+			=> If multiple operations must happen together, use:
+			✔ synchronized
+					synchronized(this) {
+						count++;
+					}
+
+			✔ Locks
+					Lock lock = new ReentrantLock();
+					lock.lock();
+					try {
+						count++;
+					} finally {
+						lock.unlock();
+					}
+
+			✔ Atomic Classes
+					AtomicInteger count = new AtomicInteger(0);
+					count.incrementAndGet();
+				
+	✅ Use volatile Only for Visibility (Not Locking) :
+			=> Use volatile when:
+				=> Only simple read/write
+				=> No compound operations
+			
+			Good example:
+			eg: volatile boolean shutdown;
+
+			Bad example:
+			eg:	volatile int count;
+				count++;   // Still unsafe
+				
+	✅ Avoid Deadlocks :
+			Deadlock happens when:
+				=> Thread A → holds Lock1 → waiting for Lock2
+				=> Thread B → holds Lock2 → waiting for Lock1
+
+			Prevention:
+				=> Always acquire locks in the same order
+				=> Keep synchronized blocks small
+				=> Avoid nested locks when possible
+				
+	✅ Minimize Scope of Synchronization :
+			Bad:
+			Eg:	public synchronized void method() {
+					// 100 lines of code
+				}
+
+			Better:
+			Eg:	public void method() {
+					// non-critical code
+
+					synchronized(this) {
+						// only critical section
+					}
+				}
+
+			✔ Improves performance
+			✔ Reduces contention
+			
+	✅ Prefer High-Level Concurrency Utilities :
+			Instead of manual threads, use:
+				=> ExecutorService
+				=> ConcurrentHashMap
+				=> BlockingQueue
+				=> AtomicInteger
+				=> CompletableFuture
+			These are safer and more scalable.
+			
+			
+141. visibility vs atomcity vs ordering ?
+
+	🔍 Visibility
+		👉 Meaning:
+			When one thread updates a variable, will other threads see the updated value immediately?
+
+		❌ Without Visibility Guarantee :
+				=> Each thread may cache variables locally.
+					eg:	boolean flag = false;
+
+						Thread A:
+						flag = true;
+
+						Thread B:
+						while (!flag) { }   // may loop forever
+
+
+				=> Thread B may never see the update.
+
+		✅ How to Guarantee Visibility
+				=> volatile
+				=> synchronized
+				=> Lock
+				=> Atomic classes
+
+					eg: volatile boolean flag;
+
+				Now changes become visible to all threads immediately.
+				
+	⚛ Atomicity
+			👉 Meaning:
+					=> An operation happens completely or not at all (indivisible).
+					=> No other thread can see it halfway.
+
+			❌ Not Atomic
+				count++;   // NOT atomic
+
+				This is actually:
+					=> Read
+					=> Increment
+					=> Write
+
+			Two threads can interfere → wrong result.
+
+			✅ Atomic Operations
+
+				=> synchronized
+				=> Lock
+				=> AtomicInteger.incrementAndGet()
+
+				Eg: AtomicInteger count = new AtomicInteger();
+					count.incrementAndGet(); 
+					
+	🔄 Ordering
+		👉 Meaning:
+				=> The execution order of instructions may be rearranged (reordered) by:
+					1. Compiler
+					2. JVM
+					3. CPU
+
+		For performance optimization:
+		
+				=> Example of Reordering
+						int a = 1;
+						int b = 2;
+
+				=> The CPU might execute:
+						b = 2;
+						a = 1;
+
+				=> Single thread → no problem
+				=> Multiple threads → can cause serious bugs
+				
+
+	=> 🧠 Summary Table :
+	
+		| Concept    | What It Solves                  | Example Tool                    |
+		| ---------- | ------------------------------- | ------------------------------- |
+		| Visibility | Other threads see latest value  | `volatile`                      |
+		| Atomicity  | Operation cannot be interrupted | `synchronized`, `AtomicInteger` |
+		| Ordering   | Prevent instruction reordering  | `volatile`, `synchronized`      |
+		
+
+142. 🧵 What is a BlockingQueue in Java?
+
+	=> A BlockingQueue is a thread-safe queue used in producer–consumer scenarios where:
+			🔹 Producers add elements
+			🔹 Consumers remove elements
+			🔹 Threads automatically wait (block) when needed
+		=> It is part of Java’s concurrency utilities (java.util.concurrent).
+
+	✅ Why "Blocking"?
+			Because operations block the thread when:
+				1. Queue is empty → take() waits
+				2. Queue is full → put() waits
+
+			=> So you don’t need to manually use:
+				1. wait()
+				2. notify()
+				3. synchronized
+				
+		Eg: BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(2);
+
+				// Producer
+				new Thread(() -> {
+					try {
+						queue.put(1);
+						queue.put(2);
+						queue.put(3); // waits (queue full) -> Queue size = 2
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}).start();
+
+				// Consumer
+				new Thread(() -> {
+					try {
+						Thread.sleep(2000);
+						System.out.println(queue.take()); // removes 1 
+					} catch (Exception e) {}
+				}).start();
+
+
+143. ReentrantLock vs readWriteLock ?
+
+	| Feature                  | ReentrantLock   | ReadWriteLock          |
+	| ------------------------ | --------------- | ---------------------- |
+	| Lock type                | Single lock     | Two locks (read/write) |
+	| Multiple readers allowed | ❌ No            | ✅ Yes                |
+	| Multiple writers allowed | ❌ No            | ❌ No                 |
+	| Best for                 | General locking | Read-heavy systems     |
+	| Complexity               | Simple          | Slightly complex       |
+	
+
+144. If I want to call third party API, what things I should consider
+
+		=>  When calling a third-party API, I consider timeout configuration, error handling, 
+			retries with backoff, circuit breaker, rate limiting, security (authentication), 
+			proper logging/monitoring, and validation of responses to prevent cascading failures.
+			
+			
+145.  We have a list of integers. Find out all the numbers starting with 1 using stream function
+	
+		Eg: List<Integer> numbers = Arrays.asList(10, 123, 415, 1567, 89, 1002, 91);
+
+        1. List<Integer> collect = numbers.stream().filter(n -> String.valueOf(n).startsWith("1")).collect(toList());
+           System.out.println(collect);    
+		
+        2. System.out.println(numbers.stream().filter(n -> String.valueOf(n).contains("1")).collect(toList()));
+		
+
+146. 🎯 Calculate Average Salary by Gender :
+		
+		System.out.println(list.stream().collect(Collectors.groupingBy(Employee::getGender,
+                Collectors.averagingDouble(Employee::getSalary)
+                )));
+				
+
+147. Write a java program to find sum of even numbers and sum of odd numbers in a given list using java 8 streams.
+		
+		List<Integer> numbers = Arrays.asList(10, 123, 45, 1567, 89, 1002, 9);
+
+        Map<Boolean, List<Integer>> collect = numbers.stream().collect(partitioningBy(n -> n % 2 == 0));
+        System.out.println(collect.get(true));
+
+        System.out.println(numbers.stream().filter(n-> n%2 == 0).reduce(0, (a,b) -> a+b));
+
+        System.out.println(numbers.stream().filter(n-> n%2 == 0).mapToInt(Integer::intValue).sum());
+		
+	
+148. compare the two array and order doesn't matter and handle duplicates
+
+	Eg:	1: 1int[] arr1 = {1, 2, 3, 4};
+			int[] arr2 = {4, 3, 2, 1};
+
+			Arrays.sort(arr1);
+			Arrays.sort(arr2);
+			System.out.println(Arrays.equals(arr1, arr2));
+
+
+	//      If You Don't Want to Modify Original Arrays
+	
+			int[] copy1 = arr1.clone();
+			int[] copy2 = arr2.clone();
+
+			Arrays.sort(copy1);
+			Arrays.sort(copy2);
+			
+steams	2. System.out.println(Arrays.stream(arr1)
+                    .sorted()
+                    .boxed()
+                    .collect(Collectors.toList())
+                        .equals(Arrays.stream(arr2)
+                                .sorted()
+                                .boxed()
+                                .collect(Collectors.toList())));
+								
+		3. ✔ Use Set
+				Set<Integer> set1 = Arrays.stream(arr1).boxed().collect(Collectors.toSet());
+				Set<Integer> set2 = Arrays.stream(arr2).boxed().collect(Collectors.toSet());
+
+				boolean isEqual = set1.equals(set2);
+				
+149.  Remove all the special char in given string
+
+	        String s1 = "abc@#12!bn";
+
+	    Eg:1    for (int i = 0; i < s1.length(); i++) {
+					if(Character.isLetterOrDigit(s1.charAt(i))){
+							System.out.println(s1.charAt(i));
+						}
+				}
+	
+		Eg:2	String s2 = s1.replaceAll("[^a-zA_Z0-9]","");   if '^' remove o/p: @#! 
+				System.out.println(s2); //abc12bn
+				
+150. Java 8 Program to get Highest paid Employee in Each department using stream api ?
+
+		System.out.println(list.stream()
+			.collect(Collectors.groupingBy(Employee::getDept
+				,Collectors.collectingAndThen(Collectors.maxBy(Comparator.comparing(Employee::getSalary))
+				,Optional::get))));
+
+
 
 ==============================================================
 
@@ -4127,6 +4563,7 @@ How do you manage tight deadlines?
 How do you handle disagreements with teammates?
 Have you worked with clients directly?
 	
+
 
 
 
