@@ -4224,6 +4224,54 @@ steams	2. System.out.println(Arrays.stream(arr1)
         String collect = sentaence.stream().flatMap(n -> Arrays.stream(n.split(" "))).collect(joining(" 		"));
     System.out.println(collect);
 
+182. What is CQRS (Command Query Responsibility Segregation) pattern ?
+
+	=> CQRS is a pattern that separates read and write operations into different models to improve scalability, performance, and maintainability 
+	
+	🔹 Key Characteristics
+		1. Separate models :
+				=> Write model → Business logic
+				=> Read model → Optimized for UI
+		2. Scalable :
+				=> Scale read and write independently
+		3. Performance :
+				=> Reads use denormalized tables or views
+		4. Clear responsibility :
+				=> Commands = intent to change
+				=> Queries = data retrieval only
+				
+	🔹 CQRS vs CRUD
+		| CRUD                     | CQRS                         |
+		| ------------------------ | ---------------------------- |
+		| One model for everything | Separate read & write models |
+		| Simpler                  | More complex                 |
+		| Hard to scale reads      | Easy to scale reads          |
+		| Best for small apps      | Best for complex domains     |
+		
+		
+183. If two threads are using shared resources, how do wait() and run() differ?
+
+		=> wait() releases the lock and pauses the thread until notified, 
+		   whereas run() contains the code that a thread executes and does not affect locking or thread state.
+		   
+	🔹 Why wait() Exists (Shared Resource Scenario)  => RUNNABLE --wait()--> WAITING --notify()--> RUNNABLE
+			When two threads share a resource, one thread may need to:
+				Pause until a condition becomes true
+				Allow other thread to modify shared data
+				Avoid busy-waiting
+		=> That’s exactly what wait() does.
+		
+	🔹 What run() Actually Does
+		class MyTask implements Runnable {
+			public void run() {
+				System.out.println("Thread logic here");
+			}
+		}
+
+		=> run() is just a method
+		=> JVM executes run() when you call start()
+		=> Calling run() directly ❌ does NOT create a new thread
+
 ==============================================================
 
 Round 2:
@@ -5482,6 +5530,7 @@ How do you manage tight deadlines?
 How do you handle disagreements with teammates?
 Have you worked with clients directly?
 	
+
 
 
 
