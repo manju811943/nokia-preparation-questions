@@ -34,10 +34,10 @@ Nokia :
 	
 
 5. diff between 
-	property 	 		width/height		New line
-	inline				No					No
-	inline block		yes					No
-	block				Yes					yes
+	property 	 		width/height		New line    tags
+	inline				No					No			span, a, em, strong, img
+	inline block		yes					No			button, select, input
+	block				Yes					yes			div, h1, p, ul
 	
 6. what is DockType -> <!DOCTYPE html>
 	=> it tells the browser that load the standards mode(not qruiks mode)
@@ -223,6 +223,17 @@ CSS:
 	=> cleaner code
 	=> easier error handling
 	=> readable
+
+🔥 Key Differences :
+
+	| Feature        | Promise (.then)        | async/await             |
+	| -------------- | ---------------------- | ----------------------- |
+	| Syntax         | `.then()` & `.catch()` | `async` + `await`       |
+	| Readability    | Can get complex        | Cleaner & easier        |
+	| Error Handling | `.catch()`             | `try/catch`             |
+	| Code Style     | Chain-based            | Looks synchronous       |
+	| Built On       | Native feature         | Built on top of Promise |
+
 	
 12. what is callback hell
 	=> Nested callbacks causing unreadbale code
@@ -400,9 +411,9 @@ CSS:
 	loading component at runtime.
 	
 23. APi is calling multiple times how to fix?
-	=> share reply
+	=> share reply RXjs operator
 	=> cache result in services
-	=> avaoid multiple subscription
+	=> avoid multiple subscription
 	
 	
 24. large table performce issue ?
@@ -706,7 +717,38 @@ CSS:
 	mutable 			No				yes							yes
 	thread safe 		yes 			Yes							No
 	performce			slow  			medium						faster
-	
+
+🔹 Why StringBuffer is Thread-Safe?
+
+	=> StringBuffer methods are synchronized.
+		
+		Example (inside JDK)
+		public synchronized StringBuffer append(String str) {
+		    toStringCache = null;
+		    super.append(str);
+		    return this;
+		}
+		
+		🔑 Key point:
+				synchronized ensures only one thread can modify the object at a time
+				Prevents race conditions
+				Guarantees data consistency
+		So, when multiple threads try to modify the same StringBuffer, access is serialized.
+
+🔹 Why StringBuilder is NOT Thread-Safe?
+
+		=> StringBuilder methods are NOT synchronized.
+		
+		Example
+		public StringBuilder append(String str) {
+		    super.append(str);
+		    return this;
+		}
+		
+		🔑 Key point:
+				Multiple threads can modify it at the same time
+				Leads to data corruption
+				Faster because no locking overhead
 	
 10. why string is immutable ?
 	=> security
@@ -730,7 +772,7 @@ CSS:
 	Hashmap					ConcurantHashMap
 	Not thread safe 		thread safe
 	faster					slight slower	
-	Allowes null key 		No null key
+	Allowes null key 		No null key 
 	
 14. why hashMap allows one null
 	=> beacause hashCode not required for null
@@ -836,7 +878,7 @@ CSS:
 	=> Appilication ready event fired
 	
 	
-32.What is autoconfiguration ?
+32. What is autoconfiguration ?
 	=> Springboot automatically configured beans based on 	
 		=> classpath
 		=> propeties
@@ -844,9 +886,9 @@ CSS:
 		
 		
 33. stereo type annotations
-	@Component	
-	@Service
-	@Repository -> tanslate db execution
+		@Component	
+		@Service
+		@Repository -> tanslate db execution
 	
 	
 34. How SpringBoot interact with JPA interanally ?
@@ -874,8 +916,8 @@ CSS:
 	=> same class invocations
 	
 	
-37. RunTimeException 			-> Roll back
-	Checked/compile time Exception -> No roll back
+37. RunTimeException 					-> Roll back
+	Checked/compile time Exception 		-> No roll back
 	
 	
 38. What is second level cache ?
@@ -914,7 +956,6 @@ CSS:
 	=> code readability and clean code
 	=> Exception handling
 	=> Test coverage
-	
 	=> Reusability and Scalability
 	=> Naming conventions
 	=> code duplication
@@ -929,7 +970,7 @@ CSS:
 	
 	
 44. what is live lock ?
-	=> live lock is situation where threads are active and running, but no actual progress is made beacsue they keep resposnidng each other.
+	=> live lock is situation where threads are active and running, but no actual progress is made beacsue they keep resposnidng each 				other.
 		=> Threads are not blocked
 		=> threads are not waiting
 		=> CPU is being used
@@ -944,7 +985,8 @@ CSS:
 45. What is Parrallel streams :
 	=> allow stream operation to run parallel using multiple threads to improve performce for large appln
 	Eg: list.parallelStream().forEach(n-> sout(n))  => Note : order is not guaranteed.
-		=> improve CPU usage								 use forEachOrdered() if order needed
+		
+		=> improve CPU usage					=> use forEachOrdered() if order needed
 		=> multiple threads
 		=> faster heavy loads.
 		
@@ -1241,13 +1283,13 @@ CSS:
 61. ✅ What is @ConfigProperty?
 			
 	==> @ConfigProperty is used to read configuration values from external sources like :
-		application.properties
-		environemnt varibale
-		system properties
+			application.properties
+			environemnt varibale
+			system properties
 		
 
 62. ✅ What is CompletableFuture?
-	==>  CompletableFuture is java classs used to perform asyncrnous , non blobking, opeartion ans handle result when they become avaibale
+	==>  CompletableFuture is java classs used to perform asyncrnous, non blobking, opeartion and handle result when they become avaibale
 	
 	=>  ✔ Non-blocking
 		✔ Callback based
@@ -1340,10 +1382,10 @@ CSS:
 			
 		2️. What ExecutorService Does
 				ExecutorService:
-				Creates a thread pool
-				Accepts tasks (Runnable / Callable)
-				Assigns tasks to available threads
-				Manages queueing, reuse, and shutdown
+					Creates a thread pool
+					Accepts tasks (Runnable / Callable)
+					Assigns tasks to available threads
+					Manages queueing, reuse, and shutdown
 		
 		
 67. JOINS in SQL
@@ -1488,12 +1530,14 @@ CSS:
 	
 	
 	
-75. Behaviour of  HashMap in Multi-threaded env.
+75. Behaviour of HashMap in Multi-threaded env.
+
 	=> 👉 HashMap is NOT thread-safe.
 			Using it concurrently without synchronization can lead to data corruption, 
 			lost updates, exceptions, and (in older Java) infinite loops.
 			
 	🔴 What goes wrong with HashMap in multi-threading?
+
 		1. Data Inconsistency (Lost Updates)
 		2. Internal Structure Corruption (Very Dangerous)
 		3. ConcurrentModificationException (Fail-Fast)
@@ -1521,10 +1565,10 @@ CSS:
 	
 77. What is @Lazy?
 
-	=> 🔍 What @Lazy Changes 
-			Bean is NOT created at startup
-			Bean is created only when first requested
-			Improves startup performance
+	=> 🔍 What @Lazy Changes  :
+				Bean is NOT created at startup
+				Bean is created only when first requested
+				Improves startup performance
 
 
 78. why lambda inroduced ?
@@ -1599,9 +1643,9 @@ CSS:
 		to support Java 8 features like Streams and Lambdas. Conflicts are resolved by overriding 
 		the method or explicitly calling the desired interface’s default implementation.
 		
-	=> default method not required to override in implemented class 
-	=> static method can not be overridden
-	=> abstract methods in interface are have to implenent in class but not required abstract class
+	✔ Default methods in interfaces are optional to override because they already have an implementation.
+	✔ Static methods in interfaces or classes cannot be overridden; they are hidden.
+	✔ Abstract methods in interfaces must be implemented by concrete classes, but abstract classes are not required to implement them
 	
 	
 83. What is Method Hiding in Java?
@@ -1664,16 +1708,12 @@ CSS:
 		    👉 This is what we usually tune.
 
 	=> What Should You Cache?
-
-		-> Not everything should be cached. Cache only:
-
-		✅ Good Candidates (Ideal for Cache)
-
-		✔ Read-mostly data
-		✔ Rarely updated data
-		✔ Small lookup/reference tables
-		✔ Data used frequently
-		✔ Data shared across users
+		=> Not everything should be cached. Cache only:
+			✔ Read-mostly data
+			✔ Rarely updated data
+			✔ Small lookup/reference tables
+			✔ Data used frequently
+			✔ Data shared across users
 		
 		
 87. mvn clean install 
@@ -1715,10 +1755,8 @@ CSS:
 	✔ Never called : verify(mockObject, never()).someMethod();
 
 	
-90. How do you verify a method is called twice in Mockito? 
-
+90. what is PowerMock and when to use it ? 
 	=> We use PowerMock when normal Mockito cannot mock certain things.
-	
 		1. Static Methods
 			Eg: public class Utils {
 				public static String getValue() {
@@ -1732,10 +1770,9 @@ CSS:
 		2. Private Methods
 		3. Final Classes / Final Methods (Older Mockito versions)
 		
-		Note : with latest version of Mockito can mock most of mocking in the abive cases
+		Note : with latest version of Mockito can mock most of mocking in the above cases
 		
 91. How to Make Sure GC Works Properly
-
 	=> Remove Unused References
 	=> Avoid Memory Leaks
 		Common causes:
@@ -1747,7 +1784,6 @@ CSS:
 	=> Close Resources Properly
 
 92. What Are Atomic Variables in Java?
-
 	=> They allow thread-safe operations without using synchronized blocks or locks.
 	Eg : AtomicInteger count = new AtomicInteger(0);
 		This operation is:
@@ -1787,17 +1823,17 @@ Synchronization can cause:
 2️⃣ Reduce Lock Scope (Most Important)
 ❌ Bad (large synchronized block):
 		public synchronized void process() {
-	    validate();
-	    calculate();
-	    save();
+		    validate();
+		    calculate();
+		    save();
 		}	
 ✅ Good (lock only critical section):
 		public void process() {
-	    validate();
-	    synchronized (this) {
-	        calculate();
-	    }
-	    save();
+		    validate();
+		    synchronized (this) {
+		        calculate();
+		    }
+		    save();
 		}
 ✔ Less time holding lock
 ✔ Higher throughput
@@ -1839,7 +1875,7 @@ count.incrementAndGet();
 ✔ Predictable performance
 
 95. What are different ways to ensure thread safety in Java?
-	=> Ensuring thread safety in Java means making sure that shared data remains consistent and correct when accessed by multiple threads concurrently
+	=> Ensuring thread safety in Java means making sure that shared data remains consistent and correct when accessed by multiple threads 		concurrently
 
  1️⃣ Synchronization (synchronized keyword)
 	=> Method-level synchronization
@@ -1887,7 +1923,7 @@ count.incrementAndGet();
 	✔ Reduces synchronization errors
 
 96. What is ThreadLocal and where is it used?
-	=> ThreadLocal is a Java utility class that allows you to create thread-confined variables—each thread accessing the variable gets its own independent copy, 		even though the variable is declared as a single static or instance field
+	=> ThreadLocal is a Java utility class that allows you to create thread-confined variables—each thread accessing the variable gets its 		own independent copy, even though the variable is declared as a single static or instance field
 	=> 👉 In simple words:
 		Same variable name, different value per thread.	
 
@@ -1903,7 +1939,7 @@ count.incrementAndGet();
 
 97. Why does Hashtable not allow null keys or values?
 
-=> Hashtable does not allow null keys or values to avoid ambiguity during retrieval and to maintain thread safety in a legacy synchronized design.
+=> Hashtable does not allow null keys or values to avoid ambiguity during retrieval and to maintain thread safety in a legacy synchronized 	design.
 	Allowing null would make it impossible to distinguish between:
 		-> a missing key, and
 		-> a key explicitly mapped to null.
@@ -1934,15 +1970,15 @@ count.incrementAndGet();
 
 98. diff between the construcotr and Setter injection :
 => Eg: Constructor Injection 
-		@Component
-		public class OrderService {
-		
-		private final PaymentService paymentService;
-		
-		public OrderService(PaymentService paymentService) {
-			this.paymentService = paymentService;
-		}
-		}
+			@Component
+			public class OrderService {
+			
+			private final PaymentService paymentService;
+			
+			public OrderService(PaymentService paymentService) {
+				this.paymentService = paymentService;
+			}
+			}
 
 
 	| Aspect                | Constructor Injection   | Setter Injection      |
@@ -2004,7 +2040,7 @@ count.incrementAndGet();
 		✔ Tune heap size after fixing leaks
 
 	🎯 Interview-Ready Answer (Perfect)
-		An OutOfMemoryError due to Strings happens when too many String objects are created or retained, often due to excessive concatenation, misuse of String 		intern, storing Strings in long-lived collections, or loading large data into memory. Since Strings are immutable, each modification creates a new 				object, leading to high memory usage and heap exhaustion.
+		An OutOfMemoryError due to Strings happens when too many String objects are created or retained, often due to excessive 				concatenation, misuse of String intern, storing Strings in long-lived collections, or loading large data into memory. Since 			Strings are immutable, each modification creates a new object, leading to high memory usage and heap exhaustion.
 
 101 : How would you optimize heavy string concatenation inside loops?
 
@@ -2050,7 +2086,7 @@ count.incrementAndGet();
 
 106. Session management in Spring Boot
 
-	=> In Spring Boot, session management is used to maintain user state across requests using HttpSession. By default, sessions are stored in server memory and 		tracked via cookies. For scalable systems, Spring Session is used with external stores like Redis. Spring Security also uses sessions to store 					authentication data, while modern microservices often use stateless JWT-based session management.
+	=> In Spring Boot, session management is used to maintain user state across requests using HttpSession. By default, sessions are 			stored in server memory and tracked via cookies. For scalable systems, Spring Session is used with external stores like 				Redis. Spring Security also uses sessions to store authentication data, while modern microservices often use stateless JWT-based 		session management.
 
 107. diff between primary and composite key? and how to define ?
 
@@ -5530,6 +5566,8 @@ How do you manage tight deadlines?
 How do you handle disagreements with teammates?
 Have you worked with clients directly?
 	
+
+example code caching is spring and hibernate ?
 
 
 
