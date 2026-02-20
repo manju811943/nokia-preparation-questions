@@ -4217,6 +4217,13 @@ steams	2. System.out.println(Arrays.stream(arr1)
 
 			Only these classes can implement Payment.
 
+
+181. Jin them together each string in sentece :
+
+	List<String> sentaence = List.of("hello how are you", "I'm Good!");
+        String collect = sentaence.stream().flatMap(n -> Arrays.stream(n.split(" "))).collect(joining(" 		"));
+    System.out.println(collect);
+
 ==============================================================
 
 Round 2:
@@ -5475,6 +5482,7 @@ How do you manage tight deadlines?
 How do you handle disagreements with teammates?
 Have you worked with clients directly?
 	
+
 
 
 
