@@ -4308,6 +4308,180 @@ steams	2. System.out.println(Arrays.stream(arr1)
 		=> JVM executes run() when you call start()
 		=> Calling run() directly ❌ does NOT create a new thread
 
+184. how would you design a spring boot API to handle large file uploads while keeping the system responsive ?
+	1. Enable Streaming (Avoid Loading Entire File in Memory)
+
+	=> Better approach → use InputStream streaming
+
+		@PostMapping("/upload")
+		public ResponseEntity<String> upload(HttpServletRequest request) throws IOException {
+		    InputStream inputStream = request.getInputStream();
+		    Files.copy(inputStream, Paths.get("temp-file.dat"), StandardCopyOption.REPLACE_EXISTING);
+		    return ResponseEntity.accepted().body("File received");
+		}
+		
+		✔ Streams directly to disk
+		✔ No full memory loading
+
+	2. Make Upload Processing Asynchronous
+	=> Don’t process file in the request thread.
+
+			Use:
+			@Async
+				ExecutorService
+				Message Queue (Kafka / RabbitMQ)
+				Background job
+			
+			Example
+			@Async
+			public void processFile(Path filePath) {
+			    // heavy processing
+			}
+
+	3.Use Chunked Upload (Very Important for Large Files) :
+			Instead of uploading 2GB at once:
+			Client uploads file in chunks:
+			
+			POST /upload?chunk=1
+			POST /upload?chunk=2
+			POST /upload?chunk=3
+			
+			Server:
+			Stores chunks temporarily
+			Reconstructs final file
+			Process after all chunks received
+				✔ Prevents timeout
+				✔ Better fault tolerance
+
+	4. Store File in Cloud (Best Practice)
+			Don’t store large files in:
+				❌ Database (bad idea)
+				❌ Local disk in production
+			
+			Use:
+			AWS S3
+			Azure Blob Storage
+			GCP Storage
+			
+			Even better 👇
+			🔥 Direct Upload Strategy (Best Design)
+			Instead of uploading through your backend:
+			Backend generates pre-signed URL
+			Client uploads directly to S3
+
+185. working example of how caching is implemented in Spring Boot, how Spring knows what to cache, and where the cache is store :
+
+	🔹 What is Caching in Spring Boot?
+			Caching means storing API results temporarily so that:
+			Repeated requests return data faster
+			Database calls are reduced
+			System remains responsive under load
+			Spring Boot provides caching via Spring Cache Abstraction.
+
+	1. Enable Caching in Spring Boot :
+		@EnableCaching
+		@SpringBootApplication
+		public class Application {
+		    public static void main(String[] args) {
+		        SpringApplication.run(Application.class, args);
+		    }
+		}
+		
+		👉 This enables Spring’s caching mechanism.
+
+	2. Service Layer (IMPORTANT) :
+			@Service
+			public class EmployeeService {
+			
+			    @Cacheable(value = "employees", key = "#id")
+			    public Employee getEmployeeById(int id) {
+			
+			        System.out.println("Fetching from DB...");
+			        // Simulate DB call
+			        return new Employee(id, "Raj", 50000);
+			    }
+			}
+
+	📌 Flow:
+			1. API called with id=1
+			2. Spring checks cache:
+				❌ Not found → call method → store result
+			3. Next call with id=1
+				✅ Found in cache → return cached value
+				❌ Method NOT executed
+
+	=> Where Is Cache Data Stored?
+		🔹 Default (If You Do Nothing)
+		
+		👉 In-memory cache (ConcurrentHashMap)
+		✔ Stored inside application memory
+		❌ Lost on restart
+		❌ Not suitable for distributed systems
+
+186. What is a Composite Index?
+	=> A composite index (also called a multi-column index) is an index created on two or more columns of a table.
+	=> Instead of indexing a single column, it indexes the combination of columns.
+
+187. What Are Isolation Levels?
+	=> Isolation levels define how and when the changes made by one transaction become visible to other concurrent transactions.
+
+	The 4 SQL Isolation Levels (Low → High) :
+	1.READ UNCOMMITTED (Lowest)
+		👉 A transaction can read uncommitted data from another transaction.
+			❌ Dirty Read
+			❌ Non-repeatable Read
+			❌ Phantom Read
+		📌 Rarely used (unsafe)
+
+	2. READ COMMITTED (Most Common – Default in many DBs)
+		👉 Can read only committed data.
+			✅ Dirty Read prevented
+			❌ Non-repeatable Read
+			❌ Phantom Read
+
+	3.REPEATABLE READ
+		👉 Same row read multiple times gives same value.
+			✅ Dirty Read prevented
+			✅ Non-repeatable Read prevented
+			❌ Phantom Read (mostly*)
+
+	4. SERIALIZABLE (Highest)
+		👉 Transactions behave as if executed one after another.
+			✅ Dirty Read
+			✅ Non-repeatable Read
+			✅ Phantom Read
+
+	🔥 Real-World Example (Bank Account)
+			Scenario:
+			Two users reading & updating same account balance.
+				READ COMMITTED → balance may change between reads
+				REPEATABLE READ → balance remains same
+				SERIALIZABLE → strict locking, safest
+
+188. What is Stateless and Statefull
+	| Feature             | Stateless | Stateful         |
+	| ------------------- | --------- | ---------------- |
+	| Stores client state | ❌ No      | ✅ Yes         |
+	| Server memory usage | Low       | High             |
+	| Scalability         | Easy      | Difficult        |
+	| Failure recovery    | Easy      | Hard             |
+	| Common use          | REST APIs | Traditional apps |
+
+
+189. diff between offset and cursor based pagination
+
+	| Feature         | Offset-Based          | Cursor-Based    |
+	| --------------- | --------------------- | --------------- |
+	| Pagination type | Page number           | Last-seen value |
+	| Performance     | ❌ Slow for large data | ✅ Fast          |
+	| Consistency     | ❌ Can break           | ✅ Stable        |
+	| Jump to page    | ✅ Yes                 | ❌ No            |
+	| Best for        | Small datasets        | Large datasets  |
+	| DB load         | High                  | Low             |
+
+
+	
+	
 ==============================================================
 
 Round 2:
@@ -5568,6 +5742,7 @@ Have you worked with clients directly?
 	
 
 example code caching is spring and hibernate ?
+
 
 
 
