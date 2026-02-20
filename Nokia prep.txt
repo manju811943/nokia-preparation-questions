@@ -3881,6 +3881,342 @@ steams	2. System.out.println(Arrays.stream(arr1)
 			WHERE table_schema = 'your_database_name'
 			GROUP BY table_name;
 
+169. Difference between REST and SOAP.
+
+	=> REST is an architectural style that uses HTTP methods and mostly JSON for lightweight communication.
+	=> SOAP is a protocol that uses XML-based messaging with strict standards like WS-Security.
+	=> REST is faster and widely used in microservices, while SOAP is more secure and used in enterprise systems like banking.
+	
+	1. Security :
+		REST → Uses HTTPS, JWT, OAuth (like in Spring Security)
+			SOAP → Has built-in security standard called WS-Security
+		SOAP is stronger in:
+			Banking
+			Payment gateways
+			Enterprise integrations
+			
+	2. Stateless :
+		REST → Always stateless
+		SOAP → Can be stateful or stateless
+		
+	3. Error Handling :
+		REST:
+			Uses HTTP status codes (200, 404, 500)
+		SOAP:
+			Uses SOAP Fault (inside XML)
+			
+	4. Real World Usage :
+		REST Used In:
+			Twitter API
+			Facebook Graph API
+			Amazon web services
+
+		SOAP Used In:
+			Banking systems
+			Payment gateways
+			Legacy enterprise systems
+			
+			
+170.  ⭐ Why Spring 
+		=> Spring is a lightweight Java framework that provides dependency injection and inversion of control 
+		   to build loosely coupled, scalable, and maintainable enterprise applications.
+		   
+		=> We use Spring to reduce boilerplate code, manage object lifecycle, handle transactions, 
+		   security, and build RESTful web services efficiently.
+
+	  ⭐ Why Spring Boot?
+		=> Spring Boot is built on top of Spring and removes XML configuration by providing auto-configuration 
+		   and embedded servers, making application development faster.
+		   
+171. How does Autowiring work in Spring?
+
+		=> Autowiring is the process by which Spring automatically injects dependent objects (beans) into 
+		   another bean at runtime.
+		   
+	
+172. what is spring security ? 
+
+		=> Spring Security is a framework that provides authentication, authorization, and protection 
+		   against common security attacks for Spring applications.
+		   
+	=> What Problems Spring Security Solves :
+		
+		| Problem              | Solution                   |
+		| -------------------- | -------------------------- |
+		| Who are you?         | Authentication             |
+		| What can you access? | Authorization              |
+		| Password protection  | Password encoders          |
+		| API security         | JWT / OAuth2               |
+		| Attacks              | CSRF, CORS, XSS protection |
+
+173. Difference between HTTP and HTTPS :
+
+		=> HTTP is an unsecured protocol where data is transferred in plain text.
+		=> HTTPS is the secure version of HTTP that uses SSL/TLS encryption to protect data, 
+		   ensure server authenticity, and prevent tampering.
+		   
+174. Model class validations: 
+
+	1. String Validations :
+		@NotEmpty          // Not null AND length > 0
+		@Size(min = 3, max = 20)
+		@Pattern(regexp = "^[A-Za-z]+$")
+		@Email
+		
+	2. Number Validations :
+		@Min(18)
+		@Max(60)
+		@Positive -> eg: private int age;
+		@PositiveOrZero
+		@Negative
+		@NegativeOrZero
+		@Digits(integer = 5, fraction = 2)
+		
+	3. Date & Time Validations :
+		@Past -> Date must be in past
+		@PastOrPresent
+		@Future -> Date must be in future
+		@FutureOrPresent
+		
+	4. Boolean Validation :
+		@AssertTrue
+		@AssertFalse
+		
+175. Why does Object class contain wait(), notify(), and notifyAll()?
+
+		=> wait(), notify(), and notifyAll() are in the Object class because they work at the object (monitor) 
+		   level, not at the thread level, and every object in Java can act as a lock (monitor).
+		   
+		 => Core Concept: Monitor / Intrinsic Lock
+			Every Java object has:
+				=> Monitor (intrinsic lock)
+				=> Used for thread synchronization
+				=> synchronized keyword locks an object, not a thread
+				
+				👉 Since locks belong to objects, these methods are placed in Object.
+				
+		=> What These Methods Do :
+			| Method        | Purpose                       |
+			| ------------- | ----------------------------- |
+			| `wait()`      | Releases lock and waits       |
+			| `notify()`    | Wakes **one** waiting thread  |
+			| `notifyAll()` | Wakes **all** waiting threads |
+
+
+176. Older and New way of read the files in java ?
+	
+	🔹 Old Way (java.io): Java 1.1
+	
+		import java.io.BufferedReader;
+		import java.io.FileReader;
+		import java.io.IOException;
+
+		BufferedReader br = new BufferedReader(new FileReader("employees.csv"));
+		String line;
+
+		while ((line = br.readLine()) != null) {
+			System.out.println(line);
+		}
+		br.close();
+		
+	Problems:
+		More boilerplate
+		Manual closing
+		Not stream-friendly
+		
+		
+	🔹 Modern Way (java.nio): Java 7+
+	
+		import java.nio.file.Files;
+		import java.nio.file.Paths;
+
+		Files.lines(Paths.get("employees.csv"))
+			 .forEach(System.out::println);
+
+		Advantages:
+			Cleaner code
+			Returns Stream<String>
+			Easily used with Stream API
+			Can use try-with-resources
+
+177. Read employee data from a CSV file and perform operations using Parallel Streams
+	
+	1. Read CSV & Convert to Employee List :
+	
+		import java.io.IOException;
+		import java.nio.file.Files;
+		import java.nio.file.Paths;
+		import java.util.List;
+		import java.util.stream.Collectors;
+
+		public class EmployeeCSVReader {
+
+			public static List<Employee> readEmployees(String filePath) throws IOException {
+
+				return Files.lines(Paths.get(filePath))
+						.skip(1) // skip header
+						.map(line -> line.split(","))
+						.map(data -> new Employee(
+								Integer.parseInt(data[0]),
+								data[1],
+								data[2],
+								Double.parseDouble(data[3])
+						))
+						.collect(Collectors.toList());
+			}
+		}
+		
+178. 🚀 Real-Time Scenarios Using Executors :
+
+	1. Microservice Handling Multiple Requests :
+			Scenario:
+				You are building a Spring Boot microservice.
+			Each request needs:
+				DB call
+				External API call
+				Logging
+				Instead of blocking main thread:
+
+			ExecutorService executor = Executors.newFixedThreadPool(10);
+
+			executor.submit(() -> callExternalService());
+
+			✅ Improves throughput
+			✅ Better CPU utilization
+
+			👉 Used in: Payment systems, Order processing systems
+
+	2. Sending Bulk Emails / Notifications :
+			Scenario:
+				User uploads 10,000 email IDs.
+
+			Without Executor:
+				Sequential processing → Slow
+			
+			With Executor:
+				ExecutorService executor = Executors.newFixedThreadPool(5);
+
+				for (String email : emailList) {
+					executor.submit(() -> sendEmail(email));
+				}
+
+
+				✅ Parallel execution
+				✅ Controlled threads
+
+			Used in:
+				E-commerce promotions
+				OTP systems
+				Marketing platforms
+
+	3. File Processing / CSV Processing
+			Scenario:
+				Large CSV file with 1 million records.
+				Split into chunks and process in parallel.
+
+			ExecutorService executor = Executors.newFixedThreadPool(4);
+
+			executor.submit(() -> processChunk(chunk1));
+			executor.submit(() -> processChunk(chunk2));
+
+			✅ Faster processing
+			✅ CPU-core utilization
+		
+	==> What does newFixedThreadPool(4) mean ?
+			=> 4 means → maximum 4 threads will run tasks concurrently.
+			
+			=> At any point in time:
+					Max 4 tasks can execute in parallel
+					Remaining tasks wait in a queue
+					
+					
+179. What is a Record class in Java?
+
+	=> Records were introduced in Java 14 (preview) and became stable in Java 16.
+	   They are a special kind of class designed to model immutable data carriers with very little 
+	   boilerplate code.
+	
+	👉 Think of records as transparent data holders.
+	
+	=> Why were Records introduced?
+		  Before records, even simple data classes required a lot of code:
+			fields
+			constructor
+			getters
+			equals()
+			hashCode()
+			toString()
+				=> Records generate all of this automatically.
+				
+	❌ Normal class
+			public class Employee {
+				private final int id;
+				private final String name;
+
+				public Employee(int id, String name) {
+					this.id = id;
+					this.name = name;
+				}
+
+				public int getId() { return id; }
+				public String getName() { return name; }
+
+				// equals, hashCode, toString...
+			}
+	✅ Record
+			public record Employee(int id, String name) {}
+
+			That’s it 👆
+			Java automatically provides:
+				private final fields
+				canonical constructor
+				getters (id(), name())
+				equals(), hashCode(), toString()
+				
+	=> Can we inherit (extend) a Record class ?
+
+		❌ NO — Records cannot be extended
+
+			public record Employee(int id, String name) {}
+
+			class Manager extends Employee {   // ❌ Compilation error
+			}
+
+		📌 Reason:
+			Records are implicitly final
+			Java enforces immutability and structural equality
+			Allowing inheritance would break these guarantees
+			
+	
+180. What are Sealed Classes in Java?
+		=> Why do we need Sealed Classes?
+			Before sealed classes:
+				Any class could extend your base class (unless it was final)
+				This could break business rules or design constraints
+
+			With sealed classes:
+				You get controlled inheritance
+				Better domain modeling
+				Strong compile-time safety
+				
+	Eg:	Basic Syntax : 
+	
+			public sealed class Payment
+					permits CreditCardPayment, UpiPayment, CashPayment {
+			}
+
+			Only the listed classes can extend Payment.
+			
+
+	Note : Sealed Interface – Basic Example :
+	
+			public sealed interface Payment
+					permits CardPayment, UpiPayment, CashPayment {
+			}
+
+
+			Only these classes can implement Payment.
+
 ==============================================================
 
 Round 2:
@@ -5139,6 +5475,7 @@ How do you manage tight deadlines?
 How do you handle disagreements with teammates?
 Have you worked with clients directly?
 	
+
 
 
 
