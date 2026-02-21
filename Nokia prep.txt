@@ -4480,6 +4480,49 @@ steams	2. System.out.println(Arrays.stream(arr1)
 	| DB load         | High                  | Low             |
 
 
+190. what is multithreading ? and how and where did you used in project ?
+		=> Multithreading is a programming concept where multiple threads execute concurrently within a single process, sharing the same memory space.
+				Each thread performs a part of the task, which helps in:
+				Better CPU utilization
+				Improved performance
+				Faster response time
+				Efficient handling of parallel tasks
+
+	Eg : Multithreaded Bulk Email (Recommended)
+			🔹 Using ExecutorService
+					ExecutorService executor = Executors.newFixedThreadPool(10);
+					
+					for (User user : users) {
+					    executor.submit(() -> emailService.sendEmail(user));
+					}
+					
+					executor.shutdown();
+
+					✔ Sends multiple emails in parallel
+					✔ Controlled concurrency (10 threads)
+					✔ Faster processing
+
+191. Diff @Async and Executor Service :
+
+		| Feature                 | ExecutorService     | @Async                    |
+		| ----------------------- | ------------------- | ------------------------- |
+		| Belongs to              | Java                | Spring                    |
+		| Thread pool management  | Manual              | Auto (Spring-managed)     |
+		| Boilerplate             | More                | Less                      |
+		| Best for                | Complex concurrency | Service-layer async tasks |
+		| Integration with Spring | No                  | Yes                       |
+
+
+192. Diff between @Async and CompletableFuture
+	| Aspect                 | `@Async`                              | `CompletableFuture` |
+	| ---------------------- | ------------------------------------- | ------------------- |
+	| Level                  | Spring abstraction                    | Core Java           |
+	| Return value           | `void`, `Future`, `CompletableFuture` | `CompletableFuture` |
+	| Chaining               | ❌ Limited                             | ✅ Very powerful     |
+	| Combine multiple tasks | ❌ No                                  | ✅ Yes               |
+	| Error handling         | Basic                                 | Advanced            |
+	| Best for               | Background tasks                      | Parallel workflows  |
+
 	
 	
 ==============================================================
@@ -5742,6 +5785,7 @@ Have you worked with clients directly?
 	
 
 example code caching is spring and hibernate ?
+
 
 
 
