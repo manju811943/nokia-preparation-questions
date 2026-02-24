@@ -6413,6 +6413,16 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
                 System.out.println(plan + " -> " + count)
         );
 
+31. Find the employees with same salary 
+
+		List<Map.Entry<Integer, List<Empolyee>>> collect = employees.stream().collect(Collectors.groupingBy(Empolyee::getSalary))
+                .entrySet()
+                .stream()
+                .filter(n -> n.getValue().size() > 1)
+                .collect(Collectors.toList());
+
+        System.out.println(collect);
+
 3. ========================================== DSA =======================================================================
 
 1. move all zoros at the end and sort remaing elements in ascending order
@@ -6949,6 +6959,7 @@ Have you worked with clients directly?
 	🔹 10. Where do you see yourself in 3–5 years?
 	offcourse i wanted to see  better version of mine ,where i can handle the thinks alone and contribute the organusetion of my fullest effor and
 	also i wanteed to be grow in  my career
+
 
 
 
