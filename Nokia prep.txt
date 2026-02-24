@@ -5924,7 +5924,7 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 
 
 		
-== Introduction ====
+===================================================== Introduction ======================================================================
 	
 Hi, I’m Roy. I have around 5.5 years of experience as a Full Stack Developer working mainly with Angular and Spring Boot.
 Currently, I’m working on an insurance domain product where I build scalable frontend modules using Angular 
@@ -5937,16 +5937,137 @@ I also have experience with Docker for containerizing applications and basic AWS
 
 (GAF's score => where we call API to get the rsting of vehicle information )
 
+==========================================================================================================================================
+My project Architeture :
+
+🔑 Core Microservices in Your Project
+
+1. ️Claim Service
+		Entry point when a new insurance claim is submitted
+		Performs basic validations
+		Publishes claim event to Kafka
+	
+2. Fraud Service (Your Core Area)
+		Consumes claim events
+		Validates claim against internal fraud rules
+		Calls external third-party systems (GAF) if data is missing
+		Calculates and stores fraud scores
+		
+3. Litigation Service
+		Handles legal cases, disputes, court-related info
+		Triggered when fraud score crosses a threshold
+		
+4. External Integration Service
+		Uses Feign Client
+		Communicates with GAF / third-party fraud scoring systems
+		Handles retries, timeouts, fallback
+		
+5. Kafka (Event Backbone)
+		Enables loose coupling
+		Handles high-volume claim processing
+		Enables async communication
+		
+		
+=> Our application follows a microservices and event-driven architecture in the insurance fraud and litigation domain.
+	Whenever a claim is created, the Claim Service publishes a Kafka event. The Fraud Service consumes this event and validates 
+	the claim against internal rules and historical data. If sufficient data is not available or it’s a new claim type, 
+	we synchronously call third-party fraud scoring systems like GAF using Feign Client.
+	
+	The external response provides fraud scores and risk indicators, which we persist in our database and use to make automated decisions.
+	Based on configurable thresholds, claims either proceed normally or are escalated to the Litigation Service for manual investigation.
+	
+	Kafka ensures loose coupling, scalability, and resilience, while Feign handles external integrations with retries and circuit breakers
+	
+	
+=> High-Level Microservices Architecture :
+
+	                +-------------------+
+                    |       UI /        |
+                    |   API Gateway     |
+                    +---------+---------+
+                              |
+                              v
+                    +-------------------+
+                    |    Claim Service  |
+                    +---------+---------+
+                              |
+                              |  (Publish Event)
+                              v
+                    =========================
+                    |        KAFKA          |
+                    =========================
+                              |
+               +--------------+--------------+
+               |                             |
+               v                             v
+     +-------------------+          +-------------------+
+     |   Fraud Service   |          | Notification Svc  |
+     +---------+---------+          +-------------------+
+               |
+               | (If data missing)
+               v
+        +--------------+
+        |  GAF System  |  <-- External (Feign Client)
+        +--------------+
+               |
+               v
+        +--------------+
+        |   Database   |
+        +--------------+
+               |
+               v
+        +-------------------+
+        | Litigation Svc    |
+        +-------------------+
 
 	
+
+
+
+==========================================================================================================================================
+
+Managerial questions  :
+
+
 Tell me about a challenging issue you faced in a project
 How do you handle production incidents?
 How do you manage tight deadlines?
 How do you handle disagreements with teammates?
 Have you worked with clients directly?
-	
 
-example code caching is spring and hibernate ?
+   🔹 3. How do you handle tight deadlines?
+   .so my approch is i can divide big task into small task 
+   then i can prioritize the task to complete
+   if there is any risk i communicate early
+   i wont make it complecate 
+   
+   🔹 4. Tell me about a conflict with a teammate.
+	 we will sit together and we review functionalities expections and code and 
+	 we conclude which which task has to be prioritize to handle 
+	 so if i really think that my opinion is worth so ill try to convence them with poc (proof of concept)
+	 
+	 🔹 5. Tell me about a production issue you handled.
+	 i have not involved  in the production deployement and in debugging since our application in developmenmt phase we mostly involved in deveoplment b
+	 but testing propose we had deployed our application for dev and test envionment
+   
+ 🔹 6. How do you take ownership?
+  along with the wrting the code i also involved code review sometimes and
+  also involved in create shema of the database based ER diagram which given by the clients
+  
+  🔹 7. How do you handle failures?
+   when i get a failure ill deep die into failure ill try to find the root cause and if possible ill fix that and
+   ill make note that what went wrong so that i wont repete the same again 
+   
+   
+   🔹 8. How do you adapt to startup culture?
+   🔹 9. What motivates you?
+    so, i will complete my daily task with putting my full effort so as a girl i want to be indepent to work every complex  problm solvimng within the time 
+	its motivets me 
+	
+	🔹 10. Where do you see yourself in 3–5 years?
+	offcourse i wanted to see  better version of mine ,where i can handle the thinks alone and contribute the organusetion of my fullest effor and
+	also i wanteed to be grow in  my career
+
 
 
 
