@@ -4523,6 +4523,19 @@ steams	2. System.out.println(Arrays.stream(arr1)
 	| Error handling         | Basic                                 | Advanced            |
 	| Best for               | Background tasks                      | Parallel workflows  |
 
+193. Advanctage and disadvabtages of Record class ?
+	Advantages:
+		=> Compact syntax.
+		=> Automatic generation of methods like toString(), equals(), and hashCode().
+		=> Immutability by default.
+		=> Ideal for data transfer and simple data-holding objects.
+
+	Drawbacks:
+		=> No inheritance (cannot extend other classes).
+		=> No setters for mutability.
+		=> Limited constructor flexibility.
+		=> Less suitable for complex behaviors or inheritance-based designs.
+
 	
 	
 ==============================================================
@@ -5785,6 +5798,7 @@ Have you worked with clients directly?
 	
 
 example code caching is spring and hibernate ?
+
 
 
 
