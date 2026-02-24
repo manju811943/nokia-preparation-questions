@@ -4687,6 +4687,454 @@ steams	2. System.out.println(Arrays.stream(arr1)
 		| Performance        | Good          | 🚀 Better                   |
 
 
+
+199. what is optmistic and pesimistic lock in hibernate ?
+	🔐 Locking in Hibernate
+			Locking is used to handle concurrent updates on the same database record and maintain data consistency.
+			
+	
+	Hibernate supports two types of locking:
+		Optimistic Locking
+		Pessimistic Locking
+		
+	1. Optimistic Locking
+	
+		🔹 What it is
+				Assumes conflicts are rare
+				No database lock while reading
+				Checks data consistency at update time
+				
+	Eg:	@Entity
+		class Order {
+
+			@Id
+			private Long id;
+
+			@Version
+			private int version;
+
+			private String status;
+		}
+		
+	Flow:
+		Two users read the same record (version = 1)
+			User A updates → version becomes 2
+			User B updates → ❌ OptimisticLockException
+
+		🔹 When to use
+			Read-heavy applications
+			Less chance of concurrent updates
+			High performance required
+
+		📌 Interview line:
+			=> Optimistic locking uses a version column and checks for conflicts during update, without locking the database row.
+			
+	2. Pessimistic Locking
+			What it is
+				Assumes conflicts are common
+				Locks the database row immediately
+				Other transactions must wait
+				
+		🔹 When to use
+				High contention data
+				Financial transactions
+				Inventory / seat booking systems
+				
+			eg:	entityManager.find(
+				   Order.class,
+				   id,
+				   LockModeType.PESSIMISTIC_WRITE
+				);
+
+			📌 Interview line:
+				Pessimistic locking locks the database row so that no other transaction can modify it until the lock is released.
+				
+				
+				
+	| Feature           | Optimistic Locking      | Pessimistic Locking |
+	| ----------------- | ----------------------- | ------------------- |
+	| Lock Type         | No DB lock              | DB row lock         |
+	| Conflict Handling | At commit time          | At read time        |
+	| Performance       | High                    | Lower               |
+	| Waiting           | No waiting              | Other threads wait  |
+	| Failure           | OptimisticLockException | Lock timeout / wait |
+	
+	
+200. If two applications update the same data simultaneously, how do you ensure consistency?
+		=> Optimistic Locking (Most Common) -> Uses a version column
+		=> Pessimistic Locking (Strong Consistency) -> Locks the database row immediately
+		=> Database Transaction Isolation Levels -> Use proper isolation to prevent issues like dirty or lost updates.
+		=> Idempotency (API Level Protection) -> Use Idempotency Key : Same request → processed only once
+		=> Atomic Updates (DB Level) -> get example from chatgpt
+		
+201. Why does a Spring Boot app start successfully but fail after a few minutes?
+		1. Database connection pool exhaustion (MOST COMMON)
+			Symptoms :
+				App runs for a few minutes
+				Suddenly DB calls hang or fail
+			Errors like:
+				HikariPool-1 - Connection is not available
+				
+		Why it happens
+			Connections are not closed
+			Long-running queries
+				Too many concurrent requests
+				
+		2. Memory leak → OutOfMemoryError
+			Symptoms :
+				App slows down
+				Suddenly crashes
+
+				Error:
+				java.lang.OutOfMemoryError: Java heap space
+
+				Common causes :
+					Storing data in static maps
+					Unbounded cache
+					Large objects kept in memory
+					Infinite list growth
+
+		3. Thread pool exhaustion
+			Symptoms :
+				App is up
+					Requests stop responding
+					No crash, just hangs
+
+				Why :
+					Too many async tasks
+					ExecutorService not sized properly
+					Blocking calls inside @Async
+					
+		4. External service failure (API / Kafka / Redis)
+			Symptoms :
+				App runs fine initially
+				After some time → errors
+				Stack traces with timeouts
+
+				Why :
+					External service goes down
+					No timeout / retry handling
+
+				Fix :
+					Add timeouts
+					Circuit breaker (Resilience4j)
+					Retry with backoff
+					
+		5. Expired credentials / tokens
+			Symptoms :
+				Works initially
+				Fails after token expiry
+				Errors like 401, 403, auth failure
+
+				Common with :
+					OAuth
+					JWT
+					Cloud services
+
+				Fix :
+					Refresh tokens
+					Don’t hardcode short-lived credentials
+					
+		6. Symptoms
+			App starts
+				Fails exactly after X minutes
+
+			Example
+
+				@Scheduled(fixedRate = 60000)
+				public void job() {
+				   throw new RuntimeException();
+				}
+
+			Fix :
+			Add try-catch
+			Log errors
+			Do not crash scheduler thread
+			
+			
+			
+202. 5xx = Server-side failure
+		The request:
+			✔ reached your API
+			✔ passed gateway / load balancer
+			❌ failed inside your application or infrastructure
+			
+			
+203. what happen when multiple configuration conflict at startup ?
+
+		=> When multiple configurations conflict at startup, Spring Boot resolves them using priority rules.
+		   If the conflict cannot be resolved, the application fails to start.
+		   
+		=> What does “configuration conflict” mean?
+				A conflict happens when:
+				The same property is defined multiple times
+				OR two beans/configs try to do incompatible things
+				
+		Case 1: Same property defined in multiple places (MOST COMMON) :
+		
+			What happens?
+				Spring Boot does NOT fail
+				👉 It chooses the value with higher priority
+					Priority order (high → low)
+						Command-line arguments
+						JVM system properties
+						Environment variables
+						application-{profile}.yml
+						application.yml / properties
+
+				✅ Result: App starts using highest-priority value
+				
+		Case 2: Conflicting Beans (Startup FAILURE) : two beans of same types
+				=> can use @Primary
+						   @Qualifier
+						   
+		Case 3: Conflicting Auto-configurations :
+			Example
+				You define a DataSource
+					Auto-configuration also tries to create one
+
+				What happens?
+					Spring Boot uses @ConditionalOnMissingBean
+					Your bean wins
+					App starts fine
+
+				✅ No failure (by design)
+				
+		Case 4: Invalid / incompatible configuration values
+				Eg : server.port=ABC
+				❌ Startup fails immediately
+				
+		Case 5: Profile conflicts
+			eg1 : spring.profiles.active=dev,prod -> it will fail	
+			eg2 : server.port: 8080
+				  server.port: 9090
+						
+				What happens?
+					Last profile wins
+					Can cause unexpected behavior
+					App usually starts, but wrongly configured
+					
+		| Conflict Type         | Result                  |
+		| --------------------- | ----------------------- |
+		| Same property         | Higher priority wins    |
+		| Duplicate beans       | ❌ Startup fails         |
+		| Auto-config vs custom | Custom wins             |
+		| Invalid value         | ❌ Startup fails         |
+		| Profile conflict      | Last profile wins       |
+		| Dependency conflict   | ❌ Fail or runtime crash |
+		
+		
+204. How can a small change in properties cause a major outage?
+		1. Reducing thread pool by mistake (VERY COMMON) -> 
+			eg : server.tomcat.max-threads=50   # was 200
+				What happens
+					Each request needs a thread
+					Under normal load → fine
+					Under peak load → no threads
+					Requests queue → timeout → 503 / 5xx
+					
+		2. Database connection pool misconfiguration
+			Eg: small chgange -> spring.datasource.hikari.maximum-pool-size=5   # was 30
+				What happens :
+					Only 5 DB connections available
+					Requests wait for connection
+					Timeout occurs
+					Thread pool also gets blocked
+
+					Result
+					🔥 Cascading failure
+					🔥 All APIs return 5xx
+					
+		3. Timeout values too aggressive
+			Eg : spring.datasource.hikari.connection-timeout=1000
+					What happens
+						DB needs 1.5s under load
+						App times out early
+						Retries multiply traffic
+
+						Result
+						❌ Retry storm
+						❌ DB overload
+						❌ Full outage
+						
+		4. Cache TTL change → DB meltdown
+			Eg: cache.ttl=10s   # was 10m
+				What happens
+					Cache expires frequently
+					All requests hit DB
+					DB cannot handle traffic
+
+					Result
+					🔥 DB exhaustion
+					🔥 API failures everywhere
+					
+		5. Disabling circuit breaker accidentally
+			Eg : resilience4j.circuitbreaker.enabled=false
+				What happens
+					Downstream service slows
+					All requests wait
+					Threads blocked
+
+					Result
+					❌ One bad service takes down entire system
+					
+		6. Profile change (silent killer)
+			Eg : spring.profiles.active=prod instead of spring.profiles.active=staging
+				What happens
+					Wrong DB
+					Wrong credentials
+					Wrong limits
+					Wrong URLs
+
+					Result
+					🔥 Immediate outage
+					🔥 Data inconsistency risk
+					
+		7. Logging level change
+			Eg : logging.level.root=DEBUG
+				What happens
+					Heavy logging
+					Disk I/O spikes
+					CPU increases
+					App slows → timeouts
+
+					Result
+					❌ Performance collapse under load
+					
+					
+205. How to Detect Blocking Calls in a Spring Boot App ?
+
+		1. Check Thread Dumps (MOST PRACTICAL WAY) :
+		
+			 Take a thread dump when the app is slow:
+				jstack <PID> > threaddump.txt
+
+				Then search for:
+					WAITING
+					BLOCKED
+					TIMED_WAITING
+
+				If you see many threads like:
+						"http-nio-8080-exec-45" waiting on socketRead
+						"http-nio-8080-exec-46" waiting on JDBC
+
+						👉 That means threads are blocked.
+						
+		2. Use Spring Boot Actuator (Quick Detection)
+			Enable:
+				management.endpoints.web.exposure.include=threaddump,metrics
+				
+				Check:
+					/actuator/threaddump
+
+				Look for:
+					Many threads in WAITING
+					Long-running threads
+					
+		3. Look for Common Blocking Code Patterns :
+		
+			❌ Blocking REST call
+				restTemplate.getForObject(...)
+			❌ Blocking DB call
+				repository.findAll()
+			❌ Thread sleep
+				Thread.sleep(5000);
+			❌ Synchronized block
+				synchronized(this) {
+				   // heavy logic
+				}
+				
+		4. Use Monitoring Tools (Production Level) :
+				JVisualVM
+				JConsole
+				YourKit
+				New Relic
+				Datadog
+
+				Look for:
+					High thread count
+					High response time
+					CPU idle but app slow (means waiting/blocking)
+					
+206. What is Graceful Shutdown?
+		=> The application stops accepting new requests, finishes in-flight work safely, 
+		   releases resources cleanly, and exits without data loss.
+		   
+		=> What happens during a graceful shutdown (sequence)
+				1. Stop taking new requests
+				2. Allow in-flight requests to complete
+				3. Finish background jobs / async tasks
+				4. Commit or rollback transactions
+				5. Close DB connections, threads, resources
+				6. Exit process cleanly
+				
+	=> How do you ensure graceful shutdown without data loss (Spring Boot)
+			1. How do you ensure graceful shutdown without data loss (Spring Boot)
+				Eg : server.shutdown=graceful
+					 spring.lifecycle.timeout-per-shutdown-phase=30s
+					 
+					What this does :
+						Stops accepting new HTTP requests
+						Waits up to 30 seconds for active requests to finish
+
+			2. Configure the web server to wait for requests
+				For Tomcat
+					server.tomcat.accept-count=100
+					server.tomcat.max-threads=200
+
+					During shutdown:
+						New connections rejected
+						Existing requests allowed to complete
+						
+			3. Gracefully stop scheduled jobs
+				Eg : @Scheduled(fixedRate = 60000)
+						public void job() {
+							if (shuttingDown.get()) return;
+							// job logic
+						}
+						'
+			4. Ensure DB consistency (VERY IMPORTANT)
+
+					Use transactions :
+ 
+						Let in-flight transactions complete
+						Close connections cleanly
+
+						@Transactional
+						public void processOrder() {
+						   // atomic operation
+						}
+
+						Spring waits for active transactions before shutdown.
+						
+		Quick checklist (save this 🧠)
+			✅ server.shutdown=graceful
+			✅ Shutdown timeout configured
+			✅ Async executor waits
+			✅ Transactions used
+			✅ Schedulers handled
+			✅ Message consumers commit
+			✅ Readiness probe enabled
+			
+
+207. how do you duebug issue that appera only on production ?
+		=> Issues that appear only in production are usually due to scale, data, timing, or environment differences.
+		
+		=> Quick checklist (save this 🧠)
+			✅ Logs first
+			✅ Metrics next
+			✅ Thread dump if slow
+			✅ Compare configs
+			✅ Check schedulers & dependencies
+			✅ Stabilize → then fix
+			
+	=> Interview-ready answer ⭐
+			To debug issues that appear only in production, I rely on observability rather than reproduction. 
+			I analyze logs, metrics, and thread dumps to understand resource usage, timing patterns, and failures,
+			compare production and non-production configurations, and identify bottlenecks like thread starvation,
+			connection pool exhaustion, blocking calls, or external dependency failures.
+
+
 ==============================================================
 
 Round 2:
@@ -6067,6 +6515,7 @@ Have you worked with clients directly?
 	🔹 10. Where do you see yourself in 3–5 years?
 	offcourse i wanted to see  better version of mine ,where i can handle the thinks alone and contribute the organusetion of my fullest effor and
 	also i wanteed to be grow in  my career
+
 
 
 
