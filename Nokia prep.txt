@@ -4536,8 +4536,157 @@ steams	2. System.out.println(Arrays.stream(arr1)
 		=> Limited constructor flexibility.
 		=> Less suitable for complex behaviors or inheritance-based designs.
 
+194. What volatile Means in Java (Spring Boot) ?
+		eg:  private volatile boolean running = true;
+
+		=> It guarantees:
+			✅ Changes made by one thread are visible to other threads immediately
+			✅ The value is always read from main memory (not thread cache)
+			❌ It does NOT make operations atomic
+
+	=> what happens when non valatile varible is accessed by the mutliple thread ? 
+		When a non-volatile variable is accessed by multiple threads, you can get:
+			❌ Visibility problems
+			❌ Race conditions
+			❌ Out-of-order execution issues
+			❌ Infinite loops
+
+
+195. Spring Bean lifecycle ?
+	=> In a Spring Boot application, the Spring Bean lifecycle describes how a bean is:
+		Created → Initialized → Used → Destroyed
+	1, Bean Creation Phase
+	2. Dependency Injection Phase => Injects dependencies (@Autowired, constructor injection, etc.)
+	3. Initialization
+		Spring calls initialization methods:
+			@PostConstruct
+			afterPropertiesSet() (optional)
+			Custom init method (optional)
+	4. Bean Ready to Use
+			Bean is available for application logic.
+	5. Bean Destruction
+		When application stops:
+			@PreDestroy
+			destroy() method (optional)
+
+	=> Spring Bean life cycle starts when the container creates the bean, injects dependencies, and calls initialization 			methods like @PostConstruct. The bean is then ready for use. When the application shuts down, Spring calls destroy 			methods such as @PreDestroy.
+
+196. Diff between the @PostConstruct and init method
+		1. @PostConstruct
+				@PostConstruct
+				public void init() {
+				    System.out.println("Initialized using PostConstruct");
+				}
 	
+				✔ Automatically called after dependency injection
+				✔ Clean and simple
+				✔ Mostly used in Spring Boot projects
+
+			2. init-method
+					=> Configured externally.
 	
+					@Bean(initMethod = "customInit")
+					public MyService myService() {
+					    return new MyService();
+					}
+					
+					public void customInit() {
+					    System.out.println("Initialized using init-method");
+					}
+	
+					✔ No need to use annotation inside class
+					✔ Useful if class is from third-party library
+
+		=> @PostConstruct is an annotation used inside the bean class to define an initialization method.
+			init-method is defined in Spring configuration and does not require modifying the class.
+			In modern Spring Boot projects, @PostConstruct is commonly used.
+
+197. SOLID Principles (Practical + Interview Ready)
+		SOLID =
+		Single Responsibility
+		Open/Closed
+		Liskov Substitution
+		Interface Segregation
+		Dependency Inversion
+
+	1 Single Responsibility Principle (SRP)
+			Definition:
+				=> A class should have only one reason to change.
+					✔ Where I used it in project
+					In my Spring Boot project, I separated business logic, persistence, and validation into different 							classes.	
+
+		❌ Bad Example
+				class UserService {
+				    void saveUser() {}
+				    void sendEmail() {}
+				    void generateReport() {}
+				}
+		✅ Good Example
+				class UserService {
+				    void saveUser() {}
+				}
+				
+				class EmailService {
+				    void sendEmail() {}
+				}
+				
+				class ReportService {
+				    void generateReport() {}
+				}
+				
+				📌 Interview line:
+					I followed SRP by separating services so that each class handled only one responsibility.
+
+	2. Open/Closed Principle (OCP) 
+			Definition:
+				Classes should be open for extension but closed for modification.
+				✔ Where I used it in project
+			====== > get the real time example where i used to place here..  same for below..
+
+	3. Liskov Substitution Principle (LSP)
+	4. Interface Segregation Principle (ISP)
+	5. Dependency Inversion Principle (DIP)
+
+
+198. How ConcurrentHashMap Works (Before Java 8) and after java 8 ?
+
+		🔹 Java 7 and Below
+				It used Segment-based locking.
+					Map divided into multiple segments
+					Each segment had its own lock
+					Only one thread per segment could write
+				📌 This reduced locking compared to Hashtable, but still had segment-level lock.
+
+		🚀 What Changed in Java 8?
+	 		1. No More Segments
+					Java 8 removed Segment class completely.
+				Instead, it uses:
+					CAS (Compare-And-Swap)
+					Synchronized block at bucket level
+					Node-based locking
+
+			2. Uses CAS for Updates
+				For insertion:
+					If bucket is empty → use CAS (no lock)
+					If bucket not empty → synchronize only that bucket
+				Much faster than segment locking.
+
+			3. Tree Structure for High Collisions
+					Just like HashMap in Java 8:
+					If bucket size > 8 → convert linked list into Red-Black Tree
+
+			4.Better Parallelism
+					Multiple threads can operate on different buckets simultaneously.
+					Reads are mostly non-blocking.
+
+		| Feature            | Java 7        | Java 8                      |
+		| ------------------ | ------------- | --------------------------- |
+		| Locking            | Segment-level | Bucket-level                |
+		| Segments           | Yes           | ❌ Removed                   |
+		| Collision Handling | LinkedList    | LinkedList + Red-Black Tree |
+		| Performance        | Good          | 🚀 Better                   |
+
+
 ==============================================================
 
 Round 2:
@@ -5798,6 +5947,7 @@ Have you worked with clients directly?
 	
 
 example code caching is spring and hibernate ?
+
 
 
 
