@@ -5283,6 +5283,267 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 	Structured Concurrency:
 		“Let me run tasks in parallel safely and manage them properly.”
 
+212. Key Features Introduced in Java 8 :
+	1. Lambda Expressions -> Anonymous functions that reduce boilerplate code.
+	2. Functional Interfaces -> An interface with only one abstract method.
+	3. Stream API -> Process collections in a functio nal and declarative way.
+	4. Optional Class -> Avoid NullPointerException.
+	5. Default & Static Methods in Interfaces -> Interfaces can have method implementations.
+	6. Method References -> Shortcut for lambdas.
+	7. New Date & Time API (java.time)  eg : LocalDate today = LocalDate.now();
+											 LocalDateTime now = LocalDateTime.now();
+	8. Parallel Streams -> Process streams using multiple CPU cores.
+	9. Nashorn JavaScript Engine -> Execute JavaScript inside Java.
+		eg : ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+
+213. How to configure and use two different databases in a single Spring Boot application ?
+	Each DB has:
+		Its own DataSource
+		Its own EntityManager
+		Its own TransactionManager
+		Its own Repository package
+
+	Eg :@Configuration
+		@EnableJpaRepositories(
+		    basePackages = "com.app.claim.repo",
+		    entityManagerFactoryRef = "primaryEntityManager",
+		    transactionManagerRef = "primaryTransactionManager"
+		)
+		public class PrimaryDbConfig {
+		
+		    @Bean
+		    @Primary
+		    @ConfigurationProperties("spring.datasource.primary")
+		    public DataSource primaryDataSource() {
+		        return DataSourceBuilder.create().build();
+		    }
+		
+		    @Bean
+		    @Primary
+		    public LocalContainerEntityManagerFactoryBean primaryEntityManager(
+		            EntityManagerFactoryBuilder builder) {
+		        return builder
+		                .dataSource(primaryDataSource())
+		                .packages("com.app.claim.entity")
+		                .persistenceUnit("primaryDB")
+		                .build();
+		    }
+		
+		    @Bean
+		    @Primary
+		    public PlatformTransactionManager primaryTransactionManager(
+		            @Qualifier("primaryEntityManager") EntityManagerFactory emf) {
+		        return new JpaTransactionManager(emf);
+		    }
+		}
+
+	=>	for 2nd Database
+			@Configuration
+			@EnableJpaRepositories(
+			    basePackages = "com.app.fraud.repo",
+			    entityManagerFactoryRef = "secondaryEntityManager",
+			    transactionManagerRef = "secondaryTransactionManager"
+			)
+			public class SecondaryDbConfig { .....  same as above but diff config
+
+=>  To use two databases in Spring Boot, we configure separate DataSources, EntityManagers, and TransactionManagers for each database. 
+    Each set of entities and repositories is mapped to its own persistence unit using @EnableJpaRepositories. One datasource is marked as primary, 
+	and transactions are handled independently per database to avoid cross-database consistency issues.”
+
+214. Explain Caching in Spring Boot implementation and where it fits best ?
+	=> Caching stores frequently used data in fast memory (RAM) so the application doesn’t hit the database or external services every time.
+	=> Goal: Reduce latency + reduce load on DB/external APIs.
+
+	=> Best Candidates for Caching
+			Read-heavy APIs
+			Rarely changing data
+			Expensive operations
+
+	=> Enabling Caching in Spring Boot
+		@EnableCaching
+		@SpringBootApplication
+		public class Application {
+		}
+
+	=> Key Cache Annotations (Core Concept)
+		| Annotation    | Purpose             |
+		| ------------- | ------------------- |
+		| `@Cacheable`  | Read & store result |
+		| `@CachePut`   | Update cache        |
+		| `@CacheEvict` | Remove cache        |
+
+	Eg: @Cacheable(value = "policyCache", key = "#policyId")
+		public Policy getPolicy(String policyId) {
+		    return policyRepository.findById(policyId).orElseThrow();
+		}
+
+=> Cache Update : everytime we call updatePolicy it will update db and same update cache aswell 
+		@CachePut(value = "policyCache", key = "#policy.id")
+		public Policy updatePolicy(Policy policy) {
+		    return policyRepository.save(policy);
+		}
+
+=> Cache Evict : evrytime we call deletePolicy It will delete record from db and same removed data from cache
+		@CacheEvict(value = "policyCache", key = "#policyId")
+		public void deletePolicy(String policyId) {
+		    policyRepository.deleteById(policyId);
+		}
+
+
+215. How you handle deployment tasks ?
+	1. Before deployment, I ensure that my code is production-ready by verifying environment-specific configurations such as application.yml profiles, 
+	   database connections, Kafka topics, cache settings, and third-party API endpoints.
+
+	2. I make sure database changes are backward-compatible and coordinate schema changes carefully. I also validate that feature flags, timeouts, circuit 					breakers, and cache TTLs are correctly configured for the target environment.
+
+	3. During deployment, I support the DevOps team by verifying the build artifacts, Docker images, and application startup logs. After deployment, I perform 			   smoke testing on critical APIs, monitor logs and metrics, and quickly address issues like 5xx errors, latency spikes, or thread pool exhaustion.
+
+	4. In case of issues, I help in rollback or hotfix deployments and participate in root cause analysis to prevent recurrence
+
+
+
+216. How do you implement Producer–Consumer in Java ?
+	=> I use BlockingQueue for Producer–Consumer because it handles synchronization and blocking automatically.
+
+			🔑 What’s happening internally?
+				put() → waits if buffer is full
+				take() → waits if buffer is empty
+			
+			JVM handles thread coordination
+				👉 No race condition
+				👉 No busy waiting
+
+217. Explain difference between ExecutorService, ForkJoinPool and CompletableFuture ?
+		=> ExecutorService manages thread pools and executes asynchronous tasks. 
+		=> ForkJoinPool is specialized for recursive divide-and-conquer CPU-intensive tasks using work-stealing. 			   
+		=> CompletableFuture is a higher-level abstraction that enables chaining, combining, and handling asynchronous tasks more elegantly, especially useful for 				parallel REST calls.
+
+218. Difference between @Controller, @RestController and @ControllerAdvice.
+	1.  @Controller :
+			=> It is used in Spring MVC applications where you return views (HTML/JSP/Thymeleaf).
+			=> Used for UI-based applications
+
+	2. @RestController :
+			=> @RestController is used for REST APIs.
+			=> @RestController = @Controller + @ResponseBody -> Always returns data (JSON/XML), not views
+
+	3. @ControllerAdvice :
+			=> @ControllerAdvice is used for global exception handling and cross-cutting concerns across controllers.
+
+219. Explain lazy loading vs eager loading — how to avoid LazyInitializationException.
+		=> What is Lazy Loading :
+			=>  Data is loaded only when you actually access it.
+			eg : Example
+					@Entity
+					class Order {
+					    @OneToMany(fetch = FetchType.LAZY)
+					    private List<Item> items;
+					}
+					
+					Order is fetched first
+					items are NOT loaded immediately
+					DB call happens only when order.getItems() is called
+
+		=> What is Eager Loading :	
+				=> Related data is loaded immediately along with the parent.
+				eg:	Example
+					@OneToMany(fetch = FetchType.EAGER)
+					private List<Item> items;
+
+						Order + Items fetched in one go
+						DB hit happens immediately
+
+		=> What is LazyInitializationException? eg : failed to lazily initialize a collection of role no session or entity manager
+
+			Why it happens?
+				Because:
+					Entity is fetched
+					Hibernate session is closed
+					Lazy data is accessed outside transaction
+
+		=> Order order = orderRepository.findById(id);
+		   order.getItems(); // ❌ LazyInitializationException
+
+		Solution  : How to Avoid LazyInitializationException
+		1. Access Lazy Data Inside Transaction
+			eg :    @Transactional
+					public Order getOrder(Long id) {
+					    Order order = orderRepository.findById(id).orElseThrow();
+					    order.getItems().size(); // initializes lazy collection
+					    return order;
+					}
+		2. use joins
+		3. DTO Projection
+		4. Open Session In View (OSIV) (NOT RECOMMENDED) eg:spring.jpa.open-in-view: true
+		5. Change FetchType to EAGER (BAD PRACTICE) eg : @OneToMany(fetch = FetchType.EAGER)
+
+
+
+220. Where you store env variable and how to read them ?
+
+		=> I store env variable in AWS Secrets Manager.
+		=> Store Secrets in AWS Secrets Manager
+			=> Secret name: insurance-app-secrets
+					{
+					  "db.username": "claim_user",
+					  "db.password": "secret123",
+					  "gaf.url": "https://gaf.prod/api"
+					}
+
+		=> we need to add AWS secret manager depedency
+				<dependency>
+				  <groupId>io.awspring.cloud</groupId>
+				  <artifactId>spring-cloud-aws-starter-secrets-manager</artifactId>
+				</dependency>
+				
+				This enables automatic integration.
+
+				and in application.properties file
+					db:
+					  username: ${db.username}
+					  password: ${db.password}
+
+				=> can read them using 	@ConfigurationProperties
+					@ConfigurationProperties(prefix = "db")
+					@Component
+					public class DbConfig {
+					    private String username;
+					    private String password;
+					}
+
+		=> Priority Order : this is variable pics on priority
+			→ Command-line args
+			→ AWS Secrets Manager
+			→ Environment variables
+			→ application.yml
+			
+
+221. Implement a REST endpoint to fetch the last 10 activities of a user.
+		Controller :
+				@GetMapping("/{userId}/activities")
+			    public List<Activity> getLastActivities(@PathVariable String userId) {
+			        return service.getLast10Activities(userId);
+			    }
+		Service :
+				public List<Activity> getLast10Activities(String userId) {
+			        return repository.findTop10ByUserIdOrderByCreatedAtDesc(userId);
+			    }
+		Repository :
+				public interface ActivityRepository extends JpaRepository<Activity, Long> {
+				    @Query(
+				        value = """
+				            SELECT *
+				            FROM user_activity
+				            WHERE user_id = :userId
+				            ORDER BY created_at DESC
+				            LIMIT 10
+				        """,
+				        nativeQuery = true
+				    )
+				    List<Activity> findLast10Activities(@Param("userId") String userId);
+				}
+
+
 
 ==============================================================
 
@@ -5891,7 +6152,7 @@ Round 2:
 	
 
 
-2. Stream API questions :
+==============================================  Stream API questions : ==================================================================
 
 1. String str = "this is a test. This test is only a test." Output: [test=3, is=3, this=2, a=2, only=1] using java 8 stream api
 
@@ -6130,7 +6391,29 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 
     System.out.println(collect); //{2000=[entity.Empolyee@4f023edb, entity.Empolyee@3a71f4dd], 3000=[entity.Empolyee@7adf9f5f], 1000=[entity.Empolyee@85ede7b
 
-3. ================================ DSA =================================================
+
+30. Implement a Java program to group patients by insurance plan and count them.
+		List<Patient> patients = List.of(
+                new Patient("John", "Gold"),
+                new Patient("Alice", "Silver"),
+                new Patient("Bob", "Gold"),
+                new Patient("David", "Platinum"),
+                new Patient("Emma", "Gold"),
+                new Patient("Sophia", "Silver")
+        );
+
+        Map<String, Long> countByPlan =
+                patients.stream()
+                        .collect(Collectors.groupingBy(
+                                Patient::getInsurancePlan,
+                                Collectors.counting()
+                        ));
+
+        countByPlan.forEach((plan, count) ->
+                System.out.println(plan + " -> " + count)
+        );
+
+3. ========================================== DSA =======================================================================
 
 1. move all zoros at the end and sort remaing elements in ascending order
 
@@ -6632,6 +6915,8 @@ How do you manage tight deadlines?
 How do you handle disagreements with teammates?
 Have you worked with clients directly?
 
+
+
    🔹 3. How do you handle tight deadlines?
    .so my approch is i can divide big task into small task 
    then i can prioritize the task to complete
@@ -6664,6 +6949,7 @@ Have you worked with clients directly?
 	🔹 10. Where do you see yourself in 3–5 years?
 	offcourse i wanted to see  better version of mine ,where i can handle the thinks alone and contribute the organusetion of my fullest effor and
 	also i wanteed to be grow in  my career
+
 
 
 
