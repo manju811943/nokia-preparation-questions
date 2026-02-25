@@ -1069,6 +1069,8 @@ CSS:
 		
 	=> Encapsulation -> Improved performance
 	=> Switch Expression
+	=> javax.persistence.Entity   // Old (Java EE)
+	   jakarta.persistence.Entity // New (Jakarta EE)
 	
 	
 49. Java 21 features :
@@ -5630,6 +5632,28 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 	4. => Examples of Synchronized Collection include synchronizedList, synchronizedSet, synchronizedMap, 
 	   => while examples of Concurrent Collection include ConcurrentHashMap, CopyOnWriteArrayList, CopyOnWriteArraySet
 
+226. How to sort emp on emp salary without using streams
+		 List<Employee> list = Arrays.asList(
+            new Employee("manju", 5000, "male", "3", "IT"),
+            new Employee("Teju", 5000, "female", "2", "DEV"),
+            new Employee("Ram", 2000, "male", "7", "QA"),
+            new Employee("Ram", 7000, "male", "7", "QA"),
+            new Employee("Ram", 9000, "male", "7", "QA")
+		    );
+		
+		    Collections.sort(list, new Comparator<Employee>(){
+		        @Override
+		        public int compare(Employee e1, Employee e2){
+		//            return e2.getSalary() - e1.getSalary();  //descending order on salary
+		            return e1.getSalary() - e2.getSalary();  //asceding order on salary
+					
+					 // for string comparision 
+					 return e2.getName().compareTo(e1.getName()); // descending order 
+		        }
+		    });
+		    
+		    list.forEach(n-> System.out.println(n.getSalary()));
+
 ==============================================================
 
 Round 2:
@@ -7137,8 +7161,9 @@ Extra questions
 1. How practically used SOLID
 2. How to implement REDIS cache in Springboot
 3. monitering tool that used my project
+4. diff between gradle and maven
 
-4. int[] arr = {1,2,3,4};
+5. int[] arr = {1,2,3,4};
 
         int[] newArr = new int[arr.length];
         int j = 0;
@@ -7151,6 +7176,7 @@ Extra questions
         }
 
 	understand what is time complexity and space complexity and how to find ouit the ?
+
 
 
 
