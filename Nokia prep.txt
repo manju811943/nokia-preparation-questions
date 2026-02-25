@@ -6954,6 +6954,29 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
         }
         System.out.println(chars);
 
+31. How to remove duplicate char in given string
+		String s = "Happynewyear";
+        Set<Character> set = new HashSet<>();
+        StringBuffer s1 = new StringBuffer();
+        for (char val : s.toCharArray()){
+            if(set.add(val)){
+                s1.append(val);
+            }
+        }
+        System.out.println(s1);
+
+	or without set
+		
+        StringBuffer s1 = new StringBuffer();
+
+        for (char val : s.toCharArray()){
+            if(s1.indexOf(String.valueOf(val)) == -1){
+                s1.append(val);
+            }
+        }
+
+
+
 
 		
 ===================================================== Introduction ======================================================================
@@ -7128,6 +7151,7 @@ Extra questions
         }
 
 	understand what is time complexity and space complexity and how to find ouit the ?
+
 
 
 
