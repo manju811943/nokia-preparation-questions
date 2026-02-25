@@ -5543,7 +5543,92 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 				    List<Activity> findLast10Activities(@Param("userId") String userId);
 				}
 
+222. Which Java version have you worked on extensively?
+	=> In my current project, we are using Java 17 (LTS).
+		Practically, I have extensively used Java 8 features on a daily basis, and selectively used Java 11–17 features 			wherever they add value.
 
+	1. Most of our business logic heavily relies on Java 8 features.
+			Streams & Lambdas – filtering, grouping, mapping API responses
+			Optional – avoiding NullPointerExceptions
+			Method references
+			Functional interfaces
+
+	2. Java 11 :
+		New HttpClient (for calling external services) -> 
+				HttpRequest req = HttpRequest.newBuilder(URI.create("https://example.com")).build();
+		String utility methods -> isBlank(), isEmpty(), repeat() etc
+		New File methods -> iles.readString(Path);
+
+	3. Java 17 :
+		Records (DTOs / response objects)
+		Switch expressions
+		Sealed classes (if asked)
+
+223. given username and userObject how do you prevent NPE effectively ?
+	1. Early Validation (Most Important & Practical) :
+		Eg : if (username == null || userObject == null) {
+		    throw new IllegalArgumentException("Username or userObject cannot be null");
+		}
+
+	2. Using Optional Properly :
+		Optional<User> userOpt = Optional.ofNullable(userObject);
+		userOpt.ifPresent(user -> {
+		    System.out.println(user.getEmail());
+		});
+
+	3. Avoid Returning Null :
+		❌ Bad:
+			return null;
+		✅ Good:
+			return Optional<User>;
+		Or:
+			return Collections.emptyList();
+
+	4. Controller-Level Validation (Spring Boot) :
+		@PostMapping("/user")
+		public ResponseEntity<?> createUser(@RequestBody @Valid User user) {
+		    ...
+		}
+		With:
+			@NotNull
+			private String username;
+
+	5. Default Values :
+		=> String name = username != null ? username : "Guest";
+
+224. What is CopyOnWriteArrayList ?
+	=> CopyOnWriteArrayList creates a fresh copy of the underlying array every time a write operation (add/remove/update) 		   occurs, while readers continue to read from the old, unmodified array.
+
+	=> CopyOnWriteArrayList is a thread-safe List implementation in Java designed for concurrent read-heavy scenarios.
+
+	Eg : CopyOnWriteArrayList<String> list = new CopyOnWriteArrayList<>();
+			list.add("A");
+			list.add("B");
+			
+			for (String s : list) {
+			    list.add("C");   // No ConcurrentModificationException, but in plain ArrayList will get Exception
+			    System.out.println(s);
+			}
+			System.out.println(list); 
+
+		Output:
+			A
+			B
+			[A, B, C, C] 
+
+225. What are the differences between Synchronized Collection and Concurrent Collection in Java?
+
+	1.  => Synchronized Collection is thread-safe but may have performance issues, 
+		=> while Concurrent Collection is optimized for concurrent access.
+
+	2. => Synchronized Collection uses synchronized keyword to achieve thread-safety, 
+	   => while Concurrent Collection uses non-blocking algorithms like CAS (Compare and Swap)
+
+	3. => Synchronized Collection locks the entire collection during modification, leading to potential performance issue	
+	   =>  while Concurrent Collection allows multiple threads to access and modify the collection concurrently
+
+	4. => Examples of Synchronized Collection include synchronizedList, synchronizedSet, synchronizedMap, 
+	   => while examples of Concurrent Collection include ConcurrentHashMap, CopyOnWriteArrayList, CopyOnWriteArraySet
 
 ==============================================================
 
@@ -6423,6 +6508,37 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 
         System.out.println(collect);
 
+32. find the missing number in given array 
+
+		int[] arr = {8,3,5,1,6,2,4,9};
+        int missingNumber = IntStream.rangeClosed(1, arr.length + 1).sum() - Arrays.stream(arr).sum();
+        System.out.println(missingNumber);
+
+33. Count Active & Inactive Users :
+
+		long activeCount = users.stream()
+        .filter(User::isActive)
+        .count();
+
+		long inactiveCount = users.stream()
+		        .filter(u -> !u.isActive())
+		        .count();
+		
+		System.out.println("Active: " + activeCount);
+		System.out.println("Inactive: " + inactiveCount);
+
+	or
+
+		Map<Boolean, Long> result = users.stream()
+        .collect(Collectors.partitioningBy(
+                User::isActive,
+                Collectors.counting()
+        ));
+
+		System.out.println("Active: " + result.get(true));
+		System.out.println("Inactive: " + result.get(false));
+
+
 3. ========================================== DSA =======================================================================
 
 1. move all zoros at the end and sort remaing elements in ascending order
@@ -6812,6 +6928,32 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
         set.add(null);
         System.out.println(set.size());	//1  same for List aswell
 
+30. Reverse a string but keep spaces in the same positions.
+	i/p : "I Am Not String"
+	o/p : "g ni rtS toNm AI"
+
+	    String input = "I Am Not String";
+
+        char[] chars = input.toCharArray();
+
+        int left = 0;
+        int right = chars.length-1;
+
+        while(left < right){
+            if(chars[left] == ' '){
+                left ++;
+            } else if (chars[right] == ' ') {
+                right ++;
+            }else{
+                char temp = chars[left];
+                chars[left] = chars[right];
+                chars[right] = temp;
+                left ++;
+                right --;
+            }
+        }
+        System.out.println(chars);
+
 
 		
 ===================================================== Introduction ======================================================================
@@ -6912,9 +7054,7 @@ My project Architeture :
 
 	
 
-
-
-==========================================================================================================================================
+============================================================================================================================
 
 Managerial questions  :
 
@@ -6967,7 +7107,27 @@ Have you worked with clients directly?
 
 
 
+====================================================================================
 
+
+Extra questions
+1. How practically used SOLID
+2. How to implement REDIS cache in Springboot
+3. monitering tool that used my project
+
+4. int[] arr = {1,2,3,4};
+
+        int[] newArr = new int[arr.length];
+        int j = 0;
+        for (int i = arr.length-1; i >= 0; i--) {
+           newArr[j++] = arr[i];
+        }
+
+        for (int val :newArr){
+            System.out.println(val);
+        }
+
+	understand what is time complexity and space complexity and how to find ouit the ?
 
 
 
