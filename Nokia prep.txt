@@ -7162,8 +7162,20 @@ Extra questions
 2. How to implement REDIS cache in Springboot
 3. monitering tool that used my project
 4. diff between gradle and maven
+5. where and how exactly we write JWT code and CORS helps
+6. two phase commit in hibernate context
+7. global transction
+8. for prototype, session, request everytime it will crate new instance of object
+	how about old object will eligibale GC or we need to removed
+	basically hoe to it handle
 
-5. int[] arr = {1,2,3,4};
+	what all the things spring will manage and what all things we need to manage
+
+9. in scenario where I'm received stream of records from upstream application how to write method or function or class to 		properly received and store them in any of collevtion	
+	-> how can handle in parallel mode without any deadlock or data inconsistncy
+	
+
+6. int[] arr = {1,2,3,4};
 
         int[] newArr = new int[arr.length];
         int j = 0;
@@ -7176,6 +7188,7 @@ Extra questions
         }
 
 	understand what is time complexity and space complexity and how to find ouit the ?
+
 
 
 
