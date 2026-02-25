@@ -4641,13 +4641,48 @@ steams	2. System.out.println(Arrays.stream(arr1)
 
 	2. Open/Closed Principle (OCP) 
 			Definition:
-				Classes should be open for extension but closed for modification.
-				✔ Where I used it in project
-			====== > get the real time example where i used to place here..  same for below..
+				=> Classes should be open for extension but closed for modification.
+				=> We used interfaces and strategy pattern so new behavior can be added without changing existing code.
+
+		Eg : public interface NotificationService {
+		    void send(String message);
+		}
+		@Service
+		public class EmailNotificationService implements NotificationService {
+		    public void send(String message) { }
+		}
+		@Service
+		public class SmsNotificationService implements NotificationService {
+		    public void send(String message) { }
+		}
+	=> Added new notification types without modifying existing logic, we can add WhatsAppNotification without modifying exsting code
+				
 
 	3. Liskov Substitution Principle (LSP)
-	4. Interface Segregation Principle (ISP)
+	4. Interface Segregation Principle (ISP) :
+		=> Instead of fat interfaces, we created small, focused interfaces.
+			❌ Wrong
+				interface UserOperations {
+				    login();
+				    register();
+				    generateReport();
+				}
+
+			✅ interface AuthService {
+				    login();
+				    register();
+				}
+				
+				interface ReportService {
+				    generateReport();
+				}
+
 	5. Dependency Inversion Principle (DIP)
+
+	=> In our Spring Boot project, we followed SOLID principles by separating responsibilities across controller, service, and repository layers.
+		We used interfaces and dependency injection to follow Open/Closed and Dependency Inversion principles.
+		Fat interfaces were avoided using Interface Segregation, and inheritance was designed carefully to respect Liskov Substitution.
+		This helped us write clean, maintainable, and easily testable code
 
 
 198. How ConcurrentHashMap Works (Before Java 8) and after java 8 ?
@@ -5653,6 +5688,102 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 		    });
 		    
 		    list.forEach(n-> System.out.println(n.getSalary()));
+
+227. What monitoring tools did you use in your project ?
+		1. What we monitored
+				API response time/ API latency
+				JVM metrics (heap, GC, threads)
+				CPU & memory usage
+				Error rates (4xx / 5xx)
+		2. Tools :
+			=> Prometheus
+			=> Grafana -> create dashboard for all the checks
+			=> Dynatrace
+			=> Actuator
+			=> Kibana
+			=> DataDog
+
+228. diff between gradle and maven and why springboot prefer Maven ?
+	=> Maven is a convention-based build tool using XML with a fixed lifecycle
+	=> while Gradle is a flexible and faster build tool using Groovy or Kotlin DSL.
+	=> Gradle supports incremental builds and caching, making it more suitable for large, modern microservices projects
+
+	=> Spring Boot defaults to Maven for simplicity, standardization, and mature dependency management
+
+229. How to configure CORS and JWT Filter
+	CORS :
+		@Bean
+		public WebMvcConfigurer corsConfigurer() {
+		    return new WebMvcConfigurer() {
+		        public void addCorsMappings(CorsRegistry registry) {
+		            registry.addMapping("/**")
+		                    .allowedOrigins("http://localhost:3000")
+		                    .allowedMethods("*")
+		                    .allowedHeaders("*");
+		        }
+		    };
+		}
+
+	JWT Filter chain :
+		@Bean
+		public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		
+		    http.csrf().disable()
+		        .authorizeHttpRequests(auth -> auth
+		            .requestMatchers("/auth/**").permitAll()
+		            .anyRequest().authenticated()
+		        )
+		        .addFilterBefore(jwtFilter,
+		                UsernamePasswordAuthenticationFilter.class);
+		
+		    return http.build();
+		}
+
+230. Two-Phase Commit (2PC) ?
+		=> Two-Phase Commit (2PC) is a distributed transaction protocol that ensures all participating systems either commit a transaction together or roll it 			   back together — guaranteeing atomicity across multiple databases or services.
+
+	⚙️ How Two-Phase Commit Works (Step-by-Step)
+	🟡 Phase 1: Prepare (Voting Phase)
+		Coordinator asks all participants: “Can you commit?”
+		Each participant:
+			Performs checks
+			Locks resources
+			Replies YES (ready) or NO (cannot commit)
+	
+	🟢 Phase 2: Commit / Rollback Phase
+		If ALL say YES → Coordinator sends COMMIT
+		If ANY say NO → Coordinator sends ROLLBACK
+		Participants act accordingly and release locks.
+
+231. Spring bean scopes :
+	1. Singleton -> only one instance of bean per spring container (default)
+	2. Prototype -> A new instance evry time a bean requsted for ?	
+	3. Request	-> single bean instance for HTTp request
+	4. session -> single bean instace for http session
+	5. global session - a single bean instance for global http session.
+
+	Note : bean cretaed for prototype -> spring will not remove the old object from memory we have to remove manually same as below
+		Prototype bean holds:
+			=> prototype bean -> can manually destory using cleanup(), assiging it null, destory(), clean 
+			=> DB connection
+			=> File handle
+			=> Thread
+			=> Long-running background objects
+
+	but for all scopes spring will destory the bean eg: session, request, global session
+
+232.  in scenario where I'm received stream of records from upstream application how to write method or function or class to properly 
+	  received and store them in any of collection ?
+
+	🔥 Final Recommendation Based on Scenarios :
+
+		| Scenario        | Best Choice            |
+		| --------------- | ---------------------- |
+		| Low traffic     | ArrayList              |
+		| Multi-threaded  | ConcurrentLinkedQueue  |
+		| High throughput | BlockingQueue          |
+		| Very high scale | Kafka + Batch consumer |
+
 
 ==============================================================
 
@@ -7157,37 +7288,8 @@ Have you worked with clients directly?
 ====================================================================================
 
 
-Extra questions
-1. How practically used SOLID
-2. How to implement REDIS cache in Springboot
-3. monitering tool that used my project
-4. diff between gradle and maven
-5. where and how exactly we write JWT code and CORS helps
-6. two phase commit in hibernate context
-7. global transction
-8. for prototype, session, request everytime it will crate new instance of object
-	how about old object will eligibale GC or we need to removed
-	basically hoe to it handle
 
-	what all the things spring will manage and what all things we need to manage
 
-9. in scenario where I'm received stream of records from upstream application how to write method or function or class to 		properly received and store them in any of collevtion	
-	-> how can handle in parallel mode without any deadlock or data inconsistncy
-	
-
-6. int[] arr = {1,2,3,4};
-
-        int[] newArr = new int[arr.length];
-        int j = 0;
-        for (int i = arr.length-1; i >= 0; i--) {
-           newArr[j++] = arr[i];
-        }
-
-        for (int val :newArr){
-            System.out.println(val);
-        }
-
-	understand what is time complexity and space complexity and how to find ouit the ?
 
 
 
