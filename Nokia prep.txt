@@ -5832,6 +5832,51 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 					});
 	
 					Integer result = future.get(); // 30
+
+236. What happens when Kafka consumer lag increases ?
+		=> Consumer lag = Number of messages produced but not yet consumed
+			1. Messages Start Piling Up
+			2. Increased Processing Delay (Business Impact)
+			3. Risk of Data Loss (Very Important)
+			4. Memory & CPU Pressure on Consumer
+
+		=> How to Fix / Reduce Consumer Lag
+			1. Increase Consumer Instances -> 📌 Max consumers = number of partitions
+			2. Increase Topic Partitions
+			3. Tune Consumer Configs -> max.poll.records=500
+										fetch.min.bytes=1
+										fetch.max.wait.ms=500
+										enable.auto.commit=false
+			4. Use Parallel Processing
+
+237. 🔥 What is a Retry Storm?
+	=> A retry storm happens when:
+			Many services retry failed requests aggressively at the same time, overwhelming a struggling downstream service even more.
+
+	=> Imagine this architecture:
+			API Gateway → Order Service → Payment Service → DB
+				Now suppose:
+					Payment Service becomes slow
+					It starts timing out
+				
+				What happens?
+					Order Service retries 3 times
+					API Gateway also retries
+					Thousands of requests retry simultaneously
+					Traffic multiplies
+					Payment Service collapses completely
+				
+				💥 This is a Retry Storm
+
+	=> 🛡️ How to Prevent Retry Storms
+			1. Circuit Breaker Pattern
+			2. Limit Retry Attempts -> Retry max 2 or 3 times
+			3. Timeout Properly -> 
+			4. Rate Limiting -> Limit incoming requests when system under stress.
+			5. Separate thread pools:
+					Payment calls use separate pool
+					So failure does not block entire system
+	
 ==============================================================
 
 Round 2:
@@ -6740,6 +6785,22 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 		System.out.println("Active: " + result.get(true));
 		System.out.println("Inactive: " + result.get(false));
 
+34. Convert List to Map :
+
+	1.	 Map<String, Empolyee> map = new HashMap<>();
+		        for (Empolyee e : employees){
+		            map.put(e.getName(), e);
+		        }
+		
+		        System.out.println(map);
+
+	2. Map<Integer, String> map = list.stream()
+        .collect(Collectors.toMap(
+                Employee::getId,
+                Employee::getName
+        ));
+
+
 
 3. ========================================== DSA =======================================================================
 
@@ -7333,6 +7394,7 @@ Have you worked with clients directly?
 
 
 ====================================================================================
+
 
 
 
