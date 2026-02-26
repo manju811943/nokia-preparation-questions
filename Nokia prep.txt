@@ -5876,7 +5876,238 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 			5. Separate thread pools:
 					Payment calls use separate pool
 					So failure does not block entire system
-	
+
+238. Why is circuit breaker not a complete solution ?
+	🔥 First: What Circuit Breaker Actually Does :
+		Circuit Breaker:
+			Detects high failure rate
+			Opens the circuit
+			Stops calling downstream service
+			After some time → tries again (half-open state)
+			It prevents continuous hammering of a failing service.
+
+	=> ❗ Why Circuit Breaker is NOT a Complete Solution :
+		1.It Only Stops Calls — It Doesn’t Fix Root Cause
+				If:
+					DB is slow
+					Thread pool is exhausted
+					CPU is 100%
+					Circuit breaker does not fix those.
+				
+				It just says:
+					“Stop calling for now.”
+					Problem still exists.
+		2. It Can Cause Cascading Failures Upstream => No gracefull failure
+				If circuit opens:
+					Order service fails
+					API Gateway fails
+					UI fails
+					Now user sees failure.
+				Without:
+					Fallback
+					Graceful degradation
+					System still breaks.
+
+		3. Wrong Configuration Can Make Things Worse
+			If threshold is too low:
+					Circuit opens too quickly (false positives)
+				If threshold is too high:
+					System gets hammered before opening
+					So tuning matters.
+
+239. How do you debug memory leaks in Spring Boot apps ?
+	=> First: What is a Memory Leak?
+			In Java:
+				Memory leak = Objects are no longer needed but still referenced, so GC cannot clean them.
+			In Spring Boot apps, this usually causes:
+				Heap usage continuously increasing
+				Frequent Full GC
+				High GC pause time
+				Eventually → OutOfMemoryError
+
+	=>  🧠 Step-by-Step: How I Debug Memory Leaks
+		1. Identify the Symptoms
+			Check:
+				Heap memory graph (growing continuously?)
+				GC logs (Full GC frequent?)
+				CPU spikes during GC?
+			Tools:
+				Actuator /metrics
+				Prometheus + Grafana
+				APM tools (New Relic, Datadog, etc.)
+
+		2. Take a Heap Dump and Analyze Heap Dump
+			=> Look for:
+					Largest objects
+					Retained size
+					Dominator tree
+					Objects growing continuously
+
+		🔍 What to Check Inside Heap
+			Common Spring Boot memory leak causes:
+			1. Static Collections (Very Common)
+					static List<User> cache = new ArrayList<>();
+						=> If never cleared → memory leak.
+
+			2. Caches Without Size Limit
+				Example:
+					Map<String, Object> map = new HashMap<>();
+					=> Without eviction → grows forever.
+				Solution:
+					Use Caffeine
+					Use Redis
+					Set max size
+
+			3. ThreadLocal Not Cleared
+				In web apps:
+					=> ThreadLocal<User> user = new ThreadLocal<>();
+
+			4. Unclosed Resources
+					Streams
+					File handles
+					DB connections
+					Executors
+				Always:
+					Use try-with-resources
+					Shutdown executors
+
+	=> To debug memory leaks in Spring Boot, I monitor heap trends, analyze GC logs, 
+	   capture heap dumps, and use tools like MAT to inspect retained objects and dominator trees. 
+	   Common causes include static collections, unbounded caches, ThreadLocal misuse, and large persistence contexts.
+
+
+240. If I have multiple databases and want to enable connections for them, which bean scope should I use ?
+	👉 Use Singleton scope (default scope).
+			=> You should NOT use prototype/request/session for DataSource.
+
+	=> 🧠 Why Singleton?
+			In Spring Boot:
+				DataSource
+				EntityManagerFactory
+				PlatformTransactionManager
+				All are expensive objects
+			They manage:
+				Connection pools
+				Threads
+				Metadata
+				DB configs
+
+			Creating them per request would:
+				Exhaust DB connections
+				Kill performance
+				Cause memory issues
+			So they must be:
+				=> @Scope("singleton")  // default
+			=> But actually, you don’t even need to specify it — Singleton is default.
+
+	=> 🔥 How Multiple Databases Are Handled  => each independntly signleton
+			For multiple DBs, you define:
+				Multiple DataSource beans
+				Multiple EntityManagerFactory
+				Multiple TransactionManager
+
+	=> What Exactly Is a Connection Pool ?
+		 A managed pool of pre-created, reusable database connections that applications borrow and return instead of creating a new connection every time.
+
+241. Why does CPU remain normal but latency spikes?
+	=> Latency is affected by waiting, not just CPU work.
+
+		1. Thread Pool / Connection Pool Saturation (Most Common 🔥)
+				CPU is idle, but threads are waiting.
+			Examples:
+				DB connection pool exhausted
+				HTTP client connection pool exhausted
+				Executor thread pool full
+		2. Blocking I/O (DB, Network, File)
+				Your threads are blocked on:
+					Slow DB query
+					Downstream API
+					Disk I/O
+				CPU isn’t used while waiting.
+		3. Lock Contention / Synchronization
+			Example:
+				synchronized void process() { ... }
+				Only one thread executes at a time.
+
+		4. Downstream Dependency Slowness
+				If:
+					DB slow
+					Kafka slow
+					Redis slow
+					External API slow
+				Your service waits → latency spikes.
+				CPU is not the bottleneck.
+
+242. 🔥 What is a Cascading Failure?
+		A cascading failure happens when:
+			=> Failure in one service spreads to other dependent services, eventually causing large-scale system outage.
+		In short:
+		👉 One failure → many failures
+
+	=> 🔗 Example: Service Chain Failure
+			API Gateway
+			↓
+			Order Service
+			↓
+			Payment Service
+			↓
+			Database
+		Scenario:
+			Database becomes slow
+			Payment Service times out
+			Order Service retries
+			API Gateway retries
+			Thread pools fill up
+				Entire system becomes unresponsive
+				💥 Cascade complete
+
+	=> 🛡️ How to Prevent Cascading Failures (High-Level)
+			You don’t need full details, but mention these:
+				Timeouts
+				Circuit breakers
+				Exponential backoff + jitter
+				Bulkhead isolation
+				Rate limiting
+				Asynchronous communication
+				Graceful degradation
+
+243. Why do we still need abstract classes when interfaces have default methods ?
+		1. Abstract Classes Can Have State (Fields)
+			Abstract classes can have:
+				Instance variables
+				Protected fields
+				Constructors
+			Interfaces cannot maintain state (only public static final constants).
+
+		2. Abstract Classes Support Constructors
+			Interfaces:
+				❌ No constructors
+			Abstract classes:
+				✔ Can enforce initialization logic
+
+		3. Abstract Classes Allow Protected Methods
+			Abstract classes:
+				=> protected, package-private, private
+			Interfaces:
+				=> Methods are public only
+
+		4. Abstract Classes Are Better for Code Reuse
+			Abstract classes:
+				Share common behavior
+				Share state
+				Share helper methods
+			Interfaces:
+				Should stay thin
+				Only provide minimal default behavior
+
+244.  How Do Threads Communicate in Java ?
+		=> hreads communicate by sharing data and coordinating execution.
+			There are 3 major mechanisms:
+				1. wait(), notify(), notifyAll() (Classic Way)
+					=> Used for inter-thread communication using object monitor (lock).
+				2. Using volatile Keyword -> for visibility
+				3. Blocking queue
+				4. CompletableFuture
 ==============================================================
 
 Round 2:
@@ -7237,7 +7468,24 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
                 s1.append(val);
             }
         }
+		
 
+32. Convert a binary number (e.g., 1011) to decimal.
+	=>  = 1×2³ + 0×2² + 1×2¹ + 1×2⁰
+		= 8 + 0 + 2 + 1
+		= 11
+
+		 String binary = "1011";
+	        int decimal = 0;
+	        int power = 0;
+	
+	        for (int i = binary.length() - 1; i >= 0; i--) {
+	            int bit = Integer.parseInt(String.valueOf(binary.charAt(i)));
+	            decimal += bit * Math.pow(2, power);
+	            power++;
+	        }
+	
+	        System.out.println(decimal);
 
 
 
@@ -7394,6 +7642,7 @@ Have you worked with clients directly?
 
 
 ====================================================================================
+
 
 
 
