@@ -5784,7 +5784,54 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 		| High throughput | BlockingQueue          |
 		| Very high scale | Kafka + Batch consumer |
 
+233. Is ovrriding is mandatory in thread class ?
+		=> Overriding run() is not mandatory when extending Thread, but if it is not overridden, 
+		   the thread executes no task. When implementing Runnable, overriding run() is mandatory. 
+		   To execute code in a new thread, logic must be inside run() and the thread must be started using start().
 
+
+234. What is future ?
+		=> A Future represents the result of an asynchronous computation.
+			When you submit a task:
+				Future<String> future = executor.submit(() -> {
+					Thread.sleep(2000);
+					return "Hello";
+				});
+		
+				The task runs in background.
+				Later, you can get result:
+				String result = future.get();  // blocks until done
+
+235. diff between submit() and execute() 
+	 excute() :
+		ExecutorService executor = Executors.newFixedThreadPool(2);
+			executor.execute(() -> {
+				System.out.println("Task running");
+		});
+		
+		🔍 Key Points :
+			Fire-and-forget
+			No result returned
+			If exception occurs → printed to console
+			Cannot track completion
+			
+	 submit() Method
+			📌 Signatures
+				Future<?> submit(Runnable task);
+				Future<T> submit(Callable<T> task);
+				
+				Example 1 (Runnable)
+				
+					Future<?> future = executor.submit(() -> {
+						System.out.println("Task running");
+					});
+					
+				Example 2 (Callable)
+					Future<Integer> future = executor.submit(() -> {
+						return 10 + 20;
+					});
+	
+					Integer result = future.get(); // 30
 ==============================================================
 
 Round 2:
@@ -7286,6 +7333,7 @@ Have you worked with clients directly?
 
 
 ====================================================================================
+
 
 
 
