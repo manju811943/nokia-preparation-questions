@@ -5634,7 +5634,7 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 		=> String name = username != null ? username : "Guest";
 
 224. What is CopyOnWriteArrayList ?
-	=> CopyOnWriteArrayList creates a fresh copy of the underlying array every time a write operation (add/remove/update) 		   occurs, while readers continue to read from the old, unmodified array.
+	=> CopyOnWriteArrayList creates a fresh copy of the underlying array every time a write operation (add/remove/update) occurs, while readers continue to read 		from the old, unmodified array.
 
 	=> CopyOnWriteArrayList is a thread-safe List implementation in Java designed for concurrent read-heavy scenarios.
 
@@ -6108,6 +6108,111 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 				2. Using volatile Keyword -> for visibility
 				3. Blocking queue
 				4. CompletableFuture
+
+245. What are the advantages of default and static methods in interfaces ?
+
+	=> Default methods allow us to add new functionality to interfaces without breaking existing implementations, 
+	   ensuring backward compatibility. They also allow code reuse and multiple inheritance of behavior. Static methods allow defining 
+	   utility methods inside interfaces, keeping related logic together and preventing overriding.
+
+	=> what are utility methods and why static method for them ?
+		They:
+			Do not depend on object state
+			Provide common functionality
+			Are reusable across the application
+
+			=> Because utility methods:
+					Don’t depend on instance variables
+					Don’t require object creation
+					Are stateless
+
+
+246. How do you design a database architecture when a Business Analyst provides requirements ?
+
+	=> I clarify functional and non-functional requirements. Then I identify core entities and relationships and design an ER diagram. 
+	   I normalize the schema to 3NF, define primary and foreign keys, and add appropriate indexes. Based on traffic and scale, 
+	   I decide whether to use relational or NoSQL. Finally, 
+	   I consider performance optimization, security, and scalability like partitioning or read replicas.
+
+247. What is @Bean in Spring?
+	=> @Bean is an annotation used to declare a Spring-managed bean inside a @Configuration class.
+		It tells Spring:
+			“Create this object, manage its lifecycle, and put it in the ApplicationContext.”
+
+	=>eg:   @Configuration
+			public class AppConfig {
+			    @Bean
+			    public RestTemplate restTemplate() {
+			        return new RestTemplate();
+			    }
+			}
+
+248. How does @RequestBody work internally? 
+	=> When a request reaches DispatcherServlet, Spring identifies the controller method. 
+	   If a parameter is annotated with @RequestBody, Spring uses RequestResponseBodyMethodProcessor,
+	   which relies on HttpMessageConverters like MappingJackson2HttpMessageConverter to deserialize the request body into a Java object using Jackson. 
+	   If validation is present, it runs before the controller method executes
+
+249. Explain end-to-end how Entity becomes table and SQL executes.
+	=> When the application starts, Hibernate scans @Entity classes and builds metadata. If ddl-auto is enabled, it generates DDL statements and creates tables. 	   When we call repository.save(), Spring delegates to EntityManager, which uses Hibernate Session. The entity is stored in the persistence context, and 		   during transaction commit, Hibernate performs dirty checking and generates SQL, which is executed via JDBC against the database.
+
+249. Explain Immutable objects and how to make a class immutable.
+	=> An immutable object is:
+		=>	An object whose state cannot be changed after it is created.
+			Once constructed:
+				No field can be modified
+				No setter methods
+				No internal data changes
+
+	=> 🧠 Why Are Immutable Objects Important?
+				Naturally thread-safe
+				No synchronization needed
+				Safe to share across threads
+				Used in caching
+				Used as keys in HashMap
+
+	Eg: public final class Employee {
+		    private final String name;
+		    private final int age;
+	   		private final List<String> skills;
+	
+		    public Employee(String name, int age, List<String> skills) {
+		        this.name = name;
+		        this.age = age;
+		        this.skills = new ArrayList<>(skills);  // Defensive copy in constructor
+		    }
+	
+		    public String getName() {
+		        return name;
+		    }
+		
+		    public int getAge() {
+		        return age;
+		    }
+		
+		    public List<String> getSkills() {
+		        return Collections.unmodifiableList(skills);  // Defensive copy in getter
+		    }
+	}
+
+250. What is Lock Interface and what implementaion class ?
+	=> Lock is an interface in: java.util.concurrent.locks.
+		=> It provides explicit locking mechanism for controlling access to shared resources in multithreaded environments.
+		=> It was introduced in Java 5 as part of the concurrency utilities.
+
+	=> Implementation Classes of Lock Interface
+		=> ReentrantLock
+		=> ReentrantReadWriteLock
+		=> StampedLock
+
+251. 🔥 Cache Concurrency Strategies
+		=> Very important interview topic :
+				Strategy					Use Case
+				READ_ONLY					Data never changes
+				READ_WRITE					Read-heavy, moderate updates
+				NONSTRICT_READ_WRITE		Occasional stale data allowed
+				TRANSACTIONAL				Fully transactional
+	
 ==============================================================
 
 Round 2:
@@ -7637,20 +7742,30 @@ Have you worked with clients directly?
 
 
 
-
-
-
-
 ====================================================================================
 
 
 
 
+===================================  SQL =================================================
 
+1. student table and asked to group by name and calculate total marks, and display the result in descending order based on total marks.
 
+		SELECT name, SUM(marks) AS total_marks
+		FROM student
+		GROUP BY name
+		ORDER BY total_marks DESC;
 
+2. Given a table containing task_id, start_time, and end_time, Write a query to fetch the events that occur more than once on the same day, and display the 		results in ascending order.
 
-
+		SELECT 
+	    task_id,
+	    DATE(start_time) AS event_date,
+	    COUNT(*) AS occurrence_count
+		FROM tasks
+		GROUP BY task_id, DATE(start_time)
+		HAVING COUNT(*) > 1
+		ORDER BY event_date ASC, task_id ASC;
 
 
 
