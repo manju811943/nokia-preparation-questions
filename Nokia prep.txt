@@ -6212,7 +6212,208 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 				READ_WRITE					Read-heavy, moderate updates
 				NONSTRICT_READ_WRITE		Occasional stale data allowed
 				TRANSACTIONAL				Fully transactional
-	
+
+252. What is Lambda in Java ?
+	=> A lambda expression is a way to write an anonymous function (function without name) in a shorter and cleaner way.
+		=> Introduced in Java
+
+	=> ❌ Problem Before Java 8
+		Before Java 8, if you wanted to pass behavior (function) as a parameter, you had to:
+			Create an interface
+			Implement it
+			Create anonymous class
+			Override method
+		Example (Before Java 8):
+			Runnable r = new Runnable() {
+			    @Override
+			    public void run() {
+			        System.out.println("Running");
+			    }
+			};
+		Too much boilerplate.
+
+	=> With Lambda (After Java 8)
+		Runnable r = () -> System.out.println("Running");
+		
+		🔥 Same logic.
+		🔥 70% less code.
+		🔥 More readable.
+
+	=> ⚡ Does Lambda Improve Performance?
+
+👉 Short answer: Not directly because of lambda itself.
+	Lambda itself does NOT magically make code faster.
+		BUT it enables:
+			1️⃣ Parallel Streams
+		users.parallelStream()
+		     .filter(u -> u.isActive())
+		     .forEach(System.out::println);
+		
+		=> Now multiple threads process data.
+		So performance improvement comes from:
+			Streams
+			Parallel processing
+			Internal iteration
+			Not from lambda alone.
+
+	=> Lambda works only with Functional Interface.
+		A functional interface has:
+			Exactly one abstract method
+		Examples:
+			Runnable
+			Callable
+			Comparator
+			Predicate
+			Function
+			Consumer
+
+	=> 🎯 What If Interface Has 2 Abstract Methods?  or if it Normal fucntion
+			Example:
+			interface Test {
+			    void a();
+			    void b();
+			}
+			Then:
+				Test t = () -> System.out.println("Hi"); ❌
+			Compiler error.
+				Because lambda must match exactly one abstract method.
+
+			Why?
+			Because:
+				Should lambda implement a() or b()?
+			
+			Ambiguity.
+				Compiler cannot decide.
+
+	=> How lambda works internally ?
+		=> Lambda expressions in Java are implemented using the invokedynamic instruction introduced in Java 7. 
+		   The compiler generates a synthetic private method for the lambda body, and at runtime, the JVM uses LambdaMetafactory to dynamically create an 				   implementation of the functional interface. 
+		   Unlike anonymous classes, lambdas do not create separate class files, making them more memory efficient and allowing better JVM optimizations.	
+
+	=> Can Lambda Throw Checked Exception ?
+
+		List<String> list = List.of("a", "b");
+			list.forEach(s -> {
+			    throw new IOException();   // ❌ compile error
+			});
+			
+		=> Why compile error?
+
+			Because forEach expects:  Consumer<T>
+			And Consumer method is:  void accept(T t);
+			It does NOT declare: throws IOException
+
+			So compiler says:
+			👉 "You cannot throw checked exception because method signature does not allow it."
+
+253. How ArrayList Stores Data Internally ?
+	=> Internally, ArrayList uses:
+			=> transient Object[] elementData;
+			👉 It is just a resizable array.
+
+	=> What Happens When You Add an Element ?
+			List<Integer> list = new ArrayList<>();
+			list.add(10);
+			
+			Internally:
+				Step 1: Check Capacity
+			If array is full → resize.  👉 Increase by 50%
+				Place element at:
+					elementData[size] = newElement;
+					size++
+	=> Java 1.2 – 7 -> default capacity of ArrayList is 10
+		Eg: new Object[10]
+
+	=> but in java 8 + :
+
+		Now internally it does:
+				private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};
+			So initially:
+				👉 It creates empty array of size 0
+			Then when you add first element:
+				ensureCapacityInternal(size + 1);
+			Now it expands to:
+				DEFAULT_CAPACITY = 10;
+				So capacity becomes 10 on first insertion
+
+	=> 🔥 Special Case: If You Do
+				new ArrayList<>(5);
+			Now internal array is:
+				new Object[5]
+				It will NOT jump to 10.
+				It respects your custom capacity.
+
+	🔥 Why ArrayList Is NOT Thread-Safe ?
+		=> Because its methods like add(), remove(), get() are NOT synchronized, so multiple threads can modify internal array simultaneously, 
+		   causing data corruption.
+
+		=> so to make to ArrayList safe we can use CopyOnWriteArrayList
+				Core Idea Behind CopyOnWriteArrayList
+					The name itself explains it:
+						=> Copy the entire array whenever a write happens.
+						=> So instead of modifying the existing array,
+						=> it creates a new copy and modifies that.
+				=> That is why it is safe.
+
+254. 🔥 What Is an Index ?
+		=> An index is a data structure that helps the database find rows faster without scanning the entire table.
+			Without index → Full table scan
+			With index → Fast lookup
+
+		=> 🔥 How Index Improves Performance
+			Instead of scanning whole table, database builds a separate sorted structure.
+				Most databases (MySQL, PostgreSQL, Oracle) use:
+
+				👉 B+ Tree index
+
+		=> Suppose emails are indexed.
+				Database builds:
+				           [m@gmail]
+				           /       \
+				  [a@gmail]       [t@gmail]
+				     |                |
+				 row pointers      row pointers
+		
+		Now searching:
+			WHERE email = 'c@gmail.com'
+		Steps:
+			1️⃣ Start at root
+			2️⃣ Compare value
+			3️⃣ Move left or right
+			4️⃣ Reach leaf node
+			5️⃣ Get row pointer
+		Time complexity:
+		👉 O(log n) instead of O(n)
+			That’s the performance gain.
+
+	=> 🔥 What Happens During INSERT?
+			When new row inserted:
+				1️⃣ Find correct position in tree
+				2️⃣ Insert into leaf node
+				3️⃣ If node full → split
+				4️⃣ Rebalance tree
+			
+			This is why:
+			👉 Too many indexes slow down INSERT/UPDATE
+				Because database must update index also.
+
+255. How will you handle millions of records so API doesn’t fail ?
+	1. Use Pagination (Mandatory)
+	2. Use Index Properly
+	3. Use Batch Processing
+	4. Increase DB Efficiency
+		Use:
+			Proper indexes
+			Avoid SELECT *
+			Fetch only required columns
+			Avoid N+1 queries
+			Use JOIN wisely
+			Analyze using EXPLAIN
+	5. Caching (If Data Static)
+	6. Connection Pool Tuning
+	7. Protect API with Limits -> Timeout configuration, Circuit breaker (Resilience4j), Graceful degradation
+	8. JVM Memory Handling -> Use projection DTO instead of entity, Disable unnecessary relationships,Use fetch size
+	9. Use Async Processing -> Use Kafka, Use Queue, Process async
 ==============================================================
 
 Round 2:
@@ -7773,6 +7974,20 @@ Have you worked with clients directly?
 
 
 
+
+6. how List will maintain data.
+7. what are deafult interfaces and how does it work
+8. are streams are improvements, are just short way of code ?
+		if impreve performance, how it impreve 
+		if not impreve performance why it required when we can write better memory concern code
+	
+9. what are the AI models available, how does it works, hoe does it 
+10. how data will be stored in cache is it in the from object, list or how ? where it will store is it have database or files ?
+11. what are the connection pool, what exactly happens in it and when to create, how to create
+
+
+12. 🔥 How Stream works internally?
+13. Can lambda throw checked exception?
 
 
 
