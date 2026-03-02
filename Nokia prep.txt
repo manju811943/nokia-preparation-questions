@@ -6519,8 +6519,278 @@ Step 4: Join Phase
 		Key: user:101
 		Value: {"id":101,"name":"Roy","active":true}
 
- 
+260. 🔷 What is a Connection Pool ?
+		=> A Connection Pool is a cache of reusable database connections.
+		=> Instead of:
+			=> Opening a new DB connection for every request ❌ (very slow)
+			=> Closing it immediately ❌
+		We:
+			=> Create a pool of connections at startup ✅
+			=> Reuse them for multiple requests ✅
+
+	=> Why Do We Need Connection Pool?
+		Creating a DB connection is expensive because:
+			TCP handshake
+			Authentication
+			Session creation
+			Memory allocation
+			DB process/thread allocation
+		
+		If you create connection per request:
+			1000 users → 1000 connection creations → DB crash 🔥
+		With pool:
+			1000 users → reuse 20–50 connections efficiently ✅
+
+=> 1️⃣ Application Starts
+		Connection Pool creates N database connections
+			Stores them in an internal data structure (usually a queue)
+		Example:
+			Initial Pool Size = 10
+		=> 	Pool now has 10 ready-to-use connections.
+
+=> Internally What Data Structure Is Used : Blocking Queue
+
+=> Most Popular: HikariCP
+		Spring Boot uses:
+			👉 HikariCP
+		It is:
+			Very fast
+			Lightweight
+			Low latency
+			Production ready
+
+=> How To Create Connection Pool?
+🔹 In Spring Boot (Recommended Way)
+			You don’t manually create it.
+		Just add:
+			spring.datasource.url=jdbc:mysql://localhost:3306/testdb
+			spring.datasource.username=root
+			spring.datasource.password=root
+			spring.datasource.hikari.maximum-pool-size=20
+			spring.datasource.hikari.minimum-idle=5
+			spring.datasource.hikari.idle-timeout=30000
+			spring.datasource.hikari.max-lifetime=1800000
+	=> 	Spring Boot automatically configures HikariCP.
+
+ => How is it different from Thread Pool ?	
+	| Thread Pool     | Connection Pool        |
+	| --------------- | ---------------------- |
+	| Manages threads | Manages DB connections |
+	| CPU resource    | External DB resource   |
+
+
+261. Can Lambda throw an exception ?
+
+		=> Yes, a lambda can throw exceptions. If it is an unchecked exception, there is no restriction. 
+		   But for checked exceptions, the functional interface method must declare the exception in its throws clause. 
+		   Since most standard functional interfaces like Consumer and Function do not declare checked exceptions, 
+		   we usually handle them using try-catch inside the lambda or wrap them in RuntimeException
+
+Eg 1:   @FunctionalInterface
+		public interface Consumer<T> {
+		    void accept(T t);   // No "throws"
+		}
+		
+	=>	Since accept() does not declare throws IOException,
+	=>	the lambda cannot throw checked exception.
+
+Eg 2:   @FunctionalInterface
+		interface MyInterface {
+		    void process() throws IOException;
+		}
+		
+		Then:
+			MyInterface m = () -> {
+			    throw new IOException("Error");
+			};
+		This works ✔
+
+262. What Is a Custom Exception ?
+	=> A custom exception is a user-defined exception class that extends:
+			RuntimeException (Unchecked) ✅ recommended for Spring apps
+		OR
+			Exception (Checked)
+
+=> How To Create Custom Exception ? : In modern Spring Boot apps, we usually extend RuntimeException.
+	Eg : public class ResourceNotFoundException extends RuntimeException {
+
+		    public ResourceNotFoundException(String message) {
+		        super(message);
+		    }
+		
+		    public ResourceNotFoundException(String message, Throwable cause) {
+		        super(message, cause);
+		    }
+		}
+
+		❌ Checked Custom Exception (Less Common in Spring)
+				public class InvalidAmountException extends Exception {
+				
+				    public InvalidAmountException(String message) {
+				        super(message);
+				    }
+				}
+				
+				Then method must declare:
+
+	=> From Where Should We Throw Custom Exception ?
+		✔ From Service Layer (Best Practice)
+		 Example:
+			public User getUser(Long id) {
+			    return userRepository.findById(id)
+			            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+			}
+			
+			Why service layer?
+				Business validation belongs here
+
+	=> Can We Throw Custom Exception From Anywhere?
+			Technically ✅ YES
+			You can throw from:
+				Controller
+				Service
+				Repository
+				Utility class
+				Even inside lambda
+		Example:
+			throw new ResourceNotFoundException("Invalid ID");
+
+=> What Happens After Throwing ?
+	In Spring Boot, we handle exceptions using:
+
+		@RestControllerAdvice
+		public class GlobalExceptionHandler {
+		
+		    @ExceptionHandler(ResourceNotFoundException.class)  // to handle specific exception 
+		    public ResponseEntity<String> handle(ResourceNotFoundException ex) {
+		        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+		                             .body(ex.getMessage());
+		    }
+
+			@ExceptionHandler(Exception.class) // to handle any kind of exception
+				public ResponseEntity<String> handleAll(Exception ex) {
+					return ResponseEntity
+							.status(HttpStatus.INTERNAL_SERVER_ERROR)
+							.body("Something went wrong");
+			}
+		}
+		
+		This gives clean API response instead of stack trace.
+
+263. How does application read application.yml?
+	How does it know where to read values from?
+	How does @Value or config class get those values?
+
+1. Who Reads application.yml?
+	Spring Boot automatically reads configuration files during startup using,
+	Internally, Spring Boot uses:
+		SpringApplication
+		Environment
+		PropertySources
+		ConfigDataEnvironment
+
+2. What Happens During Application Startup ?
+	When you run:
+		SpringApplication.run(MyApplication.class, args);
+		
+		Spring Boot does this:
+			Step 1: Bootstrap Phase
+				It looks for config files in default locations:
+					classpath:/application.yml
+					classpath:/application.properties
+					file:./config/
+					file:./
+				Priority order matters.
+	Internally this .yml file or application.properties file will converted into key:value pair
+	then Stored inside:
+			Environment → PropertySources → Map  (Spring maintains: MutablePropertySources)
+
+	=> How Does @Value Read It ?
+			@Value("${server.port}")
+			private int port;
+			
+			What happens?
+				1. Spring creates bean
+				2. It sees ${server.port}
+				3. It asks Environment
+				3. Environment looks into PropertySources
+				4. Finds key
+				5. Injects value
 	
+	=> How Does @ConfigurationProperties Work ?
+
+	Example:
+		app:
+		  name: MyApp
+		  timeout: 5000
+		
+		Java class:
+		@ConfigurationProperties(prefix = "app")
+		@Component
+		public class AppConfig {
+		    private String name;
+		    private int timeout;
+		}
+		
+		How it works internally:
+			Spring Binder API maps properties
+			Uses reflection
+			Matches prefix
+			Sets fields automatically
+
+	=> How To Read Property Manually ?
+		@Autowired
+		private Environment env;
+		
+		public void print() {
+		    String port = env.getProperty("server.port");
+		}
+
+	=> During application startup, Spring Boot uses SpringApplication to create and prepare an Environment object. 
+	   It loads configuration files like application.yml from predefined locations using ConfigDataEnvironmentPostProcessor. 
+	   YAML is parsed into key-value pairs and stored inside PropertySources. When we use @Value or @ConfigurationProperties, 
+	   Spring resolves the property from the Environment and injects it into the bean using the Binder API
+
+	=> What Happens If Property Not Found ?
+		🟢 Case 1: Using @Value
+				@Value("${app.name}")
+				private String appName;
+				❌ If app.name is NOT present:
+					Application fails at startup with:  error : Could not resolve placeholder 'app.name'
+						
+		🟢 Case 2: Using @ConfigurationProperties
+				@ConfigurationProperties(prefix = "app")
+				public class AppConfig {
+				    private String name;
+				}
+				If app.name is missing:
+					✔ No exception
+					✔ Field remains null
+
+		🟢 Case 3: Using Environment.getProperty()
+				env.getProperty("app.name");
+					If property missing:
+						✔ Returns null
+						✔ No exception
+
+	=> How To Provide Default Value ?
+		✅ Method 1: Default Value in @Value
+				Most common:
+					@Value("${app.name:DefaultApp}")
+					private String appName;
+				
+				If app.name not present:
+					✔ appName = "DefaultApp"
+					This is safest way.
+
+		✅ Method 2: Default in Environment
+			env.getProperty("app.name", "DefaultApp");
+
+		✅ Method 3: Default in @ConfigurationProperties
+			Just initialize field:
+				private String name = "DefaultApp";
+				If property missing → default used.
+
 
 =============================================================================================================
 
@@ -8086,17 +8356,14 @@ Have you worked with clients directly?
 
 	
 
-10. how data will be stored in cache is it in the from object, list or how ? where it will store is it have database or files ?
-11. what are the connection pool, what exactly happens in it and when to create, how to create
 
 
-12. 🔥 How Stream works internally?
-13. Can lambda throw checked exception?
 
 
-1. how to call custome exception and declare from wgher we need to call ?
-2. why lambdam use
-3. how how application will read app. yml file ? value/path how app should know read these value from app.yml
+
+
+
+
 4.	@Value("${path.to.value}") – quick, single value injection
 	@ConfigurationProperties(prefix="...") – best for structured/nested config
 	Environment#getProperty("path.to.value") – programmatic access
@@ -8145,6 +8412,7 @@ List<Employee> sortedList = employees.stream()
 6. from JPA stored procedures ?
 7. specidifcation in jpa ?
 8. unit test case ? what type of test case written ?
+
 
 
 
