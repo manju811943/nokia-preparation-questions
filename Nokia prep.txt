@@ -6809,6 +6809,520 @@ Eg 2:   @FunctionalInterface
 			Correct HTTP methods
 			Proper status codes
 
+265. Where do we validate username/password?
+	 Who validates it — us or Spring Security?
+	 Where do we write JWT?
+	 Which component actually validates things?
+
+🟢 PHASE 1 — Username/Password Validation (Login) :
+	Step 1: Client Sends Login Request
+		POST /login
+		{
+		  "username": "john",
+		  "password": "1234"
+		}
+
+	Step 2: Who Validates It?
+		Spring Security does NOT automatically validate against DB.
+		
+		It uses these components internally:
+			UsernamePasswordAuthenticationFilter
+			        ↓
+			AuthenticationManager
+			        ↓
+			AuthenticationProvider
+			        ↓
+			UserDetailsService
+
+	1️⃣ UsernamePasswordAuthenticationFilter :
+			This filter:
+				=> Reads username/password from request
+				=> Creates Authentication object
+				=> Sends it to AuthenticationManager
+
+	2️⃣ AuthenticationManager
+				This is the main interface:
+				Authentication authenticate(Authentication auth);
+				It delegates to:
+
+	3️⃣ AuthenticationProvider
+				Default implementation:
+					DaoAuthenticationProvider
+					This is where actual validation happens.
+
+	4️⃣ UserDetailsService (YOU IMPLEMENT THIS) :
+				Here YOU fetch user from DB:
+					@Service
+					public class CustomUserDetailsService implements UserDetailsService {
+					
+					    @Override
+					    public UserDetails loadUserByUsername(String username) {
+					        return userRepository.findByUsername(username)
+					                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+					    }
+					}
+					
+					Spring Security then:
+						Compares password using PasswordEncoder
+						If match → Authentication success
+						If not → 401
+					So:
+						✔ You fetch user
+						✔ Spring Security validates password
+
+🟢 PHASE 2 — JWT Creation
+		After successful authentication: You manually generate JWT.
+		Example:
+			String token = jwtUtil.generateToken(username);
+		
+		This is usually done in:
+			Authentication controller
+			Or custom success handler
+
+	=> Where Do We Write JWT Code ?
+		You create a utility class:
+			@Component
+			public class JwtUtil {
+			    public String generateToken(String username) {
+			        // create token using secret key
+			    }
+			}
+
+🟢 PHASE 3 — JWT Validation for Every Request
+	After login:
+		Client sends:
+			Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+		Now who validates JWT ?
+			You must create:
+				Custom JWT Filter
+			Usually extends:
+				OncePerRequestFilter
+			
+			Example:
+			public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+	This filter:
+		Extracts token from header
+		Validates using JwtUtil
+		Sets Authentication in SecurityContext
+
+🔥 Complete Flow Diagram :
+			Login Request
+			   ↓
+			UsernamePasswordAuthenticationFilter
+			   ↓
+			AuthenticationManager
+			   ↓
+			DaoAuthenticationProvider
+			   ↓
+			UserDetailsService (DB call)
+			   ↓
+			PasswordEncoder.matches()
+			   ↓
+			JWT Generated
+			-----------------------------------
+			Subsequent Request
+			   ↓
+			JwtAuthenticationFilter
+			   ↓
+			Validate Token
+			   ↓
+			Set Authentication in SecurityContext
+			   ↓
+			Controller
+
+=> If you want to Role based Authentication we need to create Security Configuration class
+		@Configuration
+		@EnableMethodSecurity
+		public class SecurityConfig {
+		    @Bean
+		    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		        http
+		            .csrf(csrf -> csrf.disable())
+		            .authorizeHttpRequests(auth -> auth
+		                .requestMatchers("/admin/**").hasRole("ADMIN")
+		                .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+		                .anyRequest().authenticated()
+		            )
+		            .formLogin();
+		        return http.build();
+		    }
+		}
+
+
+266. What Is an API Contract ?
+	=> An API contract is a formal agreement between:
+			Backend (API provider)
+			        ↔
+			Client (Frontend / Mobile / Other Service)
+
+	=> It defines:
+			What endpoints exist
+			What request format should be
+			What response format will be
+			What status codes are returned
+			What authentication is required
+
+			It is basically:
+			📄 The specification of how client and server communicate.
+
+	=> Why Is API Contract Important ?
+		 Because client and backend are developed independently.
+				=> So contract ensures:
+					✔ Stability
+					✔ Clear expectations
+					✔ No unexpected breaking changes
+					✔ Parallel development
+
+267. Status codes and meaning :
+	Code 	Constant 					(Example)				Message	Description
+	200		SC_OK						OK						The request was successful.
+	201		SC_CREATED					Created					A new resource was successfully created (common for POST requests).
+	204		SC_NO_CONTENT				No Content				The request was successful, but no response body is returned (common for DELETE operations).
+	400		SC_BAD_REQUEST				Bad Request				The server couldn't understand the request due to invalid syntax or missing parameters.
+	401		SC_UNAUTHORIZED				Unauthorized			Authentication is required and has failed or not been provided.
+	403		SC_FORBIDDEN				Forbidden				The client is authenticated but does not have permission to access the resource.
+	404		SC_NOT_FOUND				Not Found				The requested resource could not be found on the server.
+	405		SC_METHOD_NOT_ALLOWED		Method Not Allowed		The HTTP method used is not supported for the requested resource.
+	409		SC_CONFLICT					Conflict				The request could not be completed due to a conflict with the current state of the resource 																	(e.g., creating a resource that already exists).
+	500		SC_INTERNAL_SERVER_ERROR	Internal Server Error	A generic error message when an unexpected condition was encountered on the server.
+	503		SC_SERVICE_UNAVAILABLE		Service Unavailable		The server is temporarily unable to handle the request, often due to maintenance or overload.
+
+
+268. how to handle api slowness ? what we will do to faster ?
+	🔷 Step 1: Identify Where Slowness Is
+			API slowness usually comes from:
+				Database
+				External API calls
+				Large payload
+				CPU-heavy processing
+				Network latency
+				Thread blocking
+				Connection pool exhaustion
+		=> You must profile before fixing.
+
+	1️⃣ Database Optimization (Most Common Cause) :
+			✅ Add Indexes
+			✅ Avoid N+1 Problem (Very Common in JPA)
+			✅ Use Pagination
+			✅ Optimize Query -> avoid select *
+
+	2️⃣ Use Caching (Very Powerful) :
+	3️⃣ Connection Pool Tuning -> based on request that call set a pool size in properties file
+	4️⃣ Use Asynchronous Processing 
+			Use @Async
+			Use CompletableFuture
+			Use messaging (Kafka / RabbitMQ)
+	5️⃣ Reduce Payload Size -> use DTO
+	7️⃣ Avoid Blocking Calls -> use webclient instead of feignclient
+	8️⃣ Add Timeout for External Services
+	9️⃣ Horizontal Scaling and vertical scaling in server
+
+269. how to implent pagination properly ? what is Pageable ?
+	🔷 What is Pageable?
+		Pageable is an interface in Spring Data that represents:
+			Page number
+			Page size
+			Sorting
+		It belongs to:
+			👉 Spring Data JPA
+
+	✅ Step 1: Repository
+			public interface UserRepository extends JpaRepository<User, Long> {
+			    Page<User> findAll(Pageable pageable);
+			}
+			=> Notice return type: Page<User>
+
+	✅ Step 2: Service Layer
+			public Page<User> getUsers(Pageable pageable) {
+			    return userRepository.findAll(pageable);
+			}
+
+	✅ Step 3: Controller
+			@GetMapping("/users")
+			public Page<User> getUsers(
+			        @RequestParam(defaultValue = "0") int page,
+			        @RequestParam(defaultValue = "10") int size,
+			        @RequestParam(defaultValue = "id") String sortBy) {
+			
+			    Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+			
+			    return service.getUsers(pageable);
+			}
+
+	=> GET /users?page=0&size=5&sortBy=name
+
+	🔷 What is Page?
+			Page<T> contains:
+				content (actual data)
+				totalElements
+				totalPages
+				currentPage
+				size
+				isFirst
+				isLast
+
+270. What is the difference between @PathVariable and @RequestParam ? and  Where exactly do we use each?
+
+	=> 1️⃣ What is @PathVariable?
+				@PathVariable is used to capture values from the URL path.
+				It represents a specific resource.
+				
+			✅ Example
+				@GetMapping("/users/{id}")
+				public User getUser(@PathVariable Long id) {
+				    return service.getUser(id);
+				}
+				
+				Request:  GET /users/10
+	
+		Use it when:
+			✔ Fetching specific resource
+			✔ Updating specific resource
+			✔ Deleting specific resource
+
+	=> 2️⃣ What is @RequestParam ?
+		@RequestParam is used to capture values from the query string.
+			It represents filtering, sorting, optional data, pagination, etc.
+		✅ Example
+			@GetMapping("/users")
+			public List<User> getUsers(
+			        @RequestParam int page,
+			        @RequestParam int size) {
+			
+			    return service.getUsers(page, size);
+			}
+			Request:  GET /users?page=0&size=10
+		
+
+271. What is the difference between PUT and PATCH ?
+	=> 1️⃣ PUT — Full Update
+		👉 PUT is used to update the entire resource.
+			If you send PUT request, you are saying:
+				“Replace this resource completely with this new data.”
+
+	Note : After PUT → Entire record replaced. if you miss any field that field becom null in DB
+
+	=> 2️⃣ PATCH — Partial Update
+		👉 PATCH is used to update only specific fields.
+		You are saying:
+			“Update only these fields, keep rest unchanged.”
+
+	Note : Only provided fields changed.
+		   Others remain unchanged.
+
+	=> 🔷 Important Rule
+			PATCH updates only fields present in request body.
+			PUT updates entire resource.
+
+
+272. Difference between HashMap and TreeMap ? When to use which ?
+
+	| Feature         | HashMap                  | TreeMap                       |
+	| --------------- | ----------------------   | ----------------------------- |
+	| Order           | ❌ No order             | ✅ Sorted order                |
+	| Data Structure  | Hash Table               | Red-Black Tree                |
+	| Time Complexity | O(1) average             | O(log n)                      |
+	| Null Key        | ✅ One null key allowed | ❌ Not allowed                 |
+	| Performance     | Faster                   | Slower than HashMap           |
+	| Sorting         | ❌ No                   | ✅ Natural / Custom Comparator |
+
+
+	=> ✅ When To Use HashMap
+			✔ When order doesn’t matter
+			✔ Need high performance
+			✔ Most common usage
+			✔ Caching
+			✔ Storing lookup data
+		Example:
+			Session storage
+			User ID → User object mapping
+
+	=> ✅ When To Use TreeMap
+			✔ When sorted data required
+			✔ Range queries needed
+			✔ Finding closest key
+			✔ Floor / Ceiling operations
+			
+			Example:
+				Leaderboard sorted by score
+				Price-based sorting
+				Time-based event sorting
+
+273. JVM Memory Areas : Heap, Stack, Metaspace
+
+	=> ✅ What Exactly Stored in Heap ?
+			✔ Objects
+			✔ Instance variables
+			✔ Arrays
+			✔ String objects (not literals pool explanation below)
+			✔ Static variables (important interview point)
+			✔ Runtime constant pool references
+
+	=> ✅ What Exactly Stored in Stack ?
+			✔ Local variables
+			✔ Method parameters
+			✔ Reference variables
+			✔ Return addresses
+			✔ Partial results
+
+	=> ✅ What Stored in Metaspace ?
+			✔ Class definitions
+			✔ Method metadata
+			✔ Field metadata
+			✔ Static method info
+			✔ Bytecode
+			✔ Runtime constant pool
+
+274. How do you validate build failure in Jenkins ?
+
+	=> 1️⃣ First: What Causes Build Failure?
+			In a typical Java / Spring Boot project, build may fail due to:
+				Compilation error
+				Unit test failure
+				SonarQube quality gate failure
+				Dependency issue
+				Maven/Gradle error
+				Docker build failure
+				Deployment failure
+		So first rule:
+				Identify the stage where it failed.
+
+		2️⃣ Check Jenkins Console Output (Most Important Step)
+		3️⃣ Validate Each Pipeline Stage :
+				=> Checkout Code
+				=> Build (mvn clean install)
+				=> Run Unit Tests
+				=> SonarQube Scan
+				=> Docker Build
+				=> Deploy
+
+275. What is Concurrency API ?
+	=> Java Concurrency API is a set of classes and utilities that help us:
+	=> Write multi-threaded programs safely and efficiently.
+
+	🔷 Why Do We Need Concurrency API?
+			If we create threads manually:
+				new Thread(() -> {}).start();
+			Problems:
+				❌ Hard to manage
+				❌ Hard to control thread lifecycle
+				❌ No pooling
+				❌ No scheduling
+				❌ Complex synchronization
+			Concurrency API solves this.
+
+	🔷 Main Components of Concurrency API
+
+		🟢 1️⃣ Executor Framework :
+				Most important.
+					Instead of creating threads manually:
+				We use:
+					ExecutorService executor = Executors.newFixedThreadPool(5);
+				Purpose:
+					✔ Thread pooling
+					✔ Better resource management
+					✔ Reuse threads
+					✔ Control concurrency
+
+		🟢 2️⃣ Future :
+				Used to get result from async task.
+					Future<Integer> future = executor.submit(() -> 10 + 20);
+					Integer result = future.get(); // blocks
+				Purpose:
+					✔ Get async result
+					✔ Check if task completed
+					✔ Cancel task
+
+		🟢 3️⃣ CompletableFuture (Very Powerful)
+				Used for:
+					✔ Non-blocking async programming
+					✔ Chaining tasks
+					✔ Combining multiple async calls
+				
+				Example:
+					CompletableFuture.supplyAsync(() -> "Hello")
+					    .thenApply(s -> s + " World")
+					    .thenAccept(System.out::println);
+					
+					Very common in microservices.
+
+		🟢 4️⃣ Concurrent Collections
+				Thread-safe collections:
+					Class					Purpose
+					ConcurrentHashMap		Thread-safe HashMap
+					CopyOnWriteArrayList	Thread-safe List
+					BlockingQueue			Producer-consumer pattern
+
+		🟢 5️⃣ Locks (Advanced Synchronization)
+				Instead of synchronized, we use:
+					ReentrantLock lock = new ReentrantLock();
+				Advantages:
+					✔ More flexible
+					✔ tryLock()
+					✔ Fair locking
+
+
+276. How to call a stored procedure from JPA / Spring Boot ?
+	=> There are 3 main ways to call stored procedures in JPA.
+
+		1. Using @Procedure (Simple Way – Spring Data JPA) :
+				public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+				    @Procedure(name = "get_employees_by_dept")
+				    List<Employee> getEmployeesByDept(@Param("dept_name") String deptName);
+				}
+
+		2. Using @NamedStoredProcedureQuery (Entity-Level Mapping) 
+		3. Using EntityManager (Most Flexible & Professional)
+
+277. What is JPA Specification ?
+	=> JPA Specification is a way to build dynamic queries programmatically using the Criteria API.
+		It allows you to:
+			✔ Build queries dynamically
+			✔ Add conditions based on input
+			✔ Avoid writing multiple custom queries
+			✔ Keep code clean and maintainable
+
+	=> 🔷 Step-by-Step Example
+	✅ Step 1: Add JpaSpecificationExecutor
+		Eg : public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSpecificationExecutor<Employee> {}
+				-> Now repository supports Specification.
+
+	✅ Step 2: Create Specification :
+		public class EmployeeSpecification {
+		
+		    public static Specification<Employee> hasAgeGreaterThan(int age) {
+		        return (root, query, criteriaBuilder) ->
+		                criteriaBuilder.greaterThan(root.get("age"), age);
+		    }
+		
+		    public static Specification<Employee> hasDepartment(String dept) {
+		        return (root, query, criteriaBuilder) ->
+		                criteriaBuilder.equal(root.get("department"), dept);
+		    }
+		
+		    public static Specification<Employee> hasSalaryGreaterThan(double salary) {
+		        return (root, query, criteriaBuilder) ->
+		                criteriaBuilder.greaterThan(root.get("salary"), salary);
+		    }
+		}
+
+	✅ Step 3: Combine Specifications :
+
+		Specification<Employee> spec = Specification
+		        .where(EmployeeSpecification.hasAgeGreaterThan(25))
+		        .and(EmployeeSpecification.hasDepartment("IT"))
+		        .and(EmployeeSpecification.hasSalaryGreaterThan(50000));
+		
+		List<Employee> employees = repository.findAll(spec);
+
+🔥 Generated SQL (Internally)
+		SELECT *
+		FROM employee
+		WHERE age > 25
+		AND department = 'IT'
+		AND salary > 50000;
+
 =============================================================================================================
 
 Round 2:
@@ -7732,6 +8246,50 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
                 Employee::getName
         ));
 
+35. Sort by Multiple Fields :
+
+	1. Ascending :
+		List<Employee> sorted = employees.stream()
+	    .sorted(Comparator.comparing(Employee::getAge)
+	            .thenComparing(Employee::getDepartment)
+	            .thenComparing(Employee::getSalary))
+	    .collect(Collectors.toList());
+
+	2. Descending:
+		List<Employee> sorted = employees.stream()
+	    .sorted(Comparator.comparing(Employee::getAge)
+	            .thenComparing(Employee::getDepartment)
+	            .thenComparing(Employee::getSalary)
+	            .reversed())
+	    .collect(Collectors.toList());
+
+=>  What if thenComparing(Employee::getDepartment) returns null?
+	What happens?
+	How to handle it?
+
+	👉 NullPointerException will occur
+	Because internally:
+		e1.getDepartment().compareTo(e2.getDepartment())
+		And calling compareTo() on null throws NPE.
+
+=> 🔷 How To Handle Null Safely?
+		Java provides:
+			Comparator.nullsFirst()
+			Comparator.nullsLast()
+		
+	✅ Option 1: Put Nulls First
+		List<Employee> sorted = employees.stream()
+		    .sorted(Comparator.comparing(Employee::getAge)
+		        .thenComparing(
+		            Employee::getDepartment,
+		            Comparator.nullsFirst(String::compareTo)
+		        )
+		        .thenComparing(Employee::getSalary))
+		    .collect(Collectors.toList());
+
+	=> Now:
+			If department is null → comes first
+			No exception
 
 
 3. ========================================== DSA =======================================================================
@@ -8369,64 +8927,21 @@ Have you worked with clients directly?
 
 
 
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-5. have you created Rest full API ? what thing will consider to create api ?
-6. what kind of API I have created in my project ?
-7. where exactly we write JWT and where exactly we validated username/password
-8. what is API contacts with clients ?
-9. how to handle api slower ? what we will do to faster 
-10. how to implent pagination properly ? what is Pageable ?
-11.implementation of cache ?
-12. path variable vs request param ? example for both where exactly we use ?
-13. PUT and PATCH real time example ?
-14. diff hashMap and TreeMap example ? when to use what ?
-15. heap and stack memory what value will store ? 
-16. what all other design pattern used in real time example
-17. how do deploy our code ?
-18. how to valiadte build failure in Jenkins ?
-19. what are the stages in jenkins
-20. solid principles 
-21. how to debug which I have dont have access file  from where we will logs ?
 22. binary search code ? what are the prerequeste ? what is the principles ? whar the other way can search 
-23.
+
 
 
 ==============================================================================================================
 
-1. employee  
-List<Employee> sortedList = employees.stream()
-        .sorted(
-            Comparator.comparing(Employee::getName)
-                      .thenComparing(Employee::getDept)
-                      .thenComparing(Employee::getSalary)
-        )
-        .collect(Collectors.toList());
-
-
-	if  .thenComparing(Employee::getDept) is null ABD HOW TO HANDLE
 	
 	
-2. have you ever used completable future ?
-3. Concurance API ? what are purpused used ?
-4. what are the concept we used spriboot ?
-5. how to handle role based code in spring security ? code level
-6. from JPA stored procedures ?
+
+
+
+
 7. specidifcation in jpa ?
 8. unit test case ? what type of test case written ?
+
 
 
 
