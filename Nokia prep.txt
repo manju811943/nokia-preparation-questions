@@ -6791,6 +6791,23 @@ Eg 2:   @FunctionalInterface
 				private String name = "DefaultApp";
 				If property missing → default used.
 
+264.  Have you created Rest full API ? what thing will consider to create API ?
+
+	=> Yes, I have designed RESTful APIs in Spring Boot. While creating APIs, I focus on proper resource naming using nouns, correct HTTP method semantics, 		   appropriate status codes, validation, global exception handling, security using JWT, pagination for large datasets, and proper DTO mapping instead of 		   exposing entities directly. I also ensure APIs are stateless, versioned, and well-documented
+
+	🔥 Advanced Things Senior Engineers Consider
+		✔ Rate limiting
+		✔ Caching (Redis)
+		✔ API documentation (Swagger / OpenAPI)
+		✔ Circuit breaker (Resilience4j)
+		✔ Timeout handling
+		✔ Proper error codes standardization
+
+	🔥 Most Important REST Principles for Interviews
+			Stateless
+			Proper resource naming
+			Correct HTTP methods
+			Proper status codes
 
 =============================================================================================================
 
@@ -8364,9 +8381,7 @@ Have you worked with clients directly?
 
 
 
-4.	@Value("${path.to.value}") – quick, single value injection
-	@ConfigurationProperties(prefix="...") – best for structured/nested config
-	Environment#getProperty("path.to.value") – programmatic access
+
 
 
 5. have you created Rest full API ? what thing will consider to create api ?
@@ -8412,6 +8427,7 @@ List<Employee> sortedList = employees.stream()
 6. from JPA stored procedures ?
 7. specidifcation in jpa ?
 8. unit test case ? what type of test case written ?
+
 
 
 
