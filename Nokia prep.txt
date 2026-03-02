@@ -8747,6 +8747,55 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 	        System.out.println(decimal);
 
 
+33.	What Is Binary Search ? 
+	=> Binary Search is an algorithm used to: Efficiently search an element in a sorted array.
+
+	2️⃣ Prerequisite (Very Important)
+		👉 Array/List must be sorted
+				Ascending or descending — but sorted.
+		If not sorted ❌
+			Binary search will give wrong result.
+
+=> 	Principle of Binary Search
+			Main idea:
+				Divide the search space into half every time.
+			Steps:
+				Find middle element
+				Compare target with middle
+				If equal → return
+				If target < middle → search left half
+				If target > middle → search right half
+				Repeat
+			This is called:
+				👉 Divide and Conquer
+
+	=>  int[] arr = {10, 20, 30, 40, 50, 60};
+        int target = 50;
+        System.out.println(binarySearch(arr, target));+
+
+	=>  public static int binarySearch(int[] arr, int target) {
+	        int left = 0;
+	        int right = arr.length - 1;
+	
+	        while (left <= right) {
+	
+	            int mid = left + (right - left) / 2; // safe way
+	
+	            if (arr[mid] == target) {
+	                return mid;
+	            }
+	
+	            if (arr[mid] < target) {
+	                left = mid + 1;
+	            } else {
+	                right = mid - 1;
+	            }
+	        }
+	
+	        return -1; // not found
+	    }
+
+
 
 		
 ===================================================== Introduction ======================================================================
@@ -8933,14 +8982,7 @@ Have you worked with clients directly?
 
 ==============================================================================================================
 
-	
-	
 
-
-
-
-7. specidifcation in jpa ?
-8. unit test case ? what type of test case written ?
 
 
 
