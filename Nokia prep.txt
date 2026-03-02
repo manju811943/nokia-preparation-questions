@@ -6414,7 +6414,115 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 	7. Protect API with Limits -> Timeout configuration, Circuit breaker (Resilience4j), Graceful degradation
 	8. JVM Memory Handling -> Use projection DTO instead of entity, Disable unnecessary relationships,Use fetch size
 	9. Use Async Processing -> Use Kafka, Use Queue, Process async
-==============================================================
+
+256. Are stream introduce for improve the performace or just short way of writing code ?
+	=>  Streams were NOT introduced mainly for performance.
+	=>	They were introduced for functional-style programming and code readability.
+	=> 	Performance improvement is a side benefit only in some cases (parallel streams)
+
+=> How stream work Internally ?
+	1. Stream Creation :
+		list.stream() creates a Stream pipeline object.  and It does NOT process data immediately.
+			It wraps the collection’s:
+				Spliterator : A special iterator that can split data into multiple parts.
+				Source
+				Intermediate operations
+
+	2. Pipeline Building
+			Operations like:
+				filter()
+				map()
+				sorted()
+					are lazy.
+			=>	They are stored as a pipeline chain.
+			=>	Nothing executes yet
+
+	3. Terminal Operation Trigger
+		When toList() is called:
+		👉 Stream starts processing.
+			It uses:
+				Source → filter → map → collect
+				This is called internal iteration.
+				Unlike for-loop (external iteration), stream controls iteration
+
+=> How parallelStream() Works Step-by-Step ?
+Step 1: Splitting (Fork Phase) :
+		Spliterator.trySplit() divides data:
+					[1..1000000]
+			   ↓
+			[1..500000] + [500001..1000000]
+			   ↓
+			Further split
+			
+			Data keeps splitting until:
+				Size is small enough
+				Based on CPU cores
+
+Step 2: Task Submission :
+	Each chunk is submitted as:
+		ForkJoinTask
+			To:
+			ForkJoinPool.commonPool()
+
+Step 3: Work Stealing
+		If one thread finishes early:
+			It steals work from another thread.
+			This improves CPU utilization.
+
+Step 4: Join Phase
+	After all threads finish:
+		Results are combined.
+		This is the "Join" phase.
+
+257. Why are parallel streams dangerous in Spring Boot ?
+
+	=> Parallel streams use ForkJoinPool.commonPool(), which is shared globally across the JVM. 
+	   In a Spring Boot application handling multiple concurrent requests, this can lead to thread contention, 
+	   CPU exhaustion, and unpredictable performance. Additionally, parallel streams are not suitable for blocking 				   operations like database or REST calls, which are common in backend services. 
+	   Therefore, it is safer to use a custom ExecutorService or CompletableFuture with a dedicated thread pool 
+	   for better control and scalability.
+
+258. Popular AI Models in the Market ?
+
+	1. OpenAI – GPT Models -> Code generation, Chatbots, API generation
+	2. Google – Gemini  -> Multimodal (text + image + video)
+	3. Anthropic – Claude -> Long context handling, 
+	4. Meta – LLaMA -> 
+	5. Microsoft – Copilot -> Code auto-completion, Test case generation
+
+=> How does an LLM search and give results ?
+	1. LLMs do not search like traditional search engines. They are trained on massive datasets to learn statistical 				relationships between words. 
+	2. When given input, the text is tokenized and converted into vectors. Using transformer architecture and self-				   attention mechanisms, the model predicts the next most probable token repeatedly until the response is generated. 
+	3. If connected to external systems using RAG(Retrieval-Augmented Generation), the model can retrieve real-time data 		   before generating output.
+
+259. What is Cache ?
+	=> A fast temporary storage layer to avoid repeated expensive operations (DB calls, API calls)
+	=> There are two main types used in Spring Boot:
+			✅ In-Memory Cache (like ConcurrentHashMap, Caffeine)
+			✅ Distributed Cache (like Redis)
+
+	=> How Data is Stored in Cache?
+		Case 1: In-Memory Cache (Inside JVM)
+			Example: Spring Boot default cache or Caffeine
+
+			Internally it uses: ConcurrentHashMap<K, V>
+			=> So data is stored as: Key → Value  Eg: "USER_101" → User Object
+
+		So it is NOT : List, JSON, Text
+		Java objects directly in heap memory
+
+		Case 2: Redis (Distributed Cache) 
+		Redis stores data as: Key → Value
+		But value can be :String, JSON, Hash, List, Set, Sorted Set, Bitmap, HyperLogLog
+
+		Example:
+		Key: user:101
+		Value: {"id":101,"name":"Roy","active":true}
+
+ 
+	
+
+=============================================================================================================
 
 Round 2:
 1). Angualr and javascript coding questions :	
@@ -7975,19 +8083,16 @@ Have you worked with clients directly?
 
 
 
-6. how List will maintain data.
-7. what are deafult interfaces and how does it work
-8. are streams are improvements, are just short way of code ?
-		if impreve performance, how it impreve 
-		if not impreve performance why it required when we can write better memory concern code
+
 	
-9. what are the AI models available, how does it works, hoe does it 
+
 10. how data will be stored in cache is it in the from object, list or how ? where it will store is it have database or files ?
 11. what are the connection pool, what exactly happens in it and when to create, how to create
 
 
 12. 🔥 How Stream works internally?
 13. Can lambda throw checked exception?
+
 
 
 
