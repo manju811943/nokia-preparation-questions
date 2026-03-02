@@ -8094,6 +8094,59 @@ Have you worked with clients directly?
 13. Can lambda throw checked exception?
 
 
+1. how to call custome exception and declare from wgher we need to call ?
+2. why lambdam use
+3. how how application will read app. yml file ? value/path how app should know read these value from app.yml
+4.	@Value("${path.to.value}") – quick, single value injection
+	@ConfigurationProperties(prefix="...") – best for structured/nested config
+	Environment#getProperty("path.to.value") – programmatic access
+
+
+5. have you created Rest full API ? what thing will consider to create api ?
+6. what kind of API I have created in my project ?
+7. where exactly we write JWT and where exactly we validated username/password
+8. what is API contacts with clients ?
+9. how to handle api slower ? what we will do to faster 
+10. how to implent pagination properly ? what is Pageable ?
+11.implementation of cache ?
+12. path variable vs request param ? example for both where exactly we use ?
+13. PUT and PATCH real time example ?
+14. diff hashMap and TreeMap example ? when to use what ?
+15. heap and stack memory what value will store ? 
+16. what all other design pattern used in real time example
+17. how do deploy our code ?
+18. how to valiadte build failure in Jenkins ?
+19. what are the stages in jenkins
+20. solid principles 
+21. how to debug which I have dont have access file  from where we will logs ?
+22. binary search code ? what are the prerequeste ? what is the principles ? whar the other way can search 
+23.
+
+
+==============================================================================================================
+
+1. employee  
+List<Employee> sortedList = employees.stream()
+        .sorted(
+            Comparator.comparing(Employee::getName)
+                      .thenComparing(Employee::getDept)
+                      .thenComparing(Employee::getSalary)
+        )
+        .collect(Collectors.toList());
+
+
+	if  .thenComparing(Employee::getDept) is null ABD HOW TO HANDLE
+	
+	
+2. have you ever used completable future ?
+3. Concurance API ? what are purpused used ?
+4. what are the concept we used spriboot ?
+5. how to handle role based code in spring security ? code level
+6. from JPA stored procedures ?
+7. specidifcation in jpa ?
+8. unit test case ? what type of test case written ?
+
+
 
 
 
