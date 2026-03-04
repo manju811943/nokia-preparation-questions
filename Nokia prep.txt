@@ -9372,10 +9372,835 @@ Have you worked with clients directly?
 
 
 
+1. Core Java (Very Important)
+
+For 6+ years experience, they expect deep understanding.
+
+Must Prepare
+
+Multithreading
+
+Thread lifecycle
+
+synchronized
+
+wait() / notify()
+
+volatile
+
+Callable vs Runnable
+
+ExecutorService
+
+Race condition
+
+Deadlock
+
+Example questions:
+
+Print odd/even using threads
+
+Producer Consumer problem
+
+What is ThreadLocal?
+
+Collections Internal Working
+
+You should know internal implementation.
+
+Topic	Example Question
+HashMap	How it handles collisions
+ConcurrentHashMap	How it works internally
+ArrayList	Why default capacity is 10
+HashSet	How duplicates are avoided
+Comparable vs Comparator	Sorting logic
+
+Java Concepts
+
+Immutable class
+
+equals() vs hashCode()
+
+Optional
+
+Streams API
+
+Functional interfaces
+
+Lambda expressions
+
+Example coding question:
+
+Find duplicate characters in string
+Reverse words in sentence
+Find second largest number
+2. Spring Boot (Very Important for Backend)
+
+They will expect real production knowledge.
+
+Must Prepare
+
+Spring Core
+
+Dependency Injection
+
+Bean lifecycle
+
+Singleton vs Prototype
+
+Spring Boot
+
+Auto configuration
+
+Starter dependencies
+
+Configuration properties
+
+Example questions:
+
+What happens internally when Spring Boot starts?
+
+Difference between @Component, @Service, @Repository.
+
+Spring Data JPA
+
+Lazy vs Eager loading
+
+N+1 problem
+
+JPA Specifications
+
+Pagination
+
+Fetch joins
+
+Example question:
+
+How do you call a stored procedure from JPA?
+
+Security
+
+JWT authentication
+
+OAuth2
+
+Role-based access
+
+Caching
+
+Redis
+
+Ehcache
+
+Hibernate caching
+
+3. Angular (Frontend)
+
+Since you already work with Angular, they may test architecture knowledge.
+
+Must Prepare
+
+Core Angular
+
+Components
+
+Lifecycle hooks
+
+Services
+
+Dependency Injection
+
+Advanced Angular
+
+RxJS operators
+
+switchMap
+
+mergeMap
+
+Observables vs Promises
+
+Example question:
+
+How does Angular change detection work?
+
+State Management
+
+NgRx basics
+
+BehaviorSubject state management
+
+Performance
+
+Lazy loading
+
+TrackBy
+
+OnPush change detection
+
+Testing
+
+Jasmine
+
+Karma
+
+TestBed
+
+Mock services
+
+4. System Design (Very Likely)
+
+Since FICO builds large analytics systems, expect architecture questions.
+
+Example:
+
+Design a Fraud Detection System
+
+You may need to explain:
+
+API layer
+Service layer
+Database
+Cache
+Message queue
+
+Example architecture:
+
+Client
+   |
+API Gateway
+   |
+Spring Boot Services
+   |
+Kafka
+   |
+Fraud Engine
+   |
+Database
+
+Other design questions:
+
+Design URL shortener
+
+Design payment system
+
+Design scalable API for millions of requests
+
+5. Database Knowledge
+
+Prepare:
+
+Indexing
+
+Query optimization
+
+Transactions
+
+Isolation levels
+
+Sharding
+
+Pagination for millions of records
+
+Example question:
+
+How do you fetch 10 million records efficiently?
+6. Coding Questions (Common)
+
+Typical coding questions:
+
+Reverse a string
+Find duplicate elements
+Binary search
+LRU cache
+Thread problems
+
+They usually expect clean code + explanation.
+
+7. Behavioral Questions
+
+Prepare examples from your insurance project.
+
+Example:
+
+Explain your project architecture
+
+What was the most complex problem you solved?
+
+How did you improve performance?
+
+8. Smart Way to Prepare (2–3 Days Plan)
+Day 1
+
+Java core
+
+Multithreading
+
+Collections internal
+
+Day 2
+
+Spring Boot
+
+JPA
+
+Security
+
+System design
+
+Day 3
+
+Angular
+
+RxJS
+
+Unit testing
+
+Coding practice
+
+9. Most Important Question They Will Ask
+
+Almost every senior interview starts with:
+
+"Explain your current project architecture."
+
+You should explain:
+
+Angular UI
+↓
+Spring Boot APIs
+↓
+Authentication
+↓
+Business services
+↓
+JPA
+↓
+Database
+10. What FICO Usually Looks For
+
+Because it’s a product company, they evaluate:
+
+Problem solving
+
+Clean architecture
+
+Performance optimization
+
+Strong fundamentals
+
+Not just framework usage.
 
 
 
+===========================================
 
+1. Explain your current project architecture
+
+Question
+
+Explain the architecture of your insurance project.
+
+Answer
+
+In our insurance application:
+
+Angular UI
+   ↓
+Spring Boot REST APIs
+   ↓
+Service Layer (business logic)
+   ↓
+JPA / Hibernate
+   ↓
+Database (Oracle/PostgreSQL)
+
+Angular handles UI and state management, while Spring Boot exposes REST APIs for claim processing, fraud investigation, and policy management. Hibernate manages database interactions.
+
+2. How does Angular communicate with backend APIs?
+
+Answer
+
+Angular uses HttpClient service.
+
+Example:
+
+this.http.get('/api/claims');
+
+In our insurance system, Angular calls APIs like:
+
+GET /claims
+POST /fraud-investigation
+PUT /claim-status
+
+The backend processes the request and returns JSON.
+
+3. What is Dependency Injection in Angular?
+
+Answer
+
+Dependency Injection allows Angular to provide required services automatically.
+
+Example in our project:
+
+constructor(private claimService: ClaimService) {}
+
+Angular injects ClaimService so the component can fetch insurance claim data.
+
+4. What problem does NgRx solve?
+
+Answer
+
+NgRx provides centralized state management.
+
+In our project:
+
+Multiple components need claim data:
+
+Claim List
+Claim Details
+Fraud Summary
+
+Instead of calling APIs multiple times, NgRx stores the claim data in a global store.
+
+5. Difference between switchMap and mergeMap in RxJS
+
+Answer
+
+switchMap cancels previous requests.
+
+Example in insurance search:
+
+User searches claims:
+
+User types claimId quickly
+
+switchMap cancels old requests and keeps only the latest search.
+
+6. How does Spring Boot start internally?
+
+Answer
+
+Spring Boot startup flow:
+
+SpringApplication.run()
+   ↓
+ApplicationContext created
+   ↓
+AutoConfiguration applied
+   ↓
+Beans created
+   ↓
+Embedded server started (Tomcat)
+7. What is the difference between @Component, @Service, @Repository?
+
+Answer
+
+Annotation	Purpose
+@Component	Generic component
+@Service	Business logic
+@Repository	Database access
+
+Example in insurance system:
+
+ClaimController
+ClaimService
+ClaimRepository
+8. What happens inside HashMap when collision occurs?
+
+Answer
+
+HashMap uses:
+
+hashCode()
+↓
+bucket index
+↓
+linked list / tree
+
+If two claim IDs generate the same hash, they are stored in the same bucket.
+
+Java 8 converts linked list → Red Black Tree when collisions exceed 8.
+
+9. What is ConcurrentHashMap?
+
+Answer
+
+ConcurrentHashMap supports thread-safe operations without locking the entire map.
+
+Example:
+
+In fraud detection service, multiple threads process claims simultaneously.
+
+ConcurrentHashMap stores claim results safely.
+
+10. What is an immutable class?
+
+Answer
+
+An immutable object cannot change after creation.
+
+Example:
+
+Insurance policy configuration object.
+
+Example code:
+
+final class PolicyConfig {
+   private final String policyType;
+}
+11. How do you prevent race conditions?
+
+Answer
+
+Using:
+
+synchronized
+ReentrantLock
+Atomic variables
+
+Example:
+
+Multiple threads updating claim status must synchronize updates.
+
+12. Explain transaction isolation levels
+
+Answer
+
+Isolation levels prevent data inconsistency.
+
+Example:
+
+If two agents update the same claim simultaneously.
+
+Isolation levels:
+
+READ_COMMITTED
+REPEATABLE_READ
+SERIALIZABLE
+13. What is the N+1 query problem?
+
+Answer
+
+N+1 occurs when JPA executes multiple queries unnecessarily.
+
+Example:
+
+Fetching claims and their policies:
+
+1 query → claims
+N queries → policies
+
+Solution:
+
+JOIN FETCH
+14. How do you optimize database queries?
+
+Answer
+
+Techniques used in our project:
+
+Indexes
+Pagination
+Caching
+Query optimization
+
+Example:
+
+Claim search with millions of records uses pagination.
+
+15. How do you handle millions of records in API?
+
+Answer
+
+Use:
+
+Pagination
+Streaming
+Batch processing
+
+Example:
+
+GET /claims?page=1&size=50
+16. What is caching in Spring Boot?
+
+Answer
+
+Caching stores frequently accessed data.
+
+Example:
+
+Insurance policy rules rarely change.
+
+We store them in Redis.
+
+17. Explain JWT authentication
+
+Answer
+
+Authentication flow:
+
+User login
+↓
+Server generates JWT token
+↓
+Client sends token in header
+↓
+Server validates token
+
+Example:
+
+Insurance agents accessing claims.
+
+18. What is optimistic locking?
+
+Answer
+
+Prevents conflicts using version numbers.
+
+Example:
+
+Two users editing the same claim.
+
+If version mismatch occurs → update fails.
+
+19. What is pessimistic locking?
+
+Answer
+
+Locks the record during update.
+
+Example:
+
+Critical claim settlement updates.
+
+20. Difference between REST and SOAP
+
+Answer
+
+REST	SOAP
+Lightweight	Heavy
+JSON	XML
+Stateless	Stateful
+
+Insurance APIs usually use REST.
+
+21. How do you improve Angular performance?
+
+Answer
+
+Techniques used:
+
+Lazy loading
+TrackBy
+OnPush change detection
+
+Example:
+
+Claim table rendering thousands of rows.
+
+22. What is lazy loading in Angular?
+
+Answer
+
+Loads modules only when needed.
+
+Example:
+
+Fraud investigation module loads only when opened.
+
+23. What is Angular change detection?
+
+Answer
+
+Angular checks if UI data changed and updates DOM.
+
+Strategies:
+
+Default
+OnPush
+24. How do you test Angular components?
+
+Answer
+
+Using Jasmine + Karma.
+
+Example:
+
+Test claim list component rendering.
+
+25. What is microservices architecture?
+
+Answer
+
+Application divided into independent services.
+
+Example insurance architecture:
+
+Claim Service
+Policy Service
+Fraud Service
+Notification Service
+26. How do microservices communicate?
+
+Answer
+
+Two methods:
+
+REST APIs
+Message queues (Kafka)
+27. What is Kafka used for?
+
+Answer
+
+Kafka handles event streaming.
+
+Example:
+
+When a claim is submitted:
+
+ClaimCreated event
+↓
+Fraud Service consumes
+↓
+Risk evaluation
+28. What is API Gateway?
+
+Answer
+
+Single entry point for APIs.
+
+Example:
+
+Client
+ ↓
+API Gateway
+ ↓
+Claim Service
+Policy Service
+29. How would you design a fraud detection system?
+
+Answer
+
+Architecture:
+
+Claim Submission
+   ↓
+Event published (Kafka)
+   ↓
+Fraud Detection Service
+   ↓
+Machine Learning Model
+   ↓
+Fraud score returned\
+==============================================
+
+11. What is the difference between wait() and sleep()?
+wait()	sleep()
+Releases lock	Does not release lock
+Used in synchronization	Used for delay
+
+Example:
+
+Producer-consumer pattern in claim processing.
+
+12. What causes memory leaks in Java?
+
+Common reasons:
+
+Static collections
+Unclosed resources
+Listeners not removed
+Improper caching
+
+Example:
+
+Fraud detection service caching claim objects without eviction.
+
+Solution:
+
+WeakHashMap
+Cache eviction
+13. What is the difference between checked and unchecked exceptions?
+Checked	Unchecked
+Compile-time	Runtime
+IOException	NullPointerException
+
+Example:
+
+Database connection failure → checked exception
+Null pointer bug → unchecked
+14. What is double-checked locking?
+
+Used in Singleton pattern.
+
+Example:
+
+private static volatile Instance instance;
+
+public static Instance getInstance(){
+    if(instance == null){
+        synchronized(ClassName.class){
+            if(instance == null){
+                instance = new Instance();
+            }
+        }
+    }
+    return instance;
+}
+
+Used when initializing:
+
+Fraud detection engine
+Configuration loader
+15. Explain Producer Consumer problem
+
+Classic multithreading problem.
+
+Example in insurance system:
+
+Claim requests incoming
+↓
+Queue
+↓
+Worker threads process claims
+
+Example using blocking queue:
+
+BlockingQueue<Claim> queue = new LinkedBlockingQueue<>();
+
+Producer:
+
+Adds claim request
+
+Consumer:
+
+Processes claim
+Bonus: Hard Question Often Asked
+
+Why String is immutable in Java?
+
+Reasons:
+
+Security
+Thread safety
+Caching
+HashMap key stability
+
+Example:
+
+API tokens
+Database connection strings
+One Tip for Your FICO Interview
+
+Product companies like FICO focus heavily on:
+
+Java fundamentals
+Multithreading
+Data structures
+System design
+
+Not just frameworks.
 
 
 
