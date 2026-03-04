@@ -665,8 +665,331 @@ CSS:
 	| Scalability     | Hard              | Easy                     |
 	| Angular Support | ❌ Not supported  | ✅ Required              |
 
-				
 
+49. What are the ES6 features :
+	=> ES6 (ECMAScript 2015) introduced many modern JavaScript features that make code cleaner, shorter, and easier to maintain.
+
+	1. Let and Const :
+		Purpose
+		=> Block-scoped variables (safer than var).
+			Example
+				let count = 10;
+				count = 20;   // allowed
+
+				const PI = 3.14;
+				// PI = 3.15; ❌ not allowed
+
+		=>	Real-time Use Case
+				In a React or Angular component, constants like API URLs should not change.
+				const API_URL = "https://api.company.com/users";
+
+	2. Arrow Functions
+			Purpose
+				=> Shorter function syntax and automatic this binding.
+				Example
+					const add = (a, b) => a + b;
+					console.log(add(5, 3)); // 8
+
+			=> Real-time Use Case :
+				Used heavily in React event handlers or array operations.
+	
+
+	3. Template Literals
+			Purpose
+				String interpolation using backticks.
+			Example
+			let name = "Roy";
+			let message = `Hello ${name}`;
+			console.log(message);
+
+			=> Real-time Use Case :
+			 	Generating dynamic UI messages or API URLs
+					let userId = 10;
+					let url = `https://api.company.com/users/${userId}`;
+
+	4. Destructuring
+			Purpose
+				Extract values from objects/arrays easily.
+			Example
+			const user = {
+			  name: "Roy",
+			  age: 30
+			};
+			const {name, age} = user;
+			console.log(name);
+
+		=>	Real-time Use Case :
+				Very common in React props or API responses
+	5. Spread Operator (...)
+			Purpose
+				Copy or merge arrays/objects.
+			Example
+				const arr1 = [1,2];
+				const arr2 = [...arr1, 3,4];
+				console.log(arr2);
+
+	6. Default Parameters
+			Purpose
+				Provide default values to function parameters.
+			Example
+			function greet(name = "Guest"){
+			   console.log(`Hello ${name}`);
+			}
+			greet(); // Hello Guest
+
+		=>	Real-time Use Case
+				Handling optional parameters in API functions
+
+	7. Classes
+			Purpose
+				Object-oriented syntax in JavaScript.
+			Example
+				class Person {
+				   constructor(name){
+				      this.name = name;
+				   }
+				   greet(){
+				      console.log(`Hello ${this.name}`);
+				   }
+				}
+				const p = new Person("Roy");
+				p.greet();
+
+			=>	Real-time Use Case :
+					Creating models or services in large applications
+
+	8. Modules (Import / Export)
+		Purpose
+			Split code into reusable files.
+
+50. Example for NgRx and where we used in our project ?
+		=> Claim List Page :
+			-> Fetch claims from API
+			-> Show claims in table
+			-> Update claim status
+			-> Show loading indicator
+			-> Cache claims so multiple components can use them
+
+	=> With NgRx:
+		  Single centralized state store
+				Component → Action → Reducer → Store → Component
+			                     ↓
+			                  Effect → API
+
+		Main NgRx Components :
+			Store
+			Actions
+			Reducer
+			Effects
+			Selectors
+
+	1. Action (Trigger Event)
+			Action represents something that happened in the application.
+		=> Real-time Meaning :
+				User opens Claim List Page → dispatch loadClaims.
+
+	2. Reducer (Update State)
+			Reducer updates the store state.
+		=> Real-time Meaning
+			Reducer updates:
+				loading = true
+				claims = API response
+
+	3. Effect (API Calls)
+			Effects handle side effects like API calls.
+		=> Real-time Meaning :
+			Action → Effect → API call → Dispatch Success Action
+
+	4. Selector (Read Store Data)
+			Selectors help components read data from store.
+
+	5. store 
+
+	Flow Diagram :
+		Component
+		   |
+		dispatch Action
+		   |
+		Actions
+		   |
+		Effects → API Call
+		   |
+		Success Action
+		   |
+		Reducer
+		   |
+		Store Updated
+		   |
+		Selector
+		   |
+		Component UI Updated
+
+	Where did you use NgRx? 
+		=> In our Angular insurance project we used NgRx for centralized state management. For example, in the Claim module we used actions to trigger 
+		   claim loading, effects to call backend APIs, reducers to update the store, and selectors to retrieve claim data in components. 
+		   This helped avoid multiple API calls and maintain a single source of truth
+
+
+	1. Where is Memory Allocated ?
+		->  The store is allocated in the browser's JavaScript heap memory.
+		-> So the store lives as long as the Angular app is running in the browser tab.
+
+	2. Where Do Components Access the Store ?
+		-> Components inject it.
+				constructor(private store: Store) {}
+
+	3. How Can the Entire Store Be Cleared ?
+		Yes, there are multiple ways to reset the store.
+		1. Method 1 (Most Common) — Logout Action -> logout action and reset state.
+		2. Method 2 — Meta Reducer (Best Practice) -> if (action.type === '[Auth] Logout') {
+													      state = undefined;
+													    }
+		3. Method 3 — Browser Refresh
+			Since store is in memory, refreshing browser clears it.
+				Page Refresh
+				   ↓
+				Angular reloads
+				   ↓
+				Store recreated
+
+51. NgRx Store vs BehaviorSubject (Angular State Management) ?
+		| Feature      | NgRx Store              | BehaviorSubject Service    |
+		| ------------ | ----------------------- | -------------------------- |
+		| State type   | Global state management | Local/shared service state |
+		| Architecture | Redux pattern           | Simple RxJS                |
+		| Complexity   | High                    | Low                        |
+		| Boilerplate  | More files              | Minimal code               |
+		| Best for     | Large applications      | Small/medium features      |
+
+	=> BehaviorSubject is a simple RxJS-based state sharing mechanism typically used inside Angular services for small or localized state management. 
+	   NgRx Store, on the other hand, follows the Redux pattern and provides a centralized global store with actions, reducers, effects, and selectors. 
+       NgRx is better suited for large enterprise applications where predictable state management, debugging, and scalability are important.
+
+
+52. what are angular injection where and how it is used in terms of insrurance project ?
+	=> In Angular, Injection usually refers to Dependency Injection (DI).
+	=> It is a design pattern where Angular automatically provides required objects (services, classes) to components instead of you creating them manually.
+
+	2. Why Angular Uses Dependency Injection
+		Benefits:
+			Loose coupling
+			Reusable services
+			Easy testing
+			Centralized logic
+		Instead of:
+			const service = new ClaimService();
+		Angular does:
+			constructor(private claimService: ClaimService) {}
+		=> Angular creates the instance automatically.
+
+	Types of Angular Injectors
+		Angular has hierarchical injectors :
+
+			Injector Level			Example
+			Root Injector			providedIn: 'root'
+			Module Injector			Provided in module
+			Component Injector		Provided in component
+
+	Eg : @Injectable({
+		  providedIn: 'root'
+		})
+	=> 	Means: One instance for entire application
+
+53. what are injection token ?
+		=> InjectionToken is a unique identifier used in Angular dependency injection to provide and inject values that are not classes, 
+		   such as configuration objects or interfaces.
+
+	Step 1 — Create Injection Token :
+		import { InjectionToken } from '@angular/core';
+		export const API_URL = new InjectionToken<string>('API_URL');
+
+	Step 2 — Provide Value in Module :
+		@NgModule({
+		  providers: [
+		    { provide: API_URL, useValue: 'https://insurance-api.com' }
+		  ]
+		})
+		export class AppModule {}
+
+	Step 3 — Inject in Service
+		import { Inject } from '@angular/core';
+		@Injectable({
+		providedIn: 'root'
+		})
+		export class ClaimService {
+			constructor(
+			private http: HttpClient,
+			@Inject(API_URL) private apiUrl: string
+			) {}
+				getClaims() {
+				return this.http.get(`${this.apiUrl}/claims`);
+			}
+		}
+
+
+54. What is TestBed in Angular ?
+	=> In Angular unit testing, TestBed is the main testing utility provided by Angular to configure and create an Angular testing environment
+
+	=> It allows you to:
+			Configure testing module
+			Create component instances
+			Inject services
+			Compile templates
+			Mock dependencies
+		=>	It works very similar to Angular’s @NgModule, but only for test cases.
+
+		Eg: beforeEach(() => {
+			  TestBed.configureTestingModule({
+			    declarations: [UserComponent],
+			    providers: [UserService],
+			    imports: []
+			  });
+			});
+
+	1. How do you mock a service ?
+		=> Mocking a service in Angular means replacing the real service with a fake implementation during testing so that:
+				You avoid real API calls
+				You control the data returned
+				Tests become faster and predictable
+
+	2. How do you test HTTP calls ?
+		=> Testing HTTP calls in Angular is usually done using HttpClientTestingModule and HttpTestingController.
+		   This allows you to mock backend API calls and verify requests without hitting the real server.
+
+	3. How do you test Observables in Angular ?
+		=> Observables are tested by subscribing to them and asserting the emitted values. 
+		   For asynchronous observables we use Jasmine’s done() or Angular utilities like fakeAsync and tick(). 
+		   For HTTP observables we use HttpClientTestingModule and HttpTestingController to mock responses.
+
+	4. How do you test NgRx store in Angular ?
+		=> NgRx store can be tested by testing reducers, selectors, actions, and effects separately. 
+		   For component testing we use provideMockStore to create a mock store and verify dispatched actions and selected state. 
+		   Effects are tested using provideMockActions, and reducers are tested as pure functions.
+
+	5. How do you test async operations in Angular ?
+		=> Testing async operations in Angular means verifying code that runs asynchronously, such as:
+				HTTP calls
+				Promises
+				setTimeout / setInterval
+				Observables
+				NgRx effects
+				
+			Angular provides special utilities for this.
+				The most common ones are:
+					done()
+					async / waitForAsync
+					fakeAsync
+					tick()
+					flush()
+
+			=> Angular provides utilities like done(), waitForAsync, and fakeAsync to test asynchronous code. 
+			   The most commonly used approach is fakeAsync with tick() which allows us to simulate asynchronous behavior 	
+			   such as promises, timers, and observables in a synchronous testing environment
+
+	6. How do you test @Input, @Output, and Reactive Forms in Angular ?
+			@Input → Assign value to component property and run detectChanges()
+			@Output → Use spyOn() on EventEmitter.emit
+			Reactive Forms → Test form initialization, validation, and submission logic using FormGroup controls.
 				
 	Core Java :
 ===========================================================================================
@@ -8796,6 +9119,68 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 	    }
 
 
+34. How to print odd and even number using thread class ?
+
+	public class Main {
+	    public static void main(String[] args) {
+	
+	        printEvenOrOddNum printNum = new printEvenOrOddNum();
+	
+	        Thread oddThread = new Thread( () -> printNum.printOdd());
+	        Thread eventThread = new Thread( ()-> printNum.printEven());
+	    
+	        oddThread.start();
+	        eventThread.start();
+	
+	    }
+	}
+
+create another class
+		public class printEvenOrOddNum {
+	
+	    private int number = 1;
+	    private int limit = 10;
+	
+	    public synchronized void printOdd(){
+	
+	       while(number <= limit){
+	
+	           if(number%2 == 0){
+	               try {
+	                wait();
+	               }catch (Exception e){
+	                   e.printStackTrace();
+	               }
+	           }else{
+	               System.out.println("odd" + number);
+	               number ++;
+	               notify();
+	           }
+	       }
+	
+	    }
+	
+	    public synchronized  void printEven(){
+	
+	        while (number <= limit ){
+	            if(number%2 != 0){
+	                try {
+	                    wait();
+	                }catch (Exception e){
+	                    e.printStackTrace();
+	                }
+	            }else{
+	                System.out.println("even" + number);
+	                number++;
+	                notify();
+	            }
+	        }
+	
+	    }
+	}
+	
+
+
 
 		
 ===================================================== Introduction ======================================================================
@@ -8981,6 +9366,7 @@ Have you worked with clients directly?
 
 
 ==============================================================================================================
+
 
 
 
