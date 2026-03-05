@@ -4938,7 +4938,7 @@ steams	2. System.out.println(Arrays.stream(arr1)
 			Definition:
 				=> A class should have only one reason to change.
 					✔ Where I used it in project
-					In my Spring Boot project, I separated business logic, persistence, and validation into different 							classes.	
+					In my Spring Boot project, I separated business logic, persistence, and validation into different classes.	
 
 		❌ Bad Example
 				class UserService {
@@ -5107,7 +5107,7 @@ steams	2. System.out.println(Arrays.stream(arr1)
 				);
 
 			📌 Interview line:
-				Pessimistic locking locks the database row so that no other transaction can modify it until the lock is released.
+				Pessimistic locking locks the database row so that no other transaction can't modify it until the lock is released.
 				
 				
 				
@@ -5138,7 +5138,7 @@ steams	2. System.out.println(Arrays.stream(arr1)
 		Why it happens
 			Connections are not closed
 			Long-running queries
-				Too many concurrent requests
+			Too many concurrent requests
 				
 		2. Memory leak → OutOfMemoryError
 			Symptoms :
@@ -5776,7 +5776,7 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 217. Explain difference between ExecutorService, ForkJoinPool and CompletableFuture ?
 		=> ExecutorService manages thread pools and executes asynchronous tasks. 
 		=> ForkJoinPool is specialized for recursive divide-and-conquer CPU-intensive tasks using work-stealing. 			   
-		=> CompletableFuture is a higher-level abstraction that enables chaining, combining, and handling asynchronous tasks more elegantly, especially useful for 				parallel REST calls.
+		=> CompletableFuture is a higher-level abstraction that enables chaining, combining, and handling asynchronous tasks more elegantly, especially useful 				for parallel REST calls.
 
 218. Difference between @Controller, @RestController and @ControllerAdvice.
 	1.  @Controller :
@@ -5905,7 +5905,7 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 
 222. Which Java version have you worked on extensively?
 	=> In my current project, we are using Java 17 (LTS).
-		Practically, I have extensively used Java 8 features on a daily basis, and selectively used Java 11–17 features 			wherever they add value.
+		Practically, I have extensively used Java 8 features on a daily basis, and selectively used Java 11–17 features wherever they add value.
 
 	1. Most of our business logic heavily relies on Java 8 features.
 			Streams & Lambdas – filtering, grouping, mapping API responses
@@ -5917,7 +5917,7 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 		New HttpClient (for calling external services) -> 
 				HttpRequest req = HttpRequest.newBuilder(URI.create("https://example.com")).build();
 		String utility methods -> isBlank(), isEmpty(), repeat() etc
-		New File methods -> iles.readString(Path);
+		New File methods -> Files.readString(Path);
 
 	3. Java 17 :
 		Records (DTOs / response objects)
@@ -5985,7 +5985,7 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 	   => while Concurrent Collection uses non-blocking algorithms like CAS (Compare and Swap)
 
 	3. => Synchronized Collection locks the entire collection during modification, leading to potential performance issue	
-	   =>  while Concurrent Collection allows multiple threads to access and modify the collection concurrently
+	   => while Concurrent Collection allows multiple threads to access and modify the collection concurrently
 
 	4. => Examples of Synchronized Collection include synchronizedList, synchronizedSet, synchronizedMap, 
 	   => while examples of Concurrent Collection include ConcurrentHashMap, CopyOnWriteArrayList, CopyOnWriteArraySet
@@ -6080,8 +6080,8 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 
 231. Spring bean scopes :
 	1. Singleton -> only one instance of bean per spring container (default)
-	2. Prototype -> A new instance evry time a bean requsted for ?	
-	3. Request	-> single bean instance for HTTp request
+	2. Prototype -> A new instance every time a bean requsted for ?	
+	3. Request	-> single bean instance for HTTP request
 	4. session -> single bean instace for http session
 	5. global session - a single bean instance for global http session.
 
@@ -6369,11 +6369,11 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 
 	=> 🔗 Example: Service Chain Failure
 			API Gateway
-			↓
+				↓
 			Order Service
-			↓
+				↓
 			Payment Service
-			↓
+				↓
 			Database
 		Scenario:
 			Database becomes slow
@@ -7774,6 +7774,71 @@ Eg 2:   @FunctionalInterface
 
 		5. Lambda Expressions
 				Lambda expressions allow writing short inline functions.
+
+283. what is @PostConstruct and @PreDestroy
+	=> 1️⃣ @PostConstruct
+			This method runs after the bean is created and dependencies are injected.
+
+			Example:
+				import jakarta.annotation.PostConstruct;
+				import org.springframework.stereotype.Component;
+				
+				@Component
+				public class MyService {
+				
+				    @PostConstruct
+				    public void init() {
+				        System.out.println("Bean initialized");
+				    }
+				}
+
+			=>	Lifecycle
+					Bean created
+					↓
+					Dependencies injected
+					↓
+					@PostConstruct executed
+					↓
+					Bean ready to use
+				
+				Use cases:
+					Load configuration
+					Initialize cache
+					Open connections
+					Prepare resources
+
+	=> 2️⃣ @PreDestroy
+			Runs before the bean is destroyed.
+				Example:
+				import jakarta.annotation.PreDestroy;
+				import org.springframework.stereotype.Component;
+				
+				@Component
+				public class MyService {
+				
+				    @PreDestroy
+				    public void cleanup() {
+				        System.out.println("Bean is about to be destroyed");
+				    }
+				}
+				Lifecycle
+					Application shutting down
+						↓
+					@PreDestroy executed
+						↓
+					Bean destroyed
+				
+				Use cases:
+					Close DB connections
+					Close files
+					Cleanup resources
+
+	=>  | Method         | When Called                |
+		| -------------- | -------------------------- |
+		| Constructor    | Object creation            |
+		| @PostConstruct | After dependency injection |
+		| @PreDestroy    | Before bean destruction    |
+
 =============================================================================================================
 
 Round 2:
@@ -10374,6 +10439,7 @@ Data structures
 System design
 
 Not just frameworks.
+
 
 
 
