@@ -7646,6 +7646,134 @@ Eg 2:   @FunctionalInterface
 		AND department = 'IT'
 		AND salary > 50000;
 
+278. Where is LinkedList used in real systems ?
+	=>  Undo/Redo functionality -> text editor. IDE
+	=>	Music playlist navigation -> next, prev
+	=>	HashMap collision handling -> collision
+	=>	Browser history navigation -> backword, forward
+
+279. What You Should Know About Pipelines ?
+		1. What is a Pipeline?
+			A CI/CD pipeline is an automated workflow that:
+				Developer Code → Build → Test → Package → Deploy
+				It ensures every code change is automatically tested and deployed safely.
+		=>	Example flow:
+				Git Commit
+				   ↓
+				Build (Maven / Gradle)       -> mvn clean compile
+				   ↓
+				Unit Tests                   -> Run all test cases : mvn test
+				   ↓						 -> Run a specific test class : mvn -Dtest=TestClassName test
+				Code Quality (SonarQube)	 -> Run specific test methods : mvn -Dtest=TestClassName#methodName test	
+				   ↓
+				Build Artifact (JAR / Docker Image)
+				   ↓
+				Deploy to Dev / QA / Prod
+
+280. Explain the main method in Java ?
+
+	=> The main() method is the entry point of a Java application.
+	   When the JVM starts execution, it looks for the main method and begins running the program from there.
+
+	=> Syntax Breakdown :
+	1. public : 
+		=> The JVM must be able to access the method from anywhere.
+		=> If it is not public: 
+				JVM cannot access it → Program will not run.
+
+	2. static :
+		=> main() must be static because JVM calls it without creating an object.
+		=> if not : new Test().main() -> But JVM does not create objects automatically. So it must be static.
+
+	3. void :
+		=> It means main method does not return any value.
+		=> The JVM does not expect any return value from the main method.
+
+	4. main :
+		=> This is the method name recognized by JVM as the starting point.
+		If you rename:
+			eg:	public static void start(String[] args)
+			=> Program won’t run.
+
+	5. String[] args :
+		=> This allows command line arguments to be passed.
+			Example:
+				java Test hello world
+			Then:
+				args[0] = hello
+				args[1] = world
+
+			eg:	 for(String s : args){
+		            System.out.println(s);
+		         }
+
+		=> Can We Overload main() ?  : Yes
+		=> But JVM always starts with : main(String[] args)
+
+		=> Can We Change args Name ? 
+			Yes.
+				public static void main(String[] abc)
+					(or)
+				public static void main(String... args)
+					Both are valid.
+
+		=> Can main method be private? : No
+		=> Can main method be final? : Yes
+		=> Can main method be synchronized? : Yes
+		=> Can main method throw exception? : Yes
+		=> Can we run a Java program without the main method ?
+			  -> You cannot execute Java code without main() in modern JVM.
+
+				Java Version			Static Block Runs Without main()?			Reason												Java 6 or earlier		✅ Yes										Class loaded before main check
+				Java 7+ (modern)		❌ No										JVM validates main() first
+
+281. What is a Red-Black Tree ?
+
+		=> A Red-Black Tree is a self-balancing binary search tree where each node is either red or black. 
+		   It maintains balance using a set of properties such as the root being black, no two red nodes appearing 				   consecutively, and all root-to-leaf paths having the same number of black nodes. When violations occur during 		   insertion or deletion, the tree uses recoloring and rotations to restore balance. This ensures search, 				   insertion, and deletion operations run in O(log n) time. In Java, Red-Black Trees are used internally in 			   TreeMap, TreeSet, and also in HashMap for handling large collision buckets.
+
+282. Describe the concept fucntional programming ?
+	=> Functional programming focuses on what to do rather than how to do it,
+	=> Core Concepts of Functional Programming :
+
+		1. Pure Functions :
+			-> A pure function always produces the same output for the same input and does not modify external state.
+					Example:
+						int add(int a, int b) {
+						    return a + b;
+						}
+					Properties:
+						No side effects
+						Deterministic
+						Easy to test
+
+		2. Immutability : This avoids bugs in multithreaded environments.
+			-> Functional programming encourages immutable data.
+					Once created, the value cannot change.
+				Example:
+					final int x = 10;
+						Instead of modifying data, FP creates new values.
+				Example:
+						Old List → New List
+
+		3. First-Class Functions :
+			-> Functions can be:
+					Assigned to variables
+					Passed as parameters
+					Returned from methods
+					Example using lambda expression:
+							Function<Integer, Integer> square = x -> x * x;
+							System.out.println(square.apply(5));
+
+		4. Higher-Order Functions :
+			-> A higher-order function is a function that:
+					Takes another function as input
+						(or)
+					Returns a function
+						Example using Streams API:
+
+		5. Lambda Expressions
+				Lambda expressions allow writing short inline functions.
 =============================================================================================================
 
 Round 2:
@@ -9180,8 +9308,53 @@ create another class
 	}
 	
 
+35. How to multiply two number using funtional interface ?
 
+	=> @FunctionalInterface
+		public interface Multiple {
+		    int multiple(int a, int b);
+		}
 
+	=> public class Main {
+		    public static void main(String[] args) {
+		        Multiple multi = (a,b) -> a * b;
+		        int multiple = multi.multiple(10, 20);
+		        System.out.println(multiple);  // 200
+		    }
+		}
+
+36. Write a function to validate an Indian mobile number.
+
+	 System.out.println(isValidateNumber("+917019684195")); 
+
+	private static boolean isValidateNumber(String number) {
+        if(number == null){
+            return false;
+        }
+
+        if(number.startsWith("+91")){
+            number = number.substring(3);
+        } else if (number.startsWith("91")) {
+            number = number.substring(2);
+        }
+
+        if (number.length() != 10){
+            return false;
+        }
+
+        char firstDigit = number.charAt(0);
+
+        if(firstDigit < '6' || firstDigit > '9' ){
+            return false;
+        }
+
+        for (char c : number.toCharArray()){
+            if(!Character.isDigit(c)){
+                return false;
+            }
+        }
+        return true;
+    }
 		
 ===================================================== Introduction ======================================================================
 	
@@ -10201,6 +10374,7 @@ Data structures
 System design
 
 Not just frameworks.
+
 
 
 
