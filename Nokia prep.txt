@@ -6538,7 +6538,7 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 
 252. What is Lambda in Java ?
 	=> A lambda expression is a way to write an anonymous function (function without name) in a shorter and cleaner way.
-		=> Introduced in Java
+		=> Introduced in Java 8
 
 	=> ❌ Problem Before Java 8
 		Before Java 8, if you wanted to pass behavior (function) as a parameter, you had to:
@@ -6583,12 +6583,14 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 		A functional interface has:
 			Exactly one abstract method
 		Examples:
-			Runnable
-			Callable
-			Comparator
-			Predicate
-			Function
-			Consumer
+			Runnable  -> run()
+			Callable  -> call()
+			Comparator -> compare()
+			Comparable -> compareTo()
+			Predicate -> boolean test(T t)
+			Function -> R apply(T t)
+			Consumer -> void accept(T t)
+			Supplier -> T get()
 
 	=> 🎯 What If Interface Has 2 Abstract Methods?  or if it Normal fucntion
 			Example:
@@ -6613,7 +6615,7 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 		   The compiler generates a synthetic private method for the lambda body, and at runtime, the JVM uses LambdaMetafactory to dynamically create an 				   implementation of the functional interface. 
 		   Unlike anonymous classes, lambdas do not create separate class files, making them more memory efficient and allowing better JVM optimizations.	
 
-	=> Can Lambda Throw Checked Exception ?
+	=> Can Lambda Throw Checked Exception ? : No
 
 		List<String> list = List.of("a", "b");
 			list.forEach(s -> {
@@ -6678,8 +6680,8 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 						=> it creates a new copy and modifies that.
 				=> That is why it is safe.
 
-254. 🔥 What Is an Index ?
-		=> An index is a data structure that helps the database find rows faster without scanning the entire table.
+254. 🔥 What Is an Indexes ?
+		=> An indexes is a data structure that helps the database find rows faster without scanning the entire table.
 			Without index → Full table scan
 			With index → Fast lookup
 
@@ -6731,7 +6733,7 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 			Fetch only required columns
 			Avoid N+1 queries
 			Use JOIN wisely
-			Analyze using EXPLAIN
+			
 	5. Caching (If Data Static)
 	6. Connection Pool Tuning
 	7. Protect API with Limits -> Timeout configuration, Circuit breaker (Resilience4j), Graceful degradation
@@ -6801,22 +6803,22 @@ Step 4: Join Phase
 
 	=> Parallel streams use ForkJoinPool.commonPool(), which is shared globally across the JVM. 
 	   In a Spring Boot application handling multiple concurrent requests, this can lead to thread contention, 
-	   CPU exhaustion, and unpredictable performance. Additionally, parallel streams are not suitable for blocking 				   operations like database or REST calls, which are common in backend services. 
+	   CPU exhaustion, and unpredictable performance. Additionally, parallel streams are not suitable for blocking operations like database or REST calls, 
+	   which are common in backend services. 
 	   Therefore, it is safer to use a custom ExecutorService or CompletableFuture with a dedicated thread pool 
 	   for better control and scalability.
 
 258. Popular AI Models in the Market ?
-
-	1. OpenAI – GPT Models -> Code generation, Chatbots, API generation
-	2. Google – Gemini  -> Multimodal (text + image + video)
-	3. Anthropic – Claude -> Long context handling, 
-	4. Meta – LLaMA -> 
-	5. Microsoft – Copilot -> Code auto-completion, Test case generation
+		1. OpenAI – GPT Models -> Code generation, Chatbots, API generation
+		2. Google – Gemini  -> Multimodal (text + image + video)
+		3. Anthropic – Claude -> Long context handling, 
+		4. Meta – LLaMA -> 
+		5. Microsoft – Copilot -> Code auto-completion, Test case generation
 
 => How does an LLM search and give results ?
-	1. LLMs do not search like traditional search engines. They are trained on massive datasets to learn statistical 				relationships between words. 
-	2. When given input, the text is tokenized and converted into vectors. Using transformer architecture and self-				   attention mechanisms, the model predicts the next most probable token repeatedly until the response is generated. 
-	3. If connected to external systems using RAG(Retrieval-Augmented Generation), the model can retrieve real-time data 		   before generating output.
+	1. LLMs do not search like traditional search engines. They are trained on massive datasets to learn statistical relationships between words. 
+	2. When given input, the text is tokenized and converted into vectors. Using transformer architecture and self-attention mechanisms, the model predicts the         next most probable token repeatedly until the response is generated. 
+	3. If connected to external systems using RAG(Retrieval-Augmented Generation), the model can retrieve real-time data before generating output.
 
 259. What is Cache ?
 	=> A fast temporary storage layer to avoid repeated expensive operations (DB calls, API calls)
@@ -6834,7 +6836,7 @@ Step 4: Join Phase
 		So it is NOT : List, JSON, Text
 		Java objects directly in heap memory
 
-		Case 2: Redis (Distributed Cache) 
+		Case 2: Redis (Distributed Cache)  -> Uses the RAM of the machine where Redis is installed
 		Redis stores data as: Key → Value
 		But value can be :String, JSON, Hash, List, Set, Sorted Set, Bitmap, HyperLogLog
 
@@ -6903,7 +6905,6 @@ Step 4: Join Phase
 
 
 261. Can Lambda throw an exception ?
-
 		=> Yes, a lambda can throw exceptions. If it is an unchecked exception, there is no restriction. 
 		   But for checked exceptions, the functional interface method must declare the exception in its throws clause. 
 		   Since most standard functional interfaces like Consumer and Function do not declare checked exceptions, 
@@ -7341,9 +7342,9 @@ Eg 2:   @FunctionalInterface
 	8️⃣ Add Timeout for External Services
 	9️⃣ Horizontal Scaling and vertical scaling in server
 
-269. how to implent pagination properly ? what is Pageable ?
-	🔷 What is Pageable?
-		Pageable is an interface in Spring Data that represents:
+269. how to implement pagination properly ? what is Pageable ?
+	🔷 What is Pageable? 
+		Pageable is an Interface in Spring Data that represents:
 			Page number
 			Page size
 			Sorting
@@ -7724,13 +7725,14 @@ Eg 2:   @FunctionalInterface
 		=> Can we run a Java program without the main method ?
 			  -> You cannot execute Java code without main() in modern JVM.
 
-				Java Version			Static Block Runs Without main()?			Reason												Java 6 or earlier		✅ Yes										Class loaded before main check
+				Java Version			Static Block Runs Without main()?			Reason												
+				Java 6 or earlier		✅ Yes										Class loaded before main check
 				Java 7+ (modern)		❌ No										JVM validates main() first
 
 281. What is a Red-Black Tree ?
 
 		=> A Red-Black Tree is a self-balancing binary search tree where each node is either red or black. 
-		   It maintains balance using a set of properties such as the root being black, no two red nodes appearing 				   consecutively, and all root-to-leaf paths having the same number of black nodes. When violations occur during 		   insertion or deletion, the tree uses recoloring and rotations to restore balance. This ensures search, 				   insertion, and deletion operations run in O(log n) time. In Java, Red-Black Trees are used internally in 			   TreeMap, TreeSet, and also in HashMap for handling large collision buckets.
+		   It maintains balance using a set of properties such as the root being black, no two red nodes appearing consecutively, and all root-to-leaf paths 			   having the same number of black nodes. When violations occur during insertion or deletion, the tree uses recoloring and rotations to restore balance. 		   This ensures search, insertion, and deletion operations run in O(log n) time. In Java, Red-Black Trees are used internally in TreeMap, TreeSet, and 		   	   also in HashMap for handling large collision buckets.
 
 282. Describe the concept fucntional programming ?
 	=> Functional programming focuses on what to do rather than how to do it,
@@ -10439,6 +10441,7 @@ Data structures
 System design
 
 Not just frameworks.
+
 
 
 
