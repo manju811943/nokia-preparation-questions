@@ -8536,6 +8536,7 @@ Round 2:
 
 10. I want to filter the employee list based on the dept_name.
 	solution :  List<Employee> collect = list.stream().sorted(Comparator.comparing(Employee::getDept)).collect(toList());
+	reverse order : List<Employee> collect = list.stream().sorted(Comparator.comparing(Employee::getDept).reversed()).collect(Collectors.toList
 
 11. In the Java layer, I want to filter the employee list using the Stream API, selecting only those with experience of 3, 5, or 7 years.
 
@@ -10441,6 +10442,7 @@ Data structures
 System design
 
 Not just frameworks.
+
 
 
 
