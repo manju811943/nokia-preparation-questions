@@ -1137,10 +1137,27 @@ CSS:
 	=> memory leaks
 	=> CPU usage
 	
-22. what is class loader heirarchy ?
-	=> Bootstrap
-	=> Extension
-	=> Application
+22. what is class loader heirarchy ?	
+	=> how Java loads classes into memory	
+		=> Bootstrap -> Core Java classes from the Java runtime library.
+				eg : java.lang.*
+					 java.util.*
+					 java.io.*
+					 java.net.*
+					 java.math.*
+
+		=> Extension -> Classes from Java extension libraries.
+				eg : javax.crypto.*
+					 javax.naming.*
+					 javax.sql.*
+					 security providers
+					 crypto libraries
+
+		=> Application -> Your application classes.
+				eg : Your Spring Boot classes
+					 Controller classes
+					 Service classes
+					 Entity classes
 	
 23. what is Escape Analysis ?
 	=> JVM analysis the object 	allocation to imrpove the performce
@@ -6194,6 +6211,9 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 	=> 🛡️ How to Prevent Retry Storms
 			1. Circuit Breaker Pattern
 			2. Limit Retry Attempts -> Retry max 2 or 3 times
+				eg:	@Retryable(maxAttempts = 3)
+					public void callPaymentService() {
+					}
 			3. Timeout Properly -> 
 			4. Rate Limiting -> Limit incoming requests when system under stress.
 			5. Separate thread pools:
@@ -7841,6 +7861,164 @@ Eg 2:   @FunctionalInterface
 		| @PostConstruct | After dependency injection |
 		| @PreDestroy    | Before bean destruction    |
 
+284. How to handle concurrent transactions without loosing data ?
+		1. Database Transactions :
+			Use ACID properties.
+					A → Atomicity -> All operations succeed or none
+					C → Consistency -> Database remains valid
+					I → Isolation -> Transactions do not interfere
+					D → Durability -> Changes persist
+			=>	In Spring Boot:
+						@Transactional
+						public void transferMoney(){
+						}
+			=>	This ensures the transaction is executed safely.
+
+		2. Isolation Levels :
+			Isolation levels control how concurrent transactions interact.
+				Isolation Level					Problem Prevented
+				READ_UNCOMMITTED				nothing
+				READ_COMMITTED					dirty reads
+				REPEATABLE_READ					non-repeatable reads
+				SERIALIZABLE					all concurrency issues
+			Example:
+				@Transactional(isolation = Isolation.SERIALIZABLE)
+
+	3. Optimistic Locking :
+		=>	Assumes conflicts are rare.
+				We add a version column.
+			Example table:
+				id | balance | version
+				JPA Entity:
+					@Entity
+					public class Account {
+					    @Id
+					    private Long id;
+					    private double balance;
+					    @Version
+					    private Long version;
+					}
+					
+				How it works:
+				
+					User A reads version = 1
+					User B reads version = 1
+						User A updates → version becomes 2
+						User B tries update → version mismatch ❌
+				
+				Spring throws:
+					OptimisticLockException
+
+		4. Pessimistic Locking :
+				Here the database locks the row so other transactions cannot update it.
+					Example:
+						@Lock(LockModeType.PESSIMISTIC_WRITE)
+						Account findById(Long id);
+					This ensures:
+						Transaction 1 locks row
+						Transaction 2 must wait
+
+	=> Use locking, isolation levels, and optimistic concurrency to manage concurrent transactions effectively.
+			1. Implement optimistic locking using versioning to prevent lost updates.
+			2. Use pessimistic locking to lock records during a transaction.
+			3. Set appropriate isolation levels (e.g., READ_COMMITTED) to control visibility of changes.
+			4. Utilize database transactions to ensure atomicity and consistency.
+
+285. How to avoid same multiple POST requests ?
+		1. Best Solution: Idempotency Key (Industry Standard)
+			Most payment systems (Stripe, PayPal) use this.
+			Client sends a unique key with the request.
+		Example request:
+				POST /payments
+				Idempotency-Key: 12345
+		Server logic:
+				Check if key already exists
+				If yes → return previous response
+				If no → process request and store result
+
+		2. 2. Database Unique Constraint
+				Example:
+					transaction_id UNIQUE
+				If duplicate request comes:
+					DuplicateKeyException
+				Example:
+					CREATE TABLE payments(
+					 id BIGINT,
+					 transaction_id VARCHAR UNIQUE
+					)
+			=> If same transaction sent again → DB rejects it.
+
+		3. Optimistic Locking
+				Useful when updating the same record.
+				Example:
+					balance
+					version
+				If two updates occur simultaneously → one fails.
+					Used with:
+					@Version -> in JPA.
+
+		4. Distributed Lock (Redis)
+					Useful in microservices.
+				Example:
+					SETNX payment_lock
+					If lock exists → reject request.
+				Flow:
+					Request arrives
+					Acquire Redis lock
+					Process payment
+					Release lock
+
+		5. UI Level Prevention
+				Example:
+					Disable submit button
+				Angular / React:
+					button.disabled = true
+					This prevents double click
+
+286. What happens when we run a Java program ?
+		=> When we run a Java program, the JVM starts and the ClassLoader loads the .class file. The class goes through loading, 
+		   linking, and initialization phases. After that, the JVM looks for the public static void main(String[] args) method. 
+		   A main thread is created and execution starts from the main method
+
+287. Difference between Thread vs Runnable.
+		=> Both are used to create threads, but they differ in design and flexibility.
+
+		1️⃣ Thread : Thread is a class in Java.
+				=> You create a thread by extending the Thread class.
+					Example:
+						class MyThread extends Thread {
+						    public void run() {
+						        System.out.println("Thread is running");
+						    }
+						}
+						
+						public class Test {
+						    public static void main(String[] args) {
+						        MyThread t = new MyThread();
+						        t.start();
+						    }
+						}
+
+		2️⃣ Runnable : Runnable is a functional interface.
+				You implement it and pass it to a Thread.
+			Example
+				class MyRunnable implements Runnable {
+				    public void run() {
+				        System.out.println("Thread is running");
+				    }
+				}
+				
+				public class Test {
+				    public static void main(String[] args) {
+				        Thread t = new Thread(new MyRunnable());
+				        t.start();
+				    }
+				}
+
+	=> Thread is a class used to create threads by extending it and overriding the run() method. 
+	   Runnable is an interface that represents a task to be executed by a thread. 
+	   Runnable is preferred because it allows multiple inheritance and better resource sharing between threads.
+				
 =============================================================================================================
 
 Round 2:
@@ -9423,6 +9601,173 @@ create another class
         }
         return true;
     }
+
+36.  Find an index i such that the sum of elements on the left of equals the sum of elements on the right of i. (Equilibrium Index):
+			 int[] arr = {1, 7, 3, 6, 5, 6};
+		        int totalSum = 0;
+		        int leftSum = 0;
+		        
+		        for (int val : arr){
+		            totalSum += val;
+		        }
+		
+		        for (int i = 0; i < arr.length; i++) {
+		
+		            int rightSum = totalSum - (leftSum + arr[i]);
+		
+		            if(leftSum == rightSum){
+		                System.out.println("index ::" + i);
+		                return;
+		            }
+		            leftSum += arr[i];
+		
+		        }
+		        System.out.println("No equilibrium index found");
+
+	Time Complexity :
+	=> total Time
+			O(n) + O(n)  -> since two loops
+				Drop constants in Big-O:
+			O(n)
+		=> ✅ Final Time Complexity = O(n)
+
+	Space Complexity :
+		=> Extra variables used:
+				totalSum
+				leftSum
+				rightSum
+				i
+				
+			=>	These are constant variables.
+			=>  So memory used does NOT grow with input size.
+			=>	✅ Space Complexity = O(1) (Constant Space)
+
+
+37. two sum problem :
+
+	    int[] arr = {2,11,7,15};
+        int target = 9;
+
+        for (int i = 0; i < arr.length; i++) {
+
+            for (int j = i+1; j < arr.length; j++) {
+
+                if(arr[i] + arr[j] == target){
+                    System.out.println(i + " " +j);
+                }
+            }
+        }
+
+	=> Time Complexity : O(n²)
+	=> Space Complexity : O(1)
+
+38. Find the missing number :
+	int[] nums = {3,0,1};
+	public static int findMissing(int[] nums) {
+        int n = nums.length;
+        int expectedSum = n * (n + 1) / 2;
+        int actualSum = 0;
+        for(int num : nums){
+            actualSum += num;
+        }
+        return expectedSum - actualSum;
+    }
+
+	=> Time Complexity  : O(n)
+	=> Space Complexity : O(1)
+
+39. Maximum Subarray Sum :
+		int[] nums = {-2,1,-3,4,-1,2,1,-5,4};
+        int maxSum = 0;
+
+        for (int i = 0; i < nums.length; i++) {
+            int sum = 0;
+            for (int j = i; j < nums.length; j++) {
+                sum += nums[j];
+                maxSum = Math.max(maxSum, sum);
+            }
+        }
+        System.out.println(maxSum); //6
+
+	=>	Time Complexity  : O(n²)
+	=> Space Complexity : O(1)
+
+40. Given an array, rotate the array to the right by k steps.
+	Input:
+		nums = [1,2,3,4,5,6,7]           Output: [5,6,7,1,2,3,4]
+		k = 3 
+
+	 	int[] nums = {1,2,3,4,5,6,7};
+        int k = 3;
+
+        int[] result = new int[nums.length];
+        for (int i = 0; i < nums.length; i++) {
+            result[ (i+k)%nums.length] = nums[i];
+        }
+
+        for (int val : result){
+            System.out.println(val);
+        }  // [5,6,7,1,2,3,4]
+
+	=> Time  : O(n)
+	=> Space : O(n)
+
+41. Merge two Array :
+		int[] nums1 = {1,3,5};
+        int[] nums2 = {2,4,6};
+
+        int[] result = IntStream.concat(
+                Arrays.stream(nums1),
+                Arrays.stream(nums2)
+        ).toArray();
+
+        for (int val : result){
+            System.out.print(val +" ");
+        }
+
+42. Stock Buy Sell :
+
+		int[] prices = {7,1,5,3,6,4};
+        int maxprofit = 0;
+
+        for (int i = 0; i < prices.length; i++) {
+            for (int j = i+1; j < prices.length; j++) {
+                int profit = prices[j] - prices[i];
+                maxprofit = Math.max(maxprofit, profit);
+            }
+        }
+
+        System.out.println(maxprofit);
+
+		=> prices[i] = price of a stock on day i
+				You must:
+					✅ Buy one day
+					✅ Sell on a later day
+					✅ Maximize profit
+				Return the maximum profit.
+
+		=> Time Complexity  : O(n²)
+		=> Space Complexity : O(1)
+
+43. Longest Substring Without Repeating :
+	 String s = "abcabcbb";
+        int start = 0;
+        int end = 0;
+        int max_length = 0;
+
+        List<Character> list = new ArrayList<>();
+        while(end < s.length()){
+            if(!list.contains(s.charAt(end))){
+                list.add(s.charAt(end));
+                max_length = Math.max(max_length, list.size());
+                end++;
+            }else{
+                list.remove((Character)s.charAt(start));
+                start++;
+            }
+        }
+        System.out.println(max_length);
+
 		
 ===================================================== Introduction ======================================================================
 	
@@ -10442,6 +10787,7 @@ Data structures
 System design
 
 Not just frameworks.
+
 
 
 
