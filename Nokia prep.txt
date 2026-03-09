@@ -8018,6 +8018,39 @@ Eg 2:   @FunctionalInterface
 	=> Thread is a class used to create threads by extending it and overriding the run() method. 
 	   Runnable is an interface that represents a task to be executed by a thread. 
 	   Runnable is preferred because it allows multiple inheritance and better resource sharing between threads.
+
+288. Common Jenkins Pipeline Stages ?
+		1. Checkout / Source :
+			Pull code from Git (GitHub, GitLab, Bitbucket)
+		2. Build :
+			Compile the code
+			Example: mvn clean install (for Java/Spring Boot)
+		3. Static Code Analysis (SonarQube) :
+			Before testing, the code quality is analyzed using SonarQube.
+				Checks performed:
+					Code smells
+					Bugs
+					Vulnerabilities
+					Code coverage
+					Technical debt
+					Security issues
+		4.Test :
+			Run unit tests, integration tests
+		5. Package / Artifact
+			Create build artifact
+			Example: .jar, .war, Docker image
+			
+		6. Publish Artifact
+			Upload to artifact repository
+			Example: Nexus, Artifactory
+			
+		7. Deploy (Last Stage)
+			Deploy application to environment
+			Example:
+			Dev
+			QA
+			Staging
+			Production
 				
 =============================================================================================================
 
@@ -10787,6 +10820,7 @@ Data structures
 System design
 
 Not just frameworks.
+
 
 
 
