@@ -8206,7 +8206,157 @@ Eg 2:   @FunctionalInterface
 		3️⃣ No Preemption – Resource cannot be forcibly taken away
 		4️⃣ Circular Wait – Threads wait in a circular dependency
 	=> If we break any one of these, deadlock can be prevented.
+
+	=> Ways to Prevent Deadlock in Java
+		1️⃣ Lock Ordering (Most Common Solution)
+			Always acquire locks in the same order.
+			Problem Example
+				synchronized(resource1){
+				    synchronized(resource2){
+				        // work
+				    }
+				}
+			
+			Another thread:
+				synchronized(resource2){
+				    synchronized(resource1){
+				        // deadlock
+				    }
+				}
+
+		2️⃣ Using tryLock()
+			Using java.util.concurrent.locks.ReentrantLock with timeout prevents threads from waiting forever.
+			 Example:
+				Lock lock1 = new ReentrantLock();
+				Lock lock2 = new ReentrantLock();
+				if(lock1.tryLock()){
+				    try{
+				        if(lock2.tryLock()){
+				            try{
+				                // critical section
+				            } finally {
+				                lock2.unlock();
+				            }
+				        }
+				    } finally {
+				        lock1.unlock();
+				    }
+				}
+			=> If the lock is unavailable, the thread doesn't wait indefinitely.
+
+		3️⃣ Avoid Nested Locks
+			 Avoid acquiring multiple locks inside each other when possible.
+				Bad design:
+					Lock A
+					   → Lock B
+					Better design:
+			=> Single lock for shared resource
+
+		4️⃣ Use Timeout While Waiting
+			Instead of waiting forever:
+				tryLock(5, TimeUnit.SECONDS)
+				If the lock isn't acquired within time → thread exits safely.
+
+		5️⃣ Use Higher-Level Concurrency Utilities
+				Classes from java.util.concurrent help reduce deadlocks:
+			Examples:
+				ExecutorService
+				ConcurrentHashMap
+				BlockingQueue
+				These handle synchronization internally.
+			Real Project Practice
+				In real enterprise applications (Spring Boot / microservices):
+			We avoid deadlocks by:
+				Using ExecutorService thread pools
+				Avoiding nested synchronization
+				Using Concurrent collections
+				Using database transaction isolation properly
+
+293. What is Mutext ? -> Mutex stands for Mutual Exclusion
+	=> It is a synchronization mechanism used in multithreading to ensure that only one thread can access a shared 			   resource at a time
+
+	=> How Mutex Works :
+		A thread acquires the lock
+		It enters the critical section
+		Other threads must wait
+		When the thread finishes, it releases the lock
+
+294. what is Semaphore ? 
+	=> A Semaphore is a synchronization mechanism used in multithreading to control how many threads can access a shared 	   resource at the same time. 🚦
+	=> Unlike Mutex, which allows only one thread, a Semaphore can allow multiple threads.
+	=> A Semaphore is a counter-based lock that restricts the number of threads accessing a resource concurrently.
+	=> Example
+			Suppose we have a database connection pool of size 3.
+				Semaphore value = 3
+				Only 3 threads can access the database at the same time
+				Other threads must wait
+
+	=> | Feature   | Mutex                       | Semaphore                |
+	   | --------- | --------------------------- | ------------------------ |
+	   | Access    | Only **1 thread**           | **Multiple threads**     |
+	   | Lock type | Exclusive lock              | Counter based            |
+	   | Ownership | Same thread must unlock     | Any thread can release   |
+	   | Use case  | Critical section protection | Resource pool management |
+
+295. What is @PostConstruct and when to use it ?
+		=> @PostConstruct runs automatically after Spring creates the object and injects all dependencies.
+
+		=> Lifecycle Flow in Spring Bean
+				When Spring creates a bean, the lifecycle is:
+					=> Bean Instantiation (object created)
+					=> Dependency Injection
+					=> @PostConstruct method executes
+					=> Bean is ready for use
+
+		=> When Do We Use @PostConstruct ?
+			1️⃣ Initialize data after dependency injection
+				 -> Sometimes a method needs injected dependencies.
+
+				Eg :	@Service
+						public class CacheService {
+						    @Autowired
+						    RedisTemplate redisTemplate;
 						
+						    @PostConstruct
+						    public void loadCache() {
+						        System.out.println("Loading cache from Redis");
+						    }
+						}
+			2️⃣ Preload data when application starts
+					Example:
+						Load configurations
+						Load reference data
+						Warm up cache
+
+			3️⃣ Setup connections or resources
+					Example:
+						initialize Kafka consumer
+						initialize cache
+						initialize thread pool
+
+		Note : Rules of @PostConstruct :
+					✔ Method must be void
+					✔ Method should not have parameters
+					✔ Runs only once per bean
+
+		=> @PreDestroy :
+			-> Runs when the bean is about to be destroyed.
+					@PreDestroy
+					public void cleanup(){
+					    System.out.println("Bean is destroyed");
+					}
+
+296. What is the difference between clustered index vs non-clustered index ?
+
+		| Feature        | Clustered Index        | Non-Clustered Index   |
+		| -------------- | ---------------------- | --------------------- |
+		| Data storage   | Data stored with index | Separate structure    |
+		| Physical order | Changes table order    | Does not change order |
+		| Number allowed | Only **1**             | Multiple              |
+		| Lookup speed   | Faster                 | Slightly slower       |
+		| Example use    | Primary key            | Search columns        |
+
+							
 =============================================================================================================
 
 Round 2:
@@ -9790,7 +9940,7 @@ create another class
         return true;
     }
 
-36.  Find an index i such that the sum of elements on the left of equals the sum of elements on the right of i. (Equilibrium Index):
+37.Find an index i such that the sum of elements on the left of equals the sum of elements on the right of i. (Equilibrium 	Index):
 			 int[] arr = {1, 7, 3, 6, 5, 6};
 		        int totalSum = 0;
 		        int leftSum = 0;
@@ -9831,7 +9981,7 @@ create another class
 			=>	✅ Space Complexity = O(1) (Constant Space)
 
 
-37. two sum problem :
+38. two sum problem :
 
 	    int[] arr = {2,11,7,15};
         int target = 9;
@@ -9849,7 +9999,7 @@ create another class
 	=> Time Complexity : O(n²)
 	=> Space Complexity : O(1)
 
-38. Find the missing number :
+39. Find the missing number :
 	int[] nums = {3,0,1};
 	public static int findMissing(int[] nums) {
         int n = nums.length;
@@ -9864,7 +10014,7 @@ create another class
 	=> Time Complexity  : O(n)
 	=> Space Complexity : O(1)
 
-39. Maximum Subarray Sum :
+40. Maximum Subarray Sum :
 		int[] nums = {-2,1,-3,4,-1,2,1,-5,4};
         int maxSum = 0;
 
@@ -9880,7 +10030,7 @@ create another class
 	=>	Time Complexity  : O(n²)
 	=> Space Complexity : O(1)
 
-40. Given an array, rotate the array to the right by k steps.
+41. Given an array, rotate the array to the right by k steps.
 	Input:
 		nums = [1,2,3,4,5,6,7]           Output: [5,6,7,1,2,3,4]
 		k = 3 
@@ -9900,7 +10050,7 @@ create another class
 	=> Time  : O(n)
 	=> Space : O(n)
 
-41. Merge two Array :
+42. Merge two Array :
 		int[] nums1 = {1,3,5};
         int[] nums2 = {2,4,6};
 
@@ -9913,7 +10063,7 @@ create another class
             System.out.print(val +" ");
         }
 
-42. Stock Buy Sell :
+43. Stock Buy Sell :
 
 		int[] prices = {7,1,5,3,6,4};
         int maxprofit = 0;
@@ -9937,7 +10087,7 @@ create another class
 		=> Time Complexity  : O(n²)
 		=> Space Complexity : O(1)
 
-43. Longest Substring Without Repeating :
+44. Longest Substring Without Repeating :
 	 String s = "abcabcbb";
         int start = 0;
         int end = 0;
@@ -9955,6 +10105,27 @@ create another class
             }
         }
         System.out.println(max_length);
+
+45. If an element appears more than once in the array, replace all occurrences of that element with #.
+		 int[] arr = {6,7,8,5,3,5,6};
+	        Map<Integer, Integer> map = new HashMap<>();
+	        List<Object> list = new ArrayList<>();
+	        
+	        for (Integer val : arr){
+	           map.put(val, map.getOrDefault(val,0)+ 1);
+	        }
+	        
+	        for (Integer val : arr){
+	            if(map.get(val)> 1){
+	                list.add("#");
+	            }else{
+	                list.add(val);
+	            }
+	        }
+	        
+	        for (Object val : list){
+	            System.out.println(val);  [#,7,8,#,3,#,#]
+	        }
 
 		
 ===================================================== Introduction ======================================================================
@@ -10975,6 +11146,7 @@ Data structures
 System design
 
 Not just frameworks.
+
 
 
 
