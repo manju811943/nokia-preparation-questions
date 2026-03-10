@@ -8051,7 +8051,162 @@ Eg 2:   @FunctionalInterface
 			QA
 			Staging
 			Production
-				
+
+289. How do you configure SonarQube in a project ?
+		1️⃣ What is SonarQube
+			SonarQube is a static code analysis tool used to detect:
+				Bugs
+				Code smells
+				Security vulnerabilities
+				Code coverage
+				Duplicate code
+			It helps maintain code quality and enforce coding standards.
+
+		2️⃣ Basic Steps to Configure SonarQube :
+
+			Step 1 — Install SonarQube Server
+				Usually hosted on:
+					Local server
+					Docker
+					Cloud server
+				Example Docker:
+					docker run -d --name sonarqube -p 9000:9000 sonarqube
+				Access UI
+					http://localhost:9000
+
+			Step 2 — Create Project in SonarQube
+					Inside SonarQube UI:
+						Projects → Create Project
+					Generate:
+						Project Key
+						Authentication Token
+					Example:
+						projectKey=my-app
+						token=abc123
+			Step 3 — Add Sonar Scanner to Project
+					For Maven Spring Boot project
+					Add plugin in pom.xml
+						<plugin>
+						 <groupId>org.sonarsource.scanner.maven</groupId>
+						 <artifactId>sonar-maven-plugin</artifactId>
+						 <version>3.9.1.2184</version>
+						</plugin>
+
+			Step 4 — Configure Sonar Properties
+					Create sonar-project.properties
+						sonar.projectKey=my-app
+						sonar.projectName=MyApp
+						sonar.projectVersion=1.0
+						
+						sonar.sources=src/main/java
+						sonar.tests=src/test/java
+						
+						sonar.java.binaries=target/classes
+						sonar.host.url=http://localhost:9000
+						sonar.login=token
+
+290. Runnable vs Thread — When should we use each ?
+		In Java, there are two ways to create a thread:
+			1️⃣ Extend java.lang.Thread
+			2️⃣ Implement java.lang.Runnable
+
+	1️⃣ Using Runnable Interface (Recommended)
+		 Example :
+			class MyTask implements Runnable {
+			    @Override
+			    public void run() {
+			        System.out.println("Task running by " + Thread.currentThread().getName());
+			    }
+			}
+			
+			public class Main {
+			    public static void main(String[] args) {
+			        MyTask task = new MyTask();
+			        Thread t = new Thread(task);
+			        t.start();
+			    }
+			}
+
+			When should we use Runnable?
+				Use Runnable when your class needs to extend another class.
+			Example:
+				class EmployeeService extends BaseService implements Runnable
+				Java does not support multiple inheritance, so if you extend Thread, you cannot extend any other class.
+			Advantages
+				✔ Better design (separation of task and thread)
+				✔ Allows class to extend other classes
+				✔ Used with Executor Framework
+				✔ Used in thread pools
+			
+			Example with executor:
+				ExecutorService executor = Executors.newFixedThreadPool(5);
+				executor.submit(new MyTask());
+		=> For modern Java applications, especially multithreaded environments (which you’re interested in), 
+		   Runnable is preferred.
+
+	2️⃣ Using Thread Class
+			Example
+			class MyThread extends Thread {
+			    @Override
+			    public void run() {
+			        System.out.println("Thread running");
+			    }
+			}
+			
+			public class Main {
+			    public static void main(String[] args) {
+			        MyThread t = new MyThread();
+			        t.start();
+			    }
+			}
+			When should we use Thread?
+			
+			Use Thread class when:
+				✔ You want to customize thread behavior
+				✔ You need to override thread methods
+			
+			Example:
+			class MyThread extends Thread {
+			
+			    public MyThread() {
+			        setName("Worker-Thread");
+			    }
+			
+			    @Override
+			    public void run() {
+			        System.out.println(getName());
+			    }
+			}
+		=> But this approach is less flexible.
+
+	=> | Feature      | Runnable                 | Thread                      |
+	   | ------------ | ------------------------ | --------------------------- |
+	   | Type         | Interface                | Class                       |
+	   | Inheritance  | Can extend other classes | Cannot extend another class |
+	   | Design       | Better separation        | Task tightly coupled        |
+	   | Thread Pool  | Supported                | Not recommended             |
+	   | Modern usage | Preferred                | Rare                        |
+
+291. How can we implement multithreading in Java ?
+	=> Real Project Usage (Important for Interview)
+			In Spring Boot applications, we usually use:
+				ExecutorService
+				CompletableFuture
+				@Async
+			Example:
+				@Async
+				public void processOrder() {
+				    // background processing
+				}
+
+292. Causes of dead lock accurs ? and prevntive methods ?
+	=> Deadlock occurs when these 4 conditions exist simultaneously
+		1️⃣ Mutual Exclusion – Resource can be used by only one thread at a time
+		2️⃣ Hold and Wait – Thread holds one resource and waits for another
+		3️⃣ No Preemption – Resource cannot be forcibly taken away
+		4️⃣ Circular Wait – Threads wait in a circular dependency
+	=> If we break any one of these, deadlock can be prevented.
+						
 =============================================================================================================
 
 Round 2:
@@ -10820,6 +10975,7 @@ Data structures
 System design
 
 Not just frameworks.
+
 
 
 
