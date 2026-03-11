@@ -9464,6 +9464,13 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 			}
 			Arrays.sort(newArray, 0, k);
 			Arrays.stream(newArray).forEach(n-> System.out.println(n));
+
+Streram	=> int[] array = Arrays.stream(arr).boxed().filter(n -> n != 0)
+                .sorted(Comparator.reverseOrder()).mapToInt(Integer::intValue).toArray();
+
+       for (int val : array){
+           System.out.println(val);
+       }
 			
 			 
 2. get all the substring in given string
@@ -9621,6 +9628,16 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 
         System.out.println("Max occurring char: " + maxChar);
         System.out.println("Count: " + maxCount);
+
+	(OR)
+
+		=>  String s = "manjunath";
+
+	        Map.Entry<String, Long> stringLongEntry = Arrays.stream(s.split("")).collect(groupingBy(Function.identity(), 					 counting()))
+	                .entrySet().stream()
+	                .max(Map.Entry.comparingByValue()).get();
+	
+	        System.out.println(stringLongEntry);  //a=3
 		
 		
 14.   int arr[] = {2,17,11,7}; // target=9
@@ -9919,7 +9936,7 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 	
 	        while (left <= right) {
 	
-	            int mid = left + (right - left) / 2; // safe way
+	            int mid = (left + right)/2;
 	
 	            if (arr[mid] == target) {
 	                return mid;
@@ -9934,6 +9951,9 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 	
 	        return -1; // not found
 	    }
+
+	=> Time complexity : O(log n)
+	   Space complexity : O(1)
 
 
 34. How to print odd and even number using thread class ?
@@ -11251,6 +11271,7 @@ Data structures
 System design
 
 Not just frameworks.
+
 
 
 
