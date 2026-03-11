@@ -8356,6 +8356,111 @@ Eg 2:   @FunctionalInterface
 		| Lookup speed   | Faster                 | Slightly slower       |
 		| Example use    | Primary key            | Search columns        |
 
+297. What is Load Testing ?
+	=> Load testing is used to verify how an application performs under expected user load and to identify performance 		   bottlenecks such as slow APIs, memory issues, or database contention.
+
+	=> Tools Used for Load Testing :
+		Common tools used:
+			1. Apache JMeter
+			2. Gatling
+			3. k6
+			4. LoadRunner
+		=> In most projects we commonly use JMeter or k6. 
+
+	=> Steps I Follow to Perform Load Testing :
+		 1️⃣ Identify Critical APIs / Flows
+					First identify the high traffic APIs.
+				Example:
+					Login API
+					Search API
+					Payment API
+					Dashboard API
+			=> These APIs are tested first because they receive the most traffic.
+
+		2️⃣ Create Test Scripts :
+					Using JMeter / k6, create scripts to simulate user actions.
+				Example in JMeter:
+					Thread Group → Simulates users
+					HTTP Request → API call
+					Assertions → Validate response
+					Listeners → Collect results
+
+		3️⃣ Run Tests with Gradual Load
+					We do ramp-up testing.
+				Example:
+					Users	Ramp Time
+					100	1 min
+					500	5 min
+					1000	10 min
+				This helps understand when performance degrades.
+
+		 4️⃣ Monitor System Metrics
+			-> During the test we monitor:
+				Application Metrics:
+						Response time
+						Throughput
+						Error rate
+				Infrastructure Metrics:
+					CPU usage
+					Memory usage
+					Thread count
+					DB connections
+				Monitoring tools used:
+					Dynatrace
+					Prometheus
+					Grafana
+
+		5️⃣ Identify Bottlenecks
+				Common bottlenecks:
+					Slow database queries
+					Connection pool exhaustion
+					Thread pool limits
+					Memory leaks
+					External API latency
+
+		6️⃣ Optimize the System
+				After finding issues we improve:
+					Example improvements:
+						Add DB indexes
+						Enable caching (Redis)
+						Increase thread pools
+						Optimize SQL queries
+						Implement API rate limiting
+
+		=> We perform load testing using tools like JMeter or k6 by simulating concurrent users hitting critical APIs. 
+		   We gradually increase load, monitor system metrics such as response time, throughput, CPU, and memory using  		   tools like Dynatrace and Grafana, identify bottlenecks such as slow DB queries or thread pool limits, optimize 		   the system, and re-run tests to validate improvements
+
+298. Immutable class and Singleton class example
+	1. Immutable class :
+			final class Person {
+			    private final String name;
+			    private final int age;
+			
+			    public Person(String name, int age) {
+			        this.name = name;
+			        this.age = age;
+			    }
+			
+			    public String getName() {
+			        return name;
+			    }
+			
+			    public int getAge() {
+			        return age;
+			    }
+			}
+
+	2. Singleton class :
+		public class Singleton {
+		    private static Singleton instance;
+		    private Singleton() {}
+		    public static synchronized Singleton getInstance() {
+		        if(instance == null){
+		            instance = new Singleton();
+		        }
+		        return instance;
+		    }
+		}
 							
 =============================================================================================================
 
@@ -11146,6 +11251,7 @@ Data structures
 System design
 
 Not just frameworks.
+
 
 
 
