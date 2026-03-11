@@ -9445,12 +9445,14 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 					arr[i] = arr[j];
 					arr[j] = temp;
 					
-					j++
+					j++;
 					
 				}
 			 }
 			 
-			 Arrays.sort(arr,0,j)
+			 Arrays.sort(arr,0,j);
+        System.out.println(Arrays.toString(arr));
+
 			 
 			 (or)
 			 
@@ -11271,6 +11273,7 @@ Data structures
 System design
 
 Not just frameworks.
+
 
 
 
