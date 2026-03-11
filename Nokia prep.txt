@@ -8532,7 +8532,144 @@ Eg 2:   @FunctionalInterface
 				Large objects
 
 Note : They are stored in the server filesystem (disk), not in system memory.
-							
+
+
+301. What is Serialization ?
+	=> Serialization = converting a Java object into a byte stream so that it can be: stored, transferred over 									network, cached
+	=>	Deserialization = converting that byte stream back into an object.
+
+	Real-Time Example: Session Storage (Very Common)
+		=>	Suppose a user logs into a banking system.
+				User Login
+				   ↓
+				Spring Boot Server
+				   ↓
+				User Session Created
+			
+			The session contains:
+				class UserSession implements Serializable {
+				    String userId;
+				    String role;
+				    String token;
+				}
+			=>	This object is serialized before storing.
+
+		=> Where Serialized Data is Stored :
+				Serialized objects can be stored in:
+					1️⃣ File system -> session.ser
+					2️⃣ Database -> Stored as BLOB
+					3️⃣ Distributed cache -> Redis
+
+	Eg :    import java.io.Serializable;
+			class Employee implements Serializable {
+			    int id;
+			    String name;
+			
+			    Employee(int id, String name){
+			        this.id = id;
+			        this.name = name;
+			    }
+			}
+
+			Serialize Object :
+				FileOutputStream file = new FileOutputStream("employee.ser");
+				ObjectOutputStream out = new ObjectOutputStream(file);
+				
+					Employee emp = new Employee(101, "Manju");
+					
+					out.writeObject(emp);
+					out.close();
+					file.close();
+				
+			=> 	Now object stored in file: employee.ser
+
+302. Write junit test case for UserService to get user information :
+		@Service
+		public User UserService {
+			@Autowired
+			private UserRepo userRepo;
+
+			public User getUserById(1L){
+				return userRepo.findById(IL);
+			}
+		}
+
+=>	Unit Test for UserService :
+		@ExtendWith(MockitoExtension.class)
+		class UserServiceTest{
+
+			@Mock
+			private UserRepo userRepo;
+
+			@InjectMock
+			private UserService userService;
+
+			@Test
+			void testGetUserId(){
+				User user = new User(1, "manju");
+				Mockito.when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+				User result = userService.getUserById(1L)
+				asertEqual("manju",user.getName());
+			}
+
+		}
+
+	=> Write junit test case for UserController to get user information :
+		@RequestMapping("/user")
+		@RequestController
+		public class UserController{
+
+			@Autowired
+			private UserService userService;
+
+			@GetMapping("/get-user")
+			public User getUserbyId(){
+				return userService.getUserById(1L);
+			}
+		}
+
+	Unit Test case for UserController :
+
+	@WenMvcTest(UserController.class)
+	class UserControllerTest{
+		@Autowired
+		private MockMvc mockMvc;
+
+		@MockBean
+		private UserService userService;
+
+		@Test
+		void testGetUserById(){
+
+			User user =  new User(1, "manju");
+			Mockito.when(userService.getUserById(1L)).theReturn(optional.of(user));
+			mockMvc.perform("user/user-get/1")
+					.andExpect(status.OK)
+					.andExpect(value);
+		}
+	}
+
+303. what is @Transctional propagation :
+		=> @Transactional propagation defines how a transaction behaves when one transactional method calls another 			   transactional method
+
+		=> Propagation decides whether a method should join an existing transaction or start a new one.
+
+		eg:	OrderService.placeOrder()
+			       |
+			       |---- PaymentService.makePayment()
+			       |
+			       |---- InventoryService.updateStock()
+
+			Now question is:
+				👉 Should all these methods run in one transaction
+					(or)
+				👉 Should some run in separate transactions
+			=> This behavior is controlled using Propagation.
+	
+		=> Most Important Propagations
+				REQUIRED
+				REQUIRES_NEW
+				SUPPORTS
 =============================================================================================================
 
 Round 2:
@@ -11344,6 +11481,7 @@ Data structures
 System design
 
 Not just frameworks.
+
 
 
 
