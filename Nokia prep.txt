@@ -8461,6 +8461,77 @@ Eg 2:   @FunctionalInterface
 		        return instance;
 		    }
 		}
+
+299. What are GitHub Actions ?
+	=> GitHub Actions is a CI/CD (Continuous Integration / Continuous Deployment) tool built inside GitHub.
+	=> It allows you to automatically build, test, and deploy your code whenever something happens in the repository.
+
+	Example: 
+		=> Developer pushes code → GitHub Actions runs build → runs tests → deploys application.
+
+		Workflow :
+			A workflow is the automation process defined in a YAML file.
+	Steps :
+		Each job contains steps.
+		Example:
+			checkout code
+			install dependencies
+			build project
+			run tests
+
+300. What is a Thread Dump ?
+	=> A thread dump is a snapshot of all running threads in the JVM at a specific moment.
+			It helps you identify:
+				Deadlocks
+				Threads stuck in waiting state
+				High CPU threads
+				Blocked threads
+
+	=> What a Thread Dump File Looks Like : Thread dump is a text file.
+			"http-nio-8080-exec-10" #45 daemon prio=5 os_prio=0 tid=0x00007f8c8400 nid=0x2a waiting on condition
+			   java.lang.Thread.State: WAITING (parking)
+			        at java.util.concurrent.locks.LockSupport.park()
+			        at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire()
+			
+			"ForkJoinPool.commonPool-worker-1" #23 daemon prio=5 tid=0x00007f8c8500 nid=0x3b runnable
+			   java.lang.Thread.State: RUNNABLE
+			        at java.util.HashMap.get()
+
+		Key things inside:
+			Thread name
+			Thread ID
+			Thread state
+			Stack trace
+
+	=>	| State         | Meaning              |
+		| ------------- | -------------------- |
+		| RUNNABLE      | Thread executing     |
+		| BLOCKED       | Waiting for lock     |
+		| WAITING       | Waiting indefinitely |
+		| TIMED_WAITING | Waiting with timeout |
+		| TERMINATED    | Thread finished      |
+
+	=> How to Generate Thread Dump ?
+			Method 1 — Using jstack
+				Find process ID:
+					jps
+				Example:
+					12345 MySpringBootApp
+				Generate thread dump:
+					jstack 12345 > threaddump.txt
+
+==> What is Heap Dump?
+		A heap dump is a snapshot of memory used by the JVM.
+			It contains:
+				All objects in memory
+				Memory allocation
+				Object references
+			Used to detect:
+				Memory leaks
+				OutOfMemoryError
+				Large objects
+
+Note : They are stored in the server filesystem (disk), not in system memory.
 							
 =============================================================================================================
 
@@ -11273,6 +11344,7 @@ Data structures
 System design
 
 Not just frameworks.
+
 
 
 
