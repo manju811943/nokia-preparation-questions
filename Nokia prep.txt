@@ -5893,6 +5893,19 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 			→ AWS Secrets Manager
 			→ Environment variables
 			→ application.yml
+
+	=> How password stored in ASM ?
+		=> Developer stores secret
+      			  	↓	
+		   AWS Secrets Manager
+        			↓
+		   Encrypted using KMS (Key management service)
+        			↓
+		   Stored securely
+        			↓
+		  Spring Boot fetches secret
+        			↓
+		  AWS decrypts and returns value
 			
 
 221. Implement a REST endpoint to fetch the last 10 activities of a user.
@@ -8670,6 +8683,64 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 				REQUIRED
 				REQUIRES_NEW
 				SUPPORTS
+
+304. How version are maintained in springboot application ?
+	1️⃣ What is a SNAPSHOT Version ?
+		In Maven/Spring Boot projects, versions are usually defined in pom.xml.
+	Example:
+		<version>1.0.0-SNAPSHOT</version>
+	Meaning :
+			Version				Meaning
+			1.0.0				Stable release version
+			1.0.0-SNAPSHOT		Development version (still changing)
+
+	A SNAPSHOT version means:
+		=> The build is not final
+		=> Code can change anytime
+		=> Maven may download updated builds automatically
+	==> So developers use SNAPSHOT during development and release versions for production.
+
+	eg:	1.0.0-SNAPSHOT   → development
+		1.0.0            → first stable release
+		1.0.1-SNAPSHOT   → development for next patch
+		1.0.1            → bug fix release
+		1.1.0-SNAPSHOT   → development for new features
+		1.1.0            → minor release
+
+305. What is @emabaded and @Embadable ?
+	=> In JPA / Hibernate, @Embeddable is used to define a class whose fields can be embedded inside another entity 		   instead of creating a separate table.
+	=> @Embeddable marks a class as reusable component whose fields become part of the parent entity table.
+
+	Eg: Suppose a user has an address.
+		Instead of creating another table, we embed it.
+
+	1. Embeddable Class
+		import jakarta.persistence.Embeddable;
+			@Embeddable
+			public class Address {
+			
+			    private String city;
+			    private String state;
+			    private String zipCode;
+			}
+	2. Entity Class :
+		@Entity
+		public class User {
+		
+		    @Id
+		    private Long id;
+		
+		    private String name;
+		
+		    @Embedded
+		    private Address address;
+		}
+
+=>	| Annotation    | Purpose                                |
+	| ------------- | -------------------------------------- |
+	| `@Embeddable` | Defines reusable value object          |
+	| `@Embedded`   | Used inside entity to embed the object |
+
 =============================================================================================================
 
 Round 2:
