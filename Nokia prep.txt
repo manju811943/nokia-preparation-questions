@@ -4,7 +4,7 @@ Nokia :
  HTML :
  ========
 1. what is diff HTML and HTML5
-	=> semantic tags  -> <header> <footer> <nav> <article> <section> <aside>
+	=> semantic tags  -> <header> <footer> <nav> <article> <section> <aside> 
 	=> Audio/video support
 	=> local storage
 	=> canvas/SVG
@@ -9639,6 +9639,11 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 			If department is null → comes first
 			No exception
 
+36. List<String> words = List.of("a b", "c d");
+	o/p: ["a","b","c","d"]
+
+=>	List<String> collect = words.stream().flatMap(l-> Arrays,stream(l.split(" "))).collect(Collectors.toList());
+
 
 3. ========================================== DSA =======================================================================
 
@@ -10634,10 +10639,6 @@ Have you worked with clients directly?
 		GROUP BY task_id, DATE(start_time)
 		HAVING COUNT(*) > 1
 		ORDER BY event_date ASC, task_id ASC;
-
-
-
-
 
 
 
