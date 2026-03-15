@@ -8741,6 +8741,76 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 	| `@Embeddable` | Defines reusable value object          |
 	| `@Embedded`   | Used inside entity to embed the object |
 
+306. What are the deployment strategies ?
+	=> Deployment strategies define how a new version of an application is released to production without affecting users.
+
+	1️⃣ Recreate Deployment
+			Old version is stopped first, then new version starts.
+			Old Version (V1) → STOP
+			                    ↓
+			                Start V2
+			Pros :
+				Very simple
+			Cons :
+				Downtime occurs
+			Example:
+				Users cannot access application for few seconds/minutes
+
+	2️⃣ Rolling Deployment
+			=> New instances are gradually replaced with new versions.
+					V1 V1 V1 V1
+					↓
+					V2 V1 V1 V1
+					↓
+					V2 V2 V1 V1
+					↓
+					V2 V2 V2 V2
+			Pros :
+				No downtime
+				Gradual update
+			Cons :
+				Both versions run simultaneously
+
+	3️⃣ Blue-Green Deployment
+			Two environments exist:
+				Blue → Current Production
+				Green → New Version
+			Flow:
+				Users → Blue
+				Deploy V2 → Green
+				Switch traffic → Green
+			Pros
+				Instant rollback
+				No downtime
+			Cons
+				Requires double infrastructure
+			Example:
+				Blue = v1
+				Green = v2
+			If problem occurs:
+				Traffic → Blue again
+
+	4️⃣ Canary Deployment
+			Release new version to small percentage of users first.
+				90% → Old version
+				10% → New version
+			If everything works:
+				50% → New version
+				100% → New version
+			Pros :
+				Safer deployment
+				Detect issues early
+				Used by large companies like Netflix.
+
+	5️⃣ A/B Testing Deployment
+		=>	Different versions are released to different groups of users.
+			Example:
+				Group A → Version 1
+				Group B → Version 2
+			Used to test:
+				UI changes
+				new features
+				performance
 =============================================================================================================
 
 Round 2:
