@@ -8826,6 +8826,16 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 				UI changes
 				new features
 				performance
+
+307. Default Fetch Strategies ?
+
+		| Mapping Type  | Default Fetch Type |
+		| ------------- | ------------------ |
+		| `@ManyToOne`  | **EAGER**          |
+		| `@OneToOne`   | **EAGER**          |
+		| `@OneToMany`  | **LAZY**           |
+		| `@ManyToMany` | **LAZY**           |
+
 =============================================================================================================
 
 Round 2:
