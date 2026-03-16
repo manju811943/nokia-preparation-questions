@@ -2443,7 +2443,7 @@ Eg: 1. In a gaming or competition system, players must be ranked by score.
 106. Session management in Spring Boot
 
 	=> In Spring Boot, session management is used to maintain user state across requests using HttpSession. 
-	   By default, sessions are stored in server memory and tracked via cookies. For scalable systems, Spring Session is used with external stores like 			   Redis. Spring Security also uses sessions to store authentication data, while modern microservices often use stateless JWT-based session management.
+	   By default, sessions are stored in server memory and tracked via cookies. For scalable systems, Spring Session is used with external stores like			   Redis. Spring Security also uses sessions to store authentication data, while modern microservices often use stateless JWT-based session management.
 
 107. diff between primary and composite key? and how to define ?
 
