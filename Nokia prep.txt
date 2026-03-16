@@ -2548,7 +2548,7 @@ Eg: 1. In a gaming or competition system, players must be ranked by score.
 			Or eager fetching
 			Or DTO mapping inside transaction
 
-111. Thread-safe cache – what will you use?
+111. Thread-safe cache – what will you use ?
 	=>  Use ConcurrentHashMap for simple in-memory caching, 
 	=>  Caffeine for production-grade, high-performance caching.
 	=>  Redis : Distributed Thread-Safe Cache
@@ -4611,10 +4611,10 @@ steams	2. System.out.println(Arrays.stream(arr1)
 			Only these classes can implement Payment.
 
 
-181. Jin them together each string in sentece :
+181. Join them together each string in sentece :
 
 	List<String> sentaence = List.of("hello how are you", "I'm Good!");
-        String collect = sentaence.stream().flatMap(n -> Arrays.stream(n.split(" "))).collect(joining(" 		"));
+        String collect = sentaence.stream().flatMap(n -> Arrays.stream(n.split(" "))).collect(joining(" "));
     System.out.println(collect);
 
 182. What is CQRS (Command Query Responsibility Segregation) pattern ?
@@ -4850,10 +4850,14 @@ steams	2. System.out.println(Arrays.stream(arr1)
 					ExecutorService executor = Executors.newFixedThreadPool(10);
 					
 					for (User user : users) {
-					    executor.submit(() -> emailService.sendEmail(user));
+					  Future<?> future =  executor.submit(() -> emailService.sendEmail(user));
 					}
 					
 					executor.shutdown();
+
+				=> Now you can check task status.
+						future.isDone();     // check if completed
+						future.get();        // wait until task completes
 
 					✔ Sends multiple emails in parallel
 					✔ Controlled concurrency (10 threads)
@@ -4926,7 +4930,8 @@ steams	2. System.out.println(Arrays.stream(arr1)
 			@PreDestroy
 			destroy() method (optional)
 
-	=> Spring Bean life cycle starts when the container creates the bean, injects dependencies, and calls initialization 			methods like @PostConstruct. The bean is then ready for use. When the application shuts down, Spring calls destroy 			methods such as @PreDestroy.
+	=> Spring Bean life cycle starts when the container creates the bean, injects dependencies, and calls initialization methods like @PostConstruct. 
+	   The bean is then ready for use. When the application shuts down, Spring calls destroy methods such as @PreDestroy.
 
 196. Diff between the @PostConstruct and init method
 		1. @PostConstruct
@@ -5509,7 +5514,7 @@ steams	2. System.out.println(Arrays.stream(arr1)
 			✅ Readiness probe enabled
 			
 
-207. how do you duebug issue that appera only on production ?
+207. how do you duebug issue that appear only on production ?
 		=> Issues that appear only in production are usually due to scale, data, timing, or environment differences.
 		
 		=> Quick checklist (save this 🧠)
