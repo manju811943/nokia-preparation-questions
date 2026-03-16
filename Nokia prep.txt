@@ -2382,22 +2382,22 @@ count.incrementAndGet();
 		✔ Tune heap size after fixing leaks
 
 	🎯 Interview-Ready Answer (Perfect)
-		An OutOfMemoryError due to Strings happens when too many String objects are created or retained, often due to excessive 				concatenation, misuse of String intern, storing Strings in long-lived collections, or loading large data into memory. Since 			Strings are immutable, each modification creates a new object, leading to high memory usage and heap exhaustion.
+		An OutOfMemoryError due to Strings happens when too many String objects are created or retained, often due to excessive concatenation, 
+		misuse of String intern, storing Strings in long-lived collections, or loading large data into memory. Since Strings are immutable, 
+		each modification creates a new object, leading to high memory usage and heap exhaustion.
 
 101 : How would you optimize heavy string concatenation inside loops?
-
-	=> Bad : Every time we concat It will create new object in heap
+		=> Bad : Every time we concat It will create new object in heap
 			String result = "";
 			for (int i = 0; i < 1_000_000; i++) {
 			    result += i;
 			}
 
 	=> Best Solution: Use  StringBuffer (Single Thread : thread safe) / StringBuilder (Multi-threaded:not thread safe) 
-		
-		StringBuffer sb = new StringBuffer(); or StringBuilder sb = new StringBuilder(1_000_000);
-		for (int i = 0; i < 1_000_000; i++) {
-		    sb.append(i);
-		}
+		=>  StringBuffer sb = new StringBuffer(); or StringBuilder sb = new StringBuilder(1_000_000);
+			for (int i = 0; i < 1_000_000; i++) {
+			    sb.append(i);
+			}
 
 102. Sorting millions of objects — Comparable or Comparator? Why?
 
@@ -2410,8 +2410,9 @@ count.incrementAndGet();
 	| Best for large datasets | ❌                    | ✔                  |
 
 103. How do you avoid ConcurrentModificationException?
-
-	To avoid ConcurrentModificationException, I modify collections using the iterator’s remove() method, use removeIf() in Java 8+, or use concurrent collections 	like CopyOnWriteArrayList or ConcurrentHashMap in multi-threaded environments. The key is not to structurally modify a collection directly while iterating 		over it.
+		=> To avoid ConcurrentModificationException, I modify collections using the iterator’s remove() method, use removeIf() in Java 8+, 
+			or use concurrent collections like CopyOnWriteArrayList or ConcurrentHashMap in multi-threaded environments. 
+			The key is not to structurally modify a collection directly while iterating over it.
 
 104. When would you choose TreeMap over HashMap in real systems ?
 
@@ -2426,9 +2427,23 @@ count.incrementAndGet();
 	 | `ConcurrentHashMap`     | ✔ Yes           |
 	 | `ConcurrentSkipListMap` | ✔ Yes (sorted)  |
 
+=> 	A TreeMap in Java is used when you need to store key-value pairs in sorted order of keys.
+	Internally it uses a Red-Black Tree, so keys are automatically sorted
+
+Eg: 1. In a gaming or competition system, players must be ranked by score.
+		We can store:
+			Key → Score
+			Value → Player Name
+
+	2. Stock Price Tracking
+		In financial applications:
+			Key → Timestamp
+			Value → Stock price
+
 106. Session management in Spring Boot
 
-	=> In Spring Boot, session management is used to maintain user state across requests using HttpSession. By default, sessions are 			stored in server memory and tracked via cookies. For scalable systems, Spring Session is used with external stores like 				Redis. Spring Security also uses sessions to store authentication data, while modern microservices often use stateless JWT-based 		session management.
+	=> In Spring Boot, session management is used to maintain user state across requests using HttpSession. 
+	   By default, sessions are stored in server memory and tracked via cookies. For scalable systems, Spring Session is used with external stores like 			   Redis. Spring Security also uses sessions to store authentication data, while modern microservices often use stateless JWT-based session management.
 
 107. diff between primary and composite key? and how to define ?
 
