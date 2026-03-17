@@ -8841,6 +8841,44 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 		| `@OneToMany`  | **LAZY**           |
 		| `@ManyToMany` | **LAZY**           |
 
+308. How do you secure method-level in Spring Boot ?
+		=> This allows you to control who can call specific methods based on roles, permissions, or conditions.
+
+	✅ Step 1: Enable Method-Level Security
+			In your configuration class:
+				@Configuration
+				@EnableMethodSecurity   // Spring Boot 3+
+				public class SecurityConfig {
+				}
+
+	✅ Step 2: Use Method-Level Annotations
+			🔹 1. @PreAuthorize (Most Common)
+				=> Checks before method execution :
+						@PreAuthorize("hasRole('ADMIN')")
+						public void deleteUser(Long id) {
+						    // only ADMIN can call
+						}
+				👉 With multiple roles:
+						@PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+				👉 Using method parameters:
+						@PreAuthorize("#id == authentication.principal.id")
+						public User getUser(Long id) {
+						    return userRepository.findById(id);
+						}
+			🔹 2. @PostAuthorize
+				=> Checks after method execution :
+					@PostAuthorize("returnObject.owner == authentication.name")
+					public Document getDocument(Long id) {
+					    return docRepository.findById(id);
+					}
+
+			🔹 3. @Secured
+					=> Simple role-based check
+							@Secured("ROLE_ADMIN")
+							public void updateUser() {
+							}
+	
+
 =============================================================================================================
 
 Round 2:
@@ -9455,7 +9493,16 @@ Round 2:
 	=> solution : String str = "this is a test. This test is only a test.";
 			      Map<String, Long> collect = Arrays.stream(str.split(" ")).collect(groupingBy(Function.identity(), counting()));
 
-	
+	=> to ignore special char (.) and case sensitivity
+
+	String str = "this is a test. This test is only a test.";
+
+        Map<String, Long> collect = Arrays.stream(str.split(" "))
+                .map(l-> l.toLowerCase())
+                .map(l-> l.replaceAll("[^a-zA-Z]",""))
+                .collect(Collectors.groupingBy(Function.identity(),Collectors.counting()));
+
+        System.out.println(collect);
 	
 
 2. String input = "swiss";
@@ -10019,7 +10066,7 @@ Streram	=> int[] array = Arrays.stream(arr).boxed().filter(n -> n != 0)
 
 		=>  String s = "manjunath";
 
-	        Map.Entry<String, Long> stringLongEntry = Arrays.stream(s.split("")).collect(groupingBy(Function.identity(), 					 counting()))
+	        Map.Entry<String, Long> stringLongEntry = Arrays.stream(s.split("")).collect(groupingBy(Function.identity(),Collectors.counting()))
 	                .entrySet().stream()
 	                .max(Map.Entry.comparingByValue()).get();
 	
