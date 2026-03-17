@@ -990,6 +990,30 @@ CSS:
 			@Input → Assign value to component property and run detectChanges()
 			@Output → Use spyOn() on EventEmitter.emit
 			Reactive Forms → Test form initialization, validation, and submission logic using FormGroup controls.
+
+55. ⚡ Summary Table :
+		| Type       | Purpose               | Example              |
+		| ---------- | --------------------- | -------------------- |
+		| Structural | Change DOM structure  | `*ngIf`, `*ngFor`    |
+		| Attribute  | Change style/behavior | `ngClass`, `ngStyle` |
+		| Component  | UI with template      | `@Component`         |
+
+56. Angular Decorators Table :
+		| Type          | Decorator       | Used On           | Purpose                              | Example                                   |
+		| ------------- | --------------- | ----------------- | ------------------------------------ | ----------------------------------------- |
+		| **Class**     | `@Component`    | Class             | Defines a UI component with template | `@Component({selector:'app'})`            |
+		| **Class**     | `@Injectable`   | Class             | Marks class for dependency injection | `@Injectable({providedIn:'root'})`        |
+		| **Class**     | `@Directive`    | Class             | Creates custom directive             | `@Directive({selector:'[appHighlight]'})` |
+		| **Class**     | `@Pipe`         | Class             | Creates custom pipe                  | `@Pipe({name:'uppercase'})`               |
+		| **Property**  | `@Input`        | Property          | Parent → Child data binding          | `@Input() name: string;`                  |
+		| **Property**  | `@Output`       | Property          | Child → Parent communication         | `@Output() event = new EventEmitter();`   |
+		| **Property**  | `@ViewChild`    | Property          | Access child component/view          | `@ViewChild('ref') el;`                   |
+		| **Method**    | `@HostListener` | Method            | Listen to DOM events                 | `@HostListener('click')`                  |
+		| **Method**    | `@HostBinding`  | Property/Method   | Bind value to host element           | `@HostBinding('style.color')`             |
+		| **Parameter** | `@Inject`       | Constructor param | Inject dependency manually           | `constructor(@Inject('API') api)`         |
+		| **Parameter** | `@Optional`     | Constructor param | Dependency optional                  | `@Optional() service`                     |
+
+
 				
 	Core Java :
 ===========================================================================================
@@ -8877,7 +8901,69 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 							@Secured("ROLE_ADMIN")
 							public void updateUser() {
 							}
-	
+
+309. Hibernate Entity Lifecycle ?
+		=> An entity in Hibernate goes through 4 main states:
+			1️⃣ Transient State :
+				👉 Object is just created using new
+				👉 Not associated with Hibernate session
+				👉 Not stored in DB
+				
+				Employee emp = new Employee();  // transient
+				emp.setName("John");
+				
+				✔ No DB interaction
+				✔ No primary key (usually)
+
+			2️⃣ Persistent State :
+				👉 Object is associated with Session (Persistence Context)
+				👉 Changes are automatically tracked (Dirty Checking)
+				
+				Session session = sessionFactory.openSession();
+				session.beginTransaction();
+				
+				Employee emp = new Employee();
+				emp.setName("John");
+				
+				session.save(emp);  // now persistent
+				
+				✔ Stored in DB (or will be on flush/commit)
+				✔ Hibernate tracks changes automatically
+
+			3️⃣ Detached State :
+				👉 Session is closed or object is evicted
+				👉 Entity is no longer tracked by Hibernate
+					
+				session.close();  // emp becomes detached
+					✔ Exists in DB
+					❌ Changes NOT tracked automatically
+				To reattach:
+					session.update(emp);
+
+			4️⃣ Removed (Deleted) State :
+				👉 Entity marked for deletion
+					session.delete(emp);
+					✔ Will be removed from DB on commit
+
+			=> 🔄 Lifecycle Flow
+				Transient → Persistent → Detached → Removed
+
+310. update() vs merge() in Hibernate ?
+		🔹 update()
+			✅ What it does
+				Reattaches a detached entity to the session
+				Same object becomes persistent
+				session.update(emp);
+			🔥 Behavior
+				No copy created
+				Same object is reused
+				Faster (no extra work)
+
+		🔹 merge()
+			✅ What it does
+				Copies state of detached object → into a new managed entity
+				Returns a new persistent object
+				Employee managedEmp = session.merge(emp);
 
 =============================================================================================================
 
