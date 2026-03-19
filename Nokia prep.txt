@@ -10868,8 +10868,231 @@ My project Architeture :
         | Litigation Svc    |
         +-------------------+
 
-	
 
+1. how do we handle failures in Kafka while communicating between the services ?
+	🔹 1. Producer Side Failure Handling (Claim Service) :
+			When publishing claim events:
+				✅ Retries
+					Configure:
+						retries=3
+						retry.backoff.ms=1000
+							=> If Kafka is temporarily unavailable, retry automatically
+
+				✅ ACKs Configuration
+						Use:
+						acks=all
+							=> Ensures message is written to all replicas → prevents data loss
+
+				✅ Idempotent Producer
+						Avoid duplicate messages:
+							=> enable.idempotence=true
+
+				✅ Fallback Handling
+						If Kafka is completely down:
+						Store event in DB (Outbox pattern)
+						Retry later via scheduler
+
+				👉 Interview one-liner:
+				"We use retries, idempotent producers, and outbox pattern to ensure no event is lost during publishing."
+
+		🔹 2. Kafka Broker Level (Cluster Reliability)
+				✅ Replication Factor (≥ 3)
+					Prevents broker failure impact
+				✅ Leader Election
+					If broker goes down → another takes over
+				👉 One-liner:
+				"Kafka replication ensures high availability and fault tolerance at broker level."
+
+		🔹 3. Consumer Side Failure Handling (Fraud Service) 
+				✅ a. Manual Offset Commit
+					We commit offset only after successful processing
+					Prevents message loss
+					ack.acknowledge(); // only after success
+				✅ b. Retry Mechanism
+					Use Spring Kafka Retry / @RetryableTopic
+					Retry transient failures (like DB or API failure)
+
+				✅ c. Dead Letter Topic (DLT)
+					If message fails after retries:
+					Send to DLT
+					Avoid blocking the system
+					👉 Example:
+					claim-topic → retry-topic → DLT
+				✅ d. Idempotent Consumer
+					Avoid duplicate processing:
+					Use unique claimId
+					Maintain processed records
+
+				✅ e. Error Handling (External Calls)
+					In your case (Feign + GAF):
+					Use:
+						Retry (Resilience4j)
+						Circuit Breaker
+						Fallback response
+					👉 Example:
+						@Retry(name="gaf-service")
+						@CircuitBreaker(name="gaf-service", fallbackMethod="fallback")
+
+			=> We handle Kafka failures at multiple levels.
+			   On the producer side, we use retries, idempotent producers, and the outbox pattern to avoid data loss.
+			   Kafka cluster ensures reliability using replication.
+			   On the consumer side, we use manual offset commits, retry mechanisms, and Dead Letter Topics for failed messages.
+			   We also implement idempotency to avoid duplicate processing and use circuit breakers for external API failures.”
+
+	=> Retry mechanism in producer level :
+				You configure this in application.yml / properties
+					spring:
+					  kafka:
+					    producer:
+					      retries: 3
+					      properties:
+					        retry.backoff.ms: 1000
+							 enable.idempotence: true -> Prevents duplicate messages during retries
+					      acks: all
+					🔍 What this does:
+					
+					=> retries=3 → retry sending message if broker fails
+					=> retry.backoff.ms=1000 → wait 1 sec between retries
+					=> acks=all → ensures message is written safely
+
+			=> If Broker is down form long time, we cna store claim + event in DB and later we can push via scheduler
+			Eg @Scheduled(fixedDelay = 5000)
+				public void publishOutboxEvents() {
+				    List<Event> events = repository.findPending();
+				
+				    for (Event e : events) {
+				        kafkaTemplate.send("claim-topic", e);
+				        e.setStatus("SENT");
+				    }
+				}
+
+	=> Retry in comsumer level :
+		✅ Using @RetryableTopic
+		@RetryableTopic(
+		    attempts = "4",
+		    backoff = @Backoff(
+		        delay = 5000,
+		        multiplier = 2
+		    ),
+		    dltTopicSuffix = ".DLT"
+		)
+		@KafkaListener(topics = "claim-topic", groupId = "fraud-group")
+		public void consume(ClaimEvent event) {
+		    processClaim(event);
+		}
+
+=>  After max retries, the message is sent to a Dead Letter Topic.
+	Once the external system is back, we reprocess DLT messages
+
+
+2. Decision Logic (Core Part) :
+		✅ Case 1: Score < Threshold (Normal Flow)
+			👉 Example: score = 45
+			Action:
+			Mark claim as:
+				APPROVED / LOW_RISK
+			Publish event to:
+				claim-processing-topic
+			Flow:
+				Fraud Service → Kafka → Claim Processing Service
+
+		🔴 Case 2: Score ≥ Threshold (High Risk)
+			👉 Example: score = 85
+			Action:
+			Mark claim as:
+				FRAUD_SUSPECTED
+			Publish event to:
+				litigation-topic
+			Flow:
+				Fraud Service → Kafka → Litigation Service
+
+	=> before coming to fraud, it will check the some default rule at their side
+		{
+		  "rulesTriggered": [
+		    "HIGH_CLAIM_AMOUNT",
+		    "MULTIPLE_CLAIMS",
+		    "BLACKLISTED_CUSTOMER"
+		  ]
+		}
+
+	=> We maintain a detailed audit trail for every fraud decision by storing claimId, fraud score, threshold, decision, triggered rules, and external responses 	   in a dedicated audit table
+
+	=> How UI knows statsu of cliams
+		We keep the database as the source of truth and let the UI fetch or receive updates instead of tightly coupling it with backend processing.
+		status avaiable :	APPROVED ✅
+							REJECTED ❌
+							FRAUD_SUSPECTED ⚠️
+							PENDING
+
+	=> Valiadteion if Kafka data : Yes we have a model class cotnain fileds we will check with the class tyep
+	=> idempotency => once fraud process the claim data we will store that claim status, claimId and othet things in DB 
+		so, before proceesing other cliam we will check exsiting claims data
+
+	=> Feild that claim event has :	
+			  "eventId": "uuid-123",
+			  "eventType": "CLAIM_CREATED",
+			  "timestamp": "2026-03-19T10:30:00Z",
+			  "claimId": "CLM12345",
+			  "policyId": "POL67890",
+			  "customerId": "CUST111",
+			  "claimAmount": 150000,
+			  "claimType": "ACCIDENT",
+			  "incidentDate": "2026-03-18",
+			  "reportedDate": "2026-03-19",
+			  "location": "Bangalore",
+			  "documents": [
+			    "FIR",
+			    "HospitalBill"
+			  ],
+
+	3. what we store in DB and why ?
+			🔹 1. Claim Data (Claim Service DB)
+					✅ What we store:
+					CLAIM
+					------
+					claim_id
+					policy_id
+					customer_id
+					claim_amount
+					claim_type
+					status (PENDING / APPROVED / FRAUD / REJECTED)
+					created_at
+					updated_at
+					processed_at
+					assigned_to
+					
+					🎯 Why?
+						Source of truth for UI
+						Track claim lifecycle
+						Used for polling (UI → status)
+			🔹 3. Audit Data (Very Important 🔥)
+					FRAUD_AUDIT
+					------------
+					claim_id
+					fraud_score
+					threshold
+					decision
+					external_response (JSON)
+					correlation_id
+					timestamp
+	
+					🎯 Why?
+						Compliance (insurance domain)
+						Traceability
+						Debugging & legal cases
+
+	4. Exception Handling (VERY IMPORTANT 🔥) in call GAF's
+			Retry + Circuit Breaker :
+				@Retry(name = "gaf-service")
+				@CircuitBreaker(name = "gaf-service", fallbackMethod = "fallback")
+				public GafResponse callGaf(GafRequest request) {
+				    return gafClient.getScore(request);
+				}
+				🔹 Fallback Method
+				public GafResponse fallback(GafRequest request, Exception ex) {
+				    // default safe response
+				    return new GafResponse(0, "UNKNOWN", List.of(), "REVIEW");
+				}
 ============================================================================================================================
 
 Managerial questions  :
