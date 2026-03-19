@@ -11093,6 +11093,267 @@ My project Architeture :
 				    // default safe response
 				    return new GafResponse(0, "UNKNOWN", List.of(), "REVIEW");
 				}
+
+	5. Actuator Configs :
+			1.  Monitoring + Health + Debugging in production
+				1. Health Monitoring
+						Check if:
+							Fraud Service is UP
+							DB is connected
+							Kafka is reachable
+				2. Observability
+						Metrics:
+							API response time
+							Kafka lag (via integration)
+							Error rate
+				3. Debugging
+						View:
+							Environment configs
+							Beans
+							Logs
+				4. Integration with Monitoring Tools
+						Prometheus
+						Grafana
+
+		2. What Endpoints We Configure
+			🔹 Health Check
+					GET /actuator/health
+					Response:
+						{
+						  "status": "UP"
+						}
+			🔹 Metrics
+				GET /actuator/metrics
+				👉 Shows:
+					JVM memory
+					CPU
+					HTTP requests
+			🔹 Info
+					GET /actuator/info
+					👉 App details:
+						version
+						environment
+
+			🔹 Loggers
+					GET /actuator/loggers
+					👉 Change log level at runtime
+
+	3. Configuration (Important)
+		yaml: 	management:
+				  endpoints:
+				    web:
+				      exposure:
+				        include: health,info,metrics,prometheus
+				  endpoint:
+				    health:
+				      show-details: always
+
+	=> Are Actuator Endpoints Publicly Accessible ?
+		👉 Technically yes (if NOT secured) ⚠️
+				Example:
+				http://<ip>:8080/actuator/health
+				👉 If:
+					No security
+					Port open
+				 Then:
+					❌ Anyone with IP can access
+
+	 => How We Secure Actuator (Best Practice) 
+			🔹 Option 1: Secure with Spring Security + JWT
+					👉 Same JWT used for APIs
+						http
+						  .authorizeHttpRequests(auth -> auth
+						      .requestMatchers("/actuator/**").hasRole("ADMIN")
+						      .anyRequest().authenticated()
+						  )
+						  .oauth2ResourceServer(oauth2 -> oauth2.jwt());
+					👉 Only ADMIN can access
+
+	=> Internal Network Only (Most Common 👍)
+			Expose actuator only inside:
+				VPC
+				Kubernetes cluster
+				👉 Not accessible from internet
+
+	=> Option 4: Limit Endpoints
+			management:
+			  endpoints:
+			    web:
+			      exposure:
+			        include: health,info
+			👉 Avoid exposing:
+				beans ❌
+				env ❌
+
+
+6. Optimization Techniques We Follow ?
+	1. Memory Optimization :
+		✅ A. Lightweight DTOs (Kafka Events)
+				👉 We send only required fields, not full objects
+			✔ Reduces:
+				Network payload
+				Heap usage
+
+		✅ B. Avoid Large Object Loading
+				👉 Example:
+					Don’t load full customer history
+					Fetch only required fields
+					@Query("SELECT c.claimId, c.amount FROM Claim c WHERE c.id = :id")
+
+		✅ C. Streaming / Pagination
+				👉 For large data:
+					Page<Claim> claims = repository.findAll(PageRequest.of(0, 50));
+					✔ Prevents OutOfMemoryError
+
+		✅ D. Use Caching (Redis / In-Memory)
+				👉 Cache:
+					Config (threshold)
+					Frequently used data
+
+	2. Thread Safety & Concurrency :
+		✅ B. Kafka Consumer Concurrency
+				spring:
+				  kafka:
+				    listener:
+				      concurrency: 3
+				👉 Multiple threads consume messages
+				✔ Improves throughput
+
+		✅ D. Database-Level Safety
+				👉 Use:
+				Unique constraints
+				Transactions
+			@Transactional
+
+		✅ F. Use Thread Pools (ExecutorService)
+				👉 Example:
+					Sending emails
+					Parallel processing
+					ExecutorService executor = Executors.newFixedThreadPool(10);
+
+		✅ Circuit Breaker
+				✔ Avoid wasting threads on failing service
+
+		✅ ConcurantHashMap, syncronize keyword, Atomic variable, Completable future
+
+
+	3. Database Optimization :
+		✅ Indexing
+			CREATE INDEX idx_claim_id ON claim(claim_id);
+			✔ Faster lookup
+		✅ Connection Pooling (HikariCP)
+			✔ Reuse DB connections
+
+7. How Do Services Trust Each Other ?
+	-> we should forward the same JWT
+	-> 🔹 Why?
+			Because:
+				Downstream services (Fraud, Litigation) must:
+				Know who the user is
+				Know roles/permissions
+				Perform authorization
+	-> API Gateway
+			Validates:
+				Signature ✅
+				Expiry ✅
+				Issuer ✅
+				👉 If valid:
+					➡️ Forward SAME JWT to Claim Service
+	-> Claim Service
+			Again validates JWT (zero-trust 🔥)
+			Processes request
+
+8. Are We Doing Tuning ?
+		👉 Yes — we do tuning at 3 levels:
+			1. Thread Pool Tuning
+			2. Connection Pooling
+			3. JVM Tuning
+
+	🔹 1. Thread Pool Tuning 🧵
+			1. Kafka Consumer Threads
+				spring:
+				  kafka:
+				    listener:
+				      concurrency: 3
+				👉 Meaning:
+					3 threads consume messages in parallel
+
+			2. Async Tasks (Email / Notifications)
+					Executor executor = new ThreadPoolTaskExecutor(10);
+
+	🔹 2. Connection Pooling (DB) 🗄️
+				👉 We use HikariCP (default in Spring Boot)
+						✅ Configuration yaml file
+							spring:
+							  datasource:
+							    hikari:
+							      maximum-pool-size: 10
+							      minimum-idle: 5
+							      idle-timeout: 30000
+							      max-lifetime: 1800000
+							🎯 Why?
+								Avoid creating DB connection every time ❌
+								Reuse connections ✅
+								Improve performance
+
+	🔹 3. JVM Tuning ☕ (Important)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ============================================================================================================================
 
 Managerial questions  :
