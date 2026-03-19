@@ -8965,6 +8965,31 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 				Returns a new persistent object
 				Employee managedEmp = session.merge(emp);
 
+311. Time complexity for all the collections :
+		| Collection    | Get/Search | Insert   | Delete   |
+		| ------------- | ---------- | -------- | -------- |
+		| ArrayList     | O(1)       | O(1)*    | O(n)     |
+		| LinkedList    | O(n)       | O(1)     | O(n)     |
+		| HashMap       | O(1)       | O(1)     | O(1)     |
+		| TreeMap       | O(log n)   | O(log n) | O(log n) |
+		| HashSet       | O(1)       | O(1)     | O(1)     |
+		| TreeSet       | O(log n)   | O(log n) | O(log n) |
+		| PriorityQueue | O(1) peek  | O(log n) | O(log n) |
+
+312. DTO vs Entity (Core Difference) ?
+	👉 Entity = Database representation
+	👉 DTO = Data transfer representation
+
+313. DispatcherServlet internal working :
+
+		| Component        | Role             |
+		| ---------------- | ---------------- |
+		| HandlerMapping   | Finds controller |
+		| HandlerAdapter   | Executes method  |
+
+
+
+
 =============================================================================================================
 
 Round 2:
@@ -11297,6 +11322,18 @@ My project Architeture :
 								Improve performance
 
 	🔹 3. JVM Tuning ☕ (Important)
+				✅ Heap Size
+						-Xms512m
+						-Xmx1024m
+					👉 Prevent frequent resizing
+				✅ Garbage Collection
+						-XX:+UseG1GC
+					👉 Better for:
+						Low latency
+						Microservices
+				✅ Monitoring
+					Using:
+						Actuator /metrics
 
 
 
