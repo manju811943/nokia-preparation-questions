@@ -2798,9 +2798,20 @@ Eg: 1. In a gaming or competition system, players must be ranked by score.
 		
 121. Genearate 6 digit OTP
 	
-		=> SecureRandom random  = new SecureRandom();
+	eg1	=> SecureRandom random  = new SecureRandom();
 		int otp = 100000 + random.nextInt(900000);
-		System.out.println(otp)
+		System.out.println(otp) //786987
+
+	eg2	=>  String CHARACTERS =
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	        SecureRandom random = new SecureRandom();
+	        StringBuffer str = new StringBuffer();
+		        for (int i = 0; i < 6; i++) {
+		            int index = random.nextInt(CHARACTERS.length());
+		            str.append(CHARACTERS.charAt(index));
+		        }
+	        System.out.println(str); //APH8Nr
 		
 121. Coding Challenge: How would you write a Stream to count employees and sort them by salary (descending) and then name (alphabetically)?
 
@@ -3208,8 +3219,8 @@ Eg: 1. In a gaming or competition system, players must be ranked by score.
 
 134. What is an Indexes ?
 
-		🔹 What is an Index?
-		=> An index is a data structure used by a database to quickly locate rows without scanning the entire table.
+		🔹 What is an Indexes ?
+		=> An indexes is a data structure used by a database to quickly locate rows without scanning the entire table.
 		
 		
 		🔹 Pros of Indexes ✅
