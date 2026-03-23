@@ -10807,8 +10807,16 @@ create another class
 	            System.out.println(val);  [#,7,8,#,3,#,#]
 	        }
 
+46. get the common elements from given lists
+	 	List list1 = List.of(1,2,3,4,5);
+        List list2 = List.of(4,5,2,1,8,9,0);
+        List list3 = List.of(6,2,8,1,7);
+
+        List list = list1.stream().filter(n -> list2.contains(n) &&  list3.contains(n)).toList();
+        System.out.println(list);
+
 		
-===================================================== Introduction ======================================================================
+===================================================== Introduction =======================================================
 	
 Hi, I’m Roy. I have around 5.5 years of experience as a Full Stack Developer working mainly with Angular and Spring Boot.
 Currently, I’m working on an insurance domain product where I build scalable frontend modules using Angular 
