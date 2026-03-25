@@ -8999,7 +8999,275 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 		| HandlerAdapter   | Executes method  |
 
 
+314.  Collection vs Collections in Java :
 
+		| Feature     | `Collection`                           | `Collections`                    |
+		| ----------- | -------------------------------------- | -------------------------------- |
+		| Type        | Interface                              | Utility Class                    |
+		| Package     | `java.util`                            | `java.util`                      |
+		| Purpose     | Represents a group of objects          | Provides helper methods          |
+		| Usage       | Base of List, Set, Queue               | Sorting, searching, etc.         |
+		| Inheritance | Root interface of collection framework | Final class (cannot be extended) |
+
+315. If you try to insert an element into the middle of a LinkedList with 10 million elements, how will it perform compared to an ArrayList?
+	=> 🔹 Key Idea
+			Insertion itself:
+			
+			LinkedList → O(1) (just change pointers) ✅
+			ArrayList → O(n) (shift elements) ❌
+			
+			BUT…
+			👉 Finding the middle index dominates the cost
+
+	=> ArrayList :
+		Access middle index → O(1) (direct indexing)
+		Shift elements → O(n)
+		👉 Total:
+			O(1) + O(n) = O(n)
+
+	⚠️ LinkedList :
+		Traverse to middle → O(n)
+		Insert → O(1)
+		👉 Total:
+			O(n) + O(1) = O(n)
+
+	=> Both have O(n) complexity for middle insertion because traversal is required. However, ArrayList is generally 
+	   faster due to direct index access and better memory locality. LinkedList is only faster if we already have a reference to the insertion point.”
+
+316. Reading millions of records, what things to consider
+		1. pagination
+
+		2. Lazy Loading / Infinite Scroll (Angular)
+			👉 Load data as user scrolls
+				Improves UX
+				Reduces initial load
+			Example:
+				Scroll → API call → append data
+
+		3. Streaming (For Large Data Processing)
+			👉 Instead of loading all data in memory
+				Spring Boot (JPA Stream)
+				@Query("SELECT u FROM User u")
+				Stream<User> streamAllUsers();
+			✔ Processes data one by one
+			✔ Avoids memory issues
+
+		4. Use Projection / DTO (Very Important)
+			👉 Fetch only required fields
+				public interface UserDTO {
+				    String getName();
+				    String getEmail();
+				}
+				
+				✔ Reduces payload size
+				✔ Faster queries
+
+		5. Database Optimization
+				✔ Indexing
+				Add indexes on frequently queried columns
+				✔ Avoid Full Table Scan
+				Use filters (WHERE, LIMIT)
+				✔ Use Keyset Pagination (Better than Offset)
+				SELECT * FROM users WHERE id > lastId LIMIT 50;
+				
+				✔ Faster for large datasets
+
+		6. Caching (If Data Doesn’t Change Often)
+			Use Redis / in-memory cache
+			Cache frequently accessed pages
+
+		7. API Design Considerations
+			Filtering
+				/users?status=ACTIVE
+			Sorting
+				/users?sort=name,asc
+				✔ Avoid unnecessary data transfer
+		8. Use virtual scrolling (CDK Virtual Scroll)
+				Avoid rendering large DOM lists
+				Use trackBy in *ngFor
+				*ngFor="let item of items; trackBy: trackById"
+
+317. How Dynatrace Works ?
+		=> Key Features
+			 1. End-to-End Monitoring
+					Frontend + Backend + DB
+			 2. Distributed Tracing
+					Tracks request across microservices
+			 3. Root Cause Analysis (AI)
+					No manual debugging needed
+			 4. Real-Time Alerts
+					Notifies when something breaks
+			 5. Log Monitoring
+					Centralized logs
+
+318. 🔴 1. OutOfMemoryError (OOM) ?
+		=> What it means
+				JVM heap memory is exhausted—no more space to create objects.
+
+		Eg: 1. Loading Millions of Records (Your Earlier Use Case 🔥)
+				List<User> users = userRepository.findAll(); // ❌ loads everything
+				👉 Problem:
+					Millions of records → Heap full → 💥 OOM
+				✔ Fix:
+					Use pagination / streaming
+
+			2. Memory Leak (Static Collection)
+					static List<String> cache = new ArrayList<>();
+					public void addData(String data) {
+					    cache.add(data); // ❌ never cleared
+					}
+					👉 Problem:
+						List keeps growing forever
+
+			3. Large File Processing
+					String content = Files.readString(Path.of("large-file.txt")); // ❌ loads full file
+					👉 Problem:
+						Entire file in memory
+					✔ Fix:
+						Use streaming (BufferedReader)
+
+			4. Improper Caching
+					Storing too much data in memory (Redis/local cache misuse)
+
+			5. Infinite Object Creation
+					while(true) {
+					    list.add(new Object()); // 💥
+					}
+
+	🔴 2. StackOverflowError
+			🔹 What it means
+				Stack memory is exhausted due to deep or infinite method calls
+
+			1. Infinite Recursion (Most Common)
+					public void print() {
+					    print(); // ❌ no base condition
+					}
+					👉 Problem:
+						Method keeps calling itself → stack fills → 💥
+
+			2. Missing Base Condition
+					public int factorial(int n) {
+					    return n * factorial(n - 1); // ❌ no stop condition
+					}
+
+			3. Circular Dependency (Spring)
+					@Service
+					class A {
+					    @Autowired B b;
+					}
+					
+					@Service
+					class B {
+					    @Autowired A a;
+					}
+					👉 Can cause deep call chain during initialization
+
+
+319. example that handle multithread and JVM Tune :
+
+	=> I implemented bulk email using ExecutorService with Future. Each task had retry logic with a max limit and backoff. 
+	   I tracked status in DB as PENDING, SUCCESS, or FAILED, and updated retry count and error message accordingly. 
+	   I avoided recursion by using a loop and ensured results were collected using Future.
+
+	=> We had multiple external and internal API calls that were executed sequentially, causing high latency. 
+	   I optimized it using CompletableFuture to execute calls in parallel and then combined the results, 
+	   reducing overall response time significantly.
+
+		Eg: CompletableFuture<ResponseA> futureA =
+			    CompletableFuture.supplyAsync(() -> serviceA.call());
+			
+			CompletableFuture<ResponseB> futureB =
+			    CompletableFuture.supplyAsync(() -> serviceB.call());
+			
+			CompletableFuture<ResponseC> futureC =
+			    CompletableFuture.supplyAsync(() -> serviceC.call());
+			
+			// Wait for all
+			CompletableFuture.allOf(futureA, futureB, futureC).join();
+			
+			// Combine results
+			ResponseA a = futureA.join();
+			ResponseB b = futureB.join();
+			ResponseC c = futureC.join();
+
+320. What performance optimizations have you done in your project ?
+		1. Parallel API Calls (Big Impact 🔥)
+			👉 Problem:
+				Multiple API calls (3rd party + microservices) were sequential
+			👉 Solution:
+				Used CompletableFuture to run them in parallel
+			✔ Result:
+				Response time reduced significantly
+				Total time = max(call time) instead of sum
+
+		2. Bulk Email Optimization
+			👉 Problem:
+				Emails sent using for loop (slow)
+			👉 Solution:
+				Used ExecutorService with fixed thread pool
+			✔ Result:
+				Parallel processing
+				Faster email delivery
+
+		3. Retry Mechanism + Failure Handling
+			👉 Problem:
+				Email failures were not tracked properly
+			👉 Solution:
+				Implemented retry logic + DB status tracking (PENDING, SUCCESS, FAILED)
+				Used Future to track results
+			✔ Result:
+				Reliable processing
+				No silent failures
+
+		4. Handling Large Data (Very Important)
+			👉 Problem:
+				Loading large datasets caused performance issues
+			👉 Solution:
+				Implemented pagination (Pageable)
+				Used DTO projection instead of full entity
+			✔ Result:
+				Reduced memory usage
+				Faster API response
+
+		5. Database Optimization
+			👉 Actions:
+				Added indexes on frequently queried columns
+				Optimized queries
+				Avoided unnecessary joins
+			✔ Result:
+				Reduced DB query time
+
+		6. JVM & Performance Monitoring
+			👉 Used tools like:
+				Dynatrace
+			👉 Monitored:
+				Heap usage
+				GC behavior
+				Slow APIs
+			✔ Result:
+				Identified bottlenecks quickly
+
+		7. Frontend (Angular) Optimization
+			👉 Actions:
+				Pagination / lazy loading
+				Avoid rendering large lists
+				Used trackBy in *ngFor
+			✔ Result:
+				Improved UI performance
+
+321. Daemon Thread ?
+		=> A daemon thread is a low-priority background thread that automatically stops when all user (non-daemon) threads finish.
+
+=> useful for :
+	 1. Garbage Collector (GC)
+			Runs as daemon thread
+			Cleans unused objects
+	2. Background Logging / Monitoring
+			Metrics collection
+			Health checks
+	3. Timer Tasks / Cleanup Jobs
+			Cache cleanup
+			Session cleanup
 
 =============================================================================================================
 
@@ -9984,6 +10252,27 @@ Solution : Map<Integer, Long> collect = list.stream().collect(groupingBy(Functio
 
 =>	List<String> collect = words.stream().flatMap(l-> Arrays,stream(l.split(" "))).collect(Collectors.toList());
 
+37. Find max length string in given list of strings :
+
+		List<String> list = Arrays.asList("Java", "SpringBoot", "Microservices", "API");
+        String s = list.stream().max(Comparator.comparing(String::length)).get();
+        System.out.println(s);
+
+38. Converting a List to a Map ?
+	Example: List<User> → Map<id, User>
+	class User {
+	    int id;
+	    String name;
+	}
+	Map<Integer, User> map = users.stream()
+	    .collect(Collectors.toMap(User::getId, user -> user));
+
+39. combine all the striong which given list of string	
+		List<String> list = Arrays.asList("Java", "Spring", "Boot");
+
+        String collect = list.stream().collect(Collectors.joining(" "));
+        System.out.println(collect);
+
 
 3. ========================================== DSA =======================================================================
 
@@ -10814,6 +11103,17 @@ create another class
 
         List list = list1.stream().filter(n -> list2.contains(n) &&  list3.contains(n)).toList();
         System.out.println(list);
+
+47. Sort the map :
+	=> Map<Integer, String> map = new HashMap<>();
+        map.put(1, "abc");
+        map.put(4,"daa");
+        map.put(3,"pqr");
+        map.put(2,"xyz");
+
+		 Map<Integer, String> treeMapAsc = new TreeMap<>(map); //ascending sort the based on id
+		 Map<Integer, String> treeMapDesc = new TreeMap<>((a,b)-> b.compareTo(a));
+		 treeMapDesc.putAll(map) // descdemdomg sprt the id
 
 		
 ===================================================== Introduction =======================================================
