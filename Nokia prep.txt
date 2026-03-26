@@ -8718,7 +8718,7 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 	}
 
 303. what is @Transctional propagation :
-		=> @Transactional propagation defines how a transaction behaves when one transactional method calls another 			   transactional method
+		=> @Transactional propagation defines how a transaction behaves when one transactional method calls another transactional method
 
 		=> Propagation decides whether a method should join an existing transaction or start a new one.
 
@@ -8763,7 +8763,7 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 		1.1.0            → minor release
 
 305. What is @emabaded and @Embadable ?
-	=> In JPA / Hibernate, @Embeddable is used to define a class whose fields can be embedded inside another entity 		   instead of creating a separate table.
+	=> In JPA / Hibernate, @Embeddable is used to define a class whose fields can be embedded inside another entity instead of creating a separate table.
 	=> @Embeddable marks a class as reusable component whose fields become part of the parent entity table.
 
 	Eg: Suppose a user has an address.
@@ -11654,12 +11654,48 @@ My project Architeture :
 					Using:
 						Actuator /metrics
 
+9. What if Kafka is down when Claim Service tries to publish ?
+	=> If Kafka is down, we don’t lose data, and also we have some retry mechamism like retries=3 → retry sending message if broker fails
+	   retry.backoff.ms=1000 → wait 1 sec between retriesand also first persist the claim in DB and use the Outbox pattern to store the event. A background 		   process retries publishing to Kafka via scheduler, ensuring eventual consistency without data loss.
 
+10.What is Offset Commit in Kafka ? 
+	=> Offset = position of a message in a Kafka partition
+	=> Offset commit = telling Kafka “I have successfully processed messages up to this point”
 
+	🧠 Simple Understanding
+		Think like this:
+			Kafka topic = list of messages
+			Each message has a number → offset (0,1,2,3...)
+	Example:
+			Message: A   B   C   D   E
+			👉 If consumer processes till message C (offset 2)
+	👉 It commits:
+		offset = 2
+	Meaning:
+		👉 “I have successfully processed till C”
+	
 
+=> two ways we can commity offset :
+	1. Auto commit -> enable-auto-commit=true  -> ❗ Risky (may commit before processing)
+	2. Manual commit :
+			1: Using Acknowledgment
+					@KafkaListener(topics = "claim-topic", groupId = "fraud-group")
+					public void consume(ClaimEvent event, Acknowledgment ack) {
+					    // 1. Process
+					    processFraud(event);
+					
+					    // 2. Save to DB
+					    saveToDB(event);
+					
+					    // 3. Commit offset (notify Kafka)
+					    ack.acknowledge();
+					}
+				👉 ack.acknowledge() = this is your "notification"
 
-
-
+		=> ❓ What if you DON’T call ack.acknowledge()?
+				👉 Offset NOT committed
+				👉 Kafka will resend message
+				👉 Duplicate processing
 
 
 
@@ -12637,7 +12673,89 @@ Not just frameworks.
 
 
 
+=====================================
 
+🔴 Kafka Failure Scenarios
+1. What if Kafka is down when Claim Service tries to publish?
+What will happen to the claim?
+Will you lose data?
+Do you use retry / DLQ / DB fallback?
+2. What if event is published but acknowledgment is not received?
+How do you ensure exactly-once or at-least-once delivery?
+3. What if the same event is consumed multiple times?
+How do you handle idempotency in Fraud Service?
+4. What if Fraud Service is down for a long time?
+Will Kafka retain events?
+How do you prevent backlog explosion?
+5. What if Kafka consumer crashes after processing but before committing offset?
+Will the same message be reprocessed?
+How do you avoid duplicate DB updates?
+6. What if message format/schema changes?
+How do you handle backward compatibility?
+7. What if one partition is overloaded?
+How do you handle partition skew?
+8. What if Kafka lag increases drastically?
+How will you monitor and scale consumers?
+🔴 Fraud Service (Core Logic) Failures
+9. What if fraud rule engine fails in between processing?
+Do you rollback?
+Do you partially save data?
+10. What if DB is down while saving fraud score?
+Do you retry?
+Do you send to DLQ?
+11. What if fraud calculation is slow?
+How do you prevent blocking Kafka consumer?
+12. What if historical data is inconsistent or missing?
+How does your system behave?
+🔴 Third-Party (GAF) Integration Failures
+13. What if third-party API is down?
+Do you use fallback / cached response / default score?
+14. What if third-party API is slow (high latency)?
+Do you use timeouts + circuit breaker?
+15. What if third-party returns incorrect data?
+How do you validate response?
+16. What if third-party partially responds (timeout mid-way)?
+Do you retry or mark as failed?
+17. What if retries overload the third-party system?
+Do you use exponential backoff?
+🔴 Feign Client / Integration Layer
+18. What if Feign client fails after multiple retries?
+Do you push to DLQ or mark claim as “pending review”?
+19. What if fallback logic also fails?
+What is your last line of defense?
+🔴 Litigation Service Failures
+20. What if fraud score threshold logic is wrong?
+Can incorrect claims go to litigation?
+21. What if Litigation Service is down?
+Do you queue events or lose escalation?
+🔴 Data Consistency & Transactions
+22. What if event is published but DB transaction fails?
+How do you maintain event + DB consistency?
+👉 (Expected: Outbox Pattern)
+23. What if DB update succeeds but Kafka publish fails?
+How do you recover?
+🔴 System-Level Scenarios
+24. What if API Gateway is down?
+Do services communicate internally?
+25. What if Notification Service fails?
+Does it affect core flow?
+26. What if system receives duplicate claim requests?
+How do you prevent duplicate processing?
+27. What if high traffic spike occurs?
+How does system scale (Kafka + consumers)?
+28. What if configuration (thresholds) changes dynamically?
+Do you use config server?
+🔴 Advanced Senior-Level Scenarios (Very Important)
+29. How do you ensure eventual consistency across services?
+30. How do you trace a claim across services?
+(Expected: Distributed tracing like Sleuth/Zipkin)
+31. How do you debug production failures?
+Logs? Correlation ID?
+32. What if DLQ keeps growing?
+How do you reprocess failed messages?
+33. How do you handle poison messages (always failing events)?
+34. What if schema registry is not used and event breaks consumers?
+35. What if fraud service scales but DB becomes bottleneck?
 
 
 
