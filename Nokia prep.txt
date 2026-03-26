@@ -9308,7 +9308,52 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 			Cognitive complexity ≤ 15
 		If complexity > 15 → requires refactor
 			📌 Keeps code readable & testable.
-		=============================================================================================================
+
+
+323. 1. Thread.yield() — a method :
+	✔ What it does:
+		Thread.yield() tells the scheduler:
+		“I’m willing to pause, let other threads run.”
+
+	It does NOT guarantee:
+		another specific thread will run
+		any performance improvement
+		any deterministic behavior
+		
+		It is only a hint to the OS thread scheduler.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=============================================================================================================
 
 Round 2:
 1). Angualr and javascript coding questions :	
