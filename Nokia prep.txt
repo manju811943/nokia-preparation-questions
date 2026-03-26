@@ -9256,7 +9256,7 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 				Improved UI performance
 
 321. Daemon Thread ?
-		=> A daemon thread is a low-priority background thread that automatically stops when all user (non-daemon) threads finish.
+		=> A daemon thread is a low-priority background thread that automatically stops when all user (non-daemon) threads 			finish.
 
 => useful for :
 	 1. Garbage Collector (GC)
@@ -9269,7 +9269,46 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 			Cache cleanup
 			Session cleanup
 
-=============================================================================================================
+322 : What are the Sonarcube components and industry‑Standard Quality Gate Thresholds
+	1. Bugs :
+ 		Allowed: 0
+		Fail build if: > 0 bugs
+			📌 Because even a single bug in new code lowers reliability.
+
+	2. Vulnerabilities
+		Allowed: 0
+		Fail build if: > 0 vulnerabilities
+			📌 Security is non-negotiable.
+
+	3. Code Smells
+		Allowed: 0 Blocker / 0 Critical / 0 Major
+		Minor smells (very small ones): can be allowed rarely
+		Fail build if: any blocker/critical smell exists
+			📌 Critical smells often indicate hidden bugs.
+
+	4. Technical Debt Ratio
+		Maximum allowed: < 5%
+		Some teams enforce < 3% on new code
+			📌 Means code is maintainable long‑term.
+
+	5. Code Coverage (Unit Tests)
+		New Code Coverage Threshold
+			70% – 80% minimum on new code
+			Some strict teams require 90% coverage on new code
+
+	6. Duplicated Code
+		Maximum duplication: < 3% on new code
+		Strong teams enforce 0% duplication on new code
+		Fail build if duplication > 5%
+			📌 Duplicate code makes maintenance expensive.
+
+	7. Code Complexity (Cyclomatic / Cognitive)
+		New functions must be:
+			Cyclomatic complexity ≤ 10
+			Cognitive complexity ≤ 15
+		If complexity > 15 → requires refactor
+			📌 Keeps code readable & testable.
+		=============================================================================================================
 
 Round 2:
 1). Angualr and javascript coding questions :	
