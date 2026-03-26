@@ -11161,14 +11161,12 @@ My project Architeture :
 		
 		
 => Our application follows a microservices and event-driven architecture in the insurance fraud and litigation domain.
-	Whenever a claim is created, the Claim Service publishes a Kafka event. The Fraud Service consumes this event and validates 
-	the claim against internal rules and historical data. If sufficient data is not available or it’s a new claim type, 
-	we synchronously call third-party fraud scoring systems like GAF using Feign Client.
+	Whenever a claim is created, the Claim Service publishes a Kafka event. The Fraud Service consumes this event and 		validates  the claim against internal rules and historical data. If sufficient data is not available or it’s a new 		claim type, we synchronously call third-party fraud scoring systems like GAF using Feign Client.
 	
-	The external response provides fraud scores and risk indicators, which we persist in our database and use to make automated decisions.
-	Based on configurable thresholds, claims either proceed normally or are escalated to the Litigation Service for manual investigation.
+	The external response provides fraud scores and risk indicators, which we persist in our database and use to make 		automated decisions.
+	Based on configurable thresholds, claims either proceed normally or are escalated to the Litigation Service for manual 	investigation.
 	
-	Kafka ensures loose coupling, scalability, and resilience, while Feign handles external integrations with retries and circuit breakers
+	Kafka ensures loose coupling, scalability, and resilience, while Feign handles external integrations with retries and      circuit breakers
 	
 	
 => High-Level Microservices Architecture :
@@ -11280,8 +11278,8 @@ My project Architeture :
 			=> We handle Kafka failures at multiple levels.
 			   On the producer side, we use retries, idempotent producers, and the outbox pattern to avoid data loss.
 			   Kafka cluster ensures reliability using replication.
-			   On the consumer side, we use manual offset commits, retry mechanisms, and Dead Letter Topics for failed messages.
-			   We also implement idempotency to avoid duplicate processing and use circuit breakers for external API failures.”
+			   On the consumer side, we use manual offset commits, retry mechanisms, and Dead Letter Topics for failed 					messages.
+			   We also implement idempotency to avoid duplicate processing and use circuit breakers for external API 					failures.”
 
 	=> Retry mechanism in producer level :
 				You configure this in application.yml / properties
@@ -11299,7 +11297,7 @@ My project Architeture :
 					=> retry.backoff.ms=1000 → wait 1 sec between retries
 					=> acks=all → ensures message is written safely
 
-			=> If Broker is down form long time, we cna store claim + event in DB and later we can push via scheduler
+			=> If Broker is down form long time, we can store claim + event in DB and later we can push via scheduler
 			Eg @Scheduled(fixedDelay = 5000)
 				public void publishOutboxEvents() {
 				    List<Event> events = repository.findPending();
@@ -11359,20 +11357,20 @@ My project Architeture :
 		  ]
 		}
 
-	=> We maintain a detailed audit trail for every fraud decision by storing claimId, fraud score, threshold, decision, triggered rules, and external responses 	   in a dedicated audit table
+	=> We maintain a detailed audit trail for every fraud decision by storing claimId, fraud score, threshold, decision, 	   triggered rules, and external responses in a dedicated audit table
 
-	=> How UI knows statsu of cliams
-		We keep the database as the source of truth and let the UI fetch or receive updates instead of tightly coupling it with backend processing.
+	=> How UI knows status of cliams
+		We keep the database as the source of truth and let the UI fetch or receive updates instead of tightly coupling it 		with backend processing.
 		status avaiable :	APPROVED ✅
 							REJECTED ❌
 							FRAUD_SUSPECTED ⚠️
 							PENDING
 
-	=> Valiadteion if Kafka data : Yes we have a model class cotnain fileds we will check with the class tyep
+	=> Valiadtaion of Kafka data : Yes we have a model class cotnain fileds we will check with the class type
 	=> idempotency => once fraud process the claim data we will store that claim status, claimId and othet things in DB 
 		so, before proceesing other cliam we will check exsiting claims data
 
-	=> Feild that claim event has :	
+	=> Field that claim event has :	
 			  "eventId": "uuid-123",
 			  "eventType": "CLAIM_CREATED",
 			  "timestamp": "2026-03-19T10:30:00Z",
@@ -11656,7 +11654,7 @@ My project Architeture :
 
 9. What if Kafka is down when Claim Service tries to publish ?
 	=> If Kafka is down, we don’t lose data, and also we have some retry mechamism like retries=3 → retry sending message if broker fails
-	   retry.backoff.ms=1000 → wait 1 sec between retriesand also first persist the claim in DB and use the Outbox pattern to store the event. A background 		   process retries publishing to Kafka via scheduler, ensuring eventual consistency without data loss.
+	   retry.backoff.ms=1000 → wait 1 sec between retriesand also first persist the claim in DB and use the Outbox pattern to store the event. A background  process retries publishing to Kafka via scheduler, ensuring eventual consistency without data loss.
 
 10.What is Offset Commit in Kafka ? 
 	=> Offset = position of a message in a Kafka partition
@@ -11697,7 +11695,56 @@ My project Architeture :
 				👉 Kafka will resend message
 				👉 Duplicate processing
 
+11. What if message format/schema changes?
+	How do you handle backward compatibility?
+=> Allowed changes:
+		Adding optional fields
+		Adding fields with default values
 
+12. How do you decide which data should go to which Kafka partition ?
+	=> Kafka uses the record key to determine partition.
+		So we choose the key based on business semantics.
+		
+		If ordering is required, all related events share the same key (e.g., orderId, userId).
+		If we want even load distribution, we pick a key with high cardinality like transactionId.
+		If a single key is too hot, we shard it (e.g., userId + shard).
+		
+		This ensures we get correct ordering, avoid partition skew, and achieve optimal throughput.
+
+13. What is Kafka Consumer Lag ?
+	Consumer Lag = Latest Offset (producer) − Committed Offset (consumer)
+	If lag increases:
+		Consumers are slow
+		Messages are piling up in the topic
+		Fraud checks or downstream processing become delayed
+
+14.  What if DB is down while saving the fraud score? Do you retry? Do you send to DLQ ?
+		=> When the DB is down, we do not commit the Kafka offset.
+			We retry the DB write using exponential backoff.
+		=> If the DB is temporarily unavailable, Kafka will re-deliver the message and the Fraud Service retries safely 			because our DB writes are idempotent.
+		=> If retries exceed a threshold or DB outage is prolonged, we route the message to a retry topic or DLQ(dead 				letter queue) to avoid blocking the partition.
+		=>  We never save partial data, and we never commit offsets until the fraud score is successfully stored.
+			This guarantees no data loss, no partial writes, and safe recovery after DB outages.
+
+15. The message that went to into DLQ, normal comsumer willnot cosume the data again by deafult,
+but If we want to design to read that data again we can wrute separate listener to read DLQ message
+	Eg: 
+		@KafkaListener(topics = "fraud-events-dlq", groupId = "fraud-dlq-consumer")
+		public void reprocess(Message msg) {
+		    // attempt repair or reprocessing
+		}
+
+16. 24. What if API Gateway is down?
+	Do services communicate internally?
+
+=> Even if the gateway is gone:
+	Fraud Service continues consuming Kafka normally
+	Services continue interacting via service-to-service calls
+	Background jobs, schedulers, CRONs, Kafka listeners continue to run
+	Internal GraphQL/Federation queries keep functioning
+	
+	System works internally.
+	Only external users can’t reach it.
 
 
 
