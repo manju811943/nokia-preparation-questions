@@ -9324,7 +9324,116 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 
 
 
+324. Dynatrace :
+		1. 
+		
+		=> we can configure the column that are required
+			eg: responseTime, Http method, 
+			
+		=> all the service are configured under this dynatrace, we can see each individualyy
+		=> can see each track each API call, how many times it call  time rrsponse
+		=>also can see execpetion api calls with red bar, error transaction, rrspective calls
+		=> alert can be configure based on resposne time degradation etc to a mail
+		=> can see logs, metrics, execption, failure, using graph for withing time peroid, like last 72 hours data
+		=> in dahsboard classic where we can see all the peroformace of app like whsts the trend, eg: failure rate, s				service helth , 4xx, 5xx errors
+		
+	
+325. project quote creation :
+		To calculate a quote, the system needs 3 major categories of data:
+			👤 A. Customer (Driver) Details
 
+					These define risk profile of the person
+
+					Age (very important)
+					Gender (in some regions)
+					Driving experience (years)
+					Claim history (No Claim Bonus / past claims)
+					Location (city, pincode)
+					Occupation (sometimes)
+
+					👉 Example:
+
+					22-year-old → high risk → higher premium
+					40-year-old with no claims → low risk → lower premium
+					
+			🚘 B. Vehicle Details
+
+					These define risk of the car
+
+					Car make & model (e.g., Swift, BMW)
+					Variant (petrol/diesel/electric)
+					Engine capacity (cc)
+					Ex-showroom price / IDV (Insured Declared Value)
+					Registration year (vehicle age)
+					Fuel type
+					Usage (private / commercial)
+
+					👉 Example:
+
+					Luxury car → high repair cost → higher premium
+					Old car → lower IDV → lower premium
+					
+			🛡️ C. Policy Details
+
+					These define coverage level
+
+					Policy type:
+					Third-party only
+					Comprehensive
+					Add-ons:
+					Zero depreciation
+					Engine protection
+					Roadside assistance
+					Deductibles:
+					Voluntary deductible (user chooses)
+					No Claim Bonus (NCB %)
+		
+		
+		=>	How quote amount is calculated ?  other team handling that system, they maintain somke rule engine
+			
+			1. Base Premium  -> car type, year make, model, previous claimed or not, depeciation,engine capacity, coverage 								selection
+			
+			=>	Final Premium =
+				(Base Premium + Add-ons)
+				- Discounts
+				+ GST (18%)
+		
+	
+326. On what basis which message will go to which topic ?
+		We don’t always create separate topics for every event type like Claim Created, Updated, Approved, Rejected, or 		Closed.
+		We design Kafka topics based on business meaning and consumer needs.
+		In most cases, a single topic like claim-events containing an eventType field is sufficient and gives ordering, 		replayability, and simplicity.
+		If different consumers need different subsets of events or different retention, we split topics accordingly. 			Otherwise, 
+		1 topic per domain entity is the cleanest and most scalable design.
+		
+327. How does Kafka decide which partition within a topic a message goes to ?
+
+		IF partition is provided manually:
+				use that partition
+		ELSE IF key exists:
+			   partition = hash(key) % totalPartitions  -> al
+		ELSE:
+			   use default sticky partitioning
+
+328. How many partitions will each topic have ?
+		→ It is NOT fixed.
+		→ It is 100% based on your configuration.**
+		
+		Kafka does not force a fixed number of partitions.
+		You decide the partition count when creating the topic.
+		kafka-topics --create --topic claim-events --partitions 10 --replication-factor 3
+		
+		
+329. What is a consumer? How does it consume? Can we have multiple consumers for same topic?
+
+	A Kafka consumer reads messages from topic partitions inside a continuous poll loop and commits offsets.
+	Consumers belong to consumer groups, and partitions are distributed among consumers in the group.
+	Within a group, each partition is consumed by exactly one consumer → enabling parallel processing.
+	Different consumer groups can consume the same topic independently → enabling fan‑out.
+	Yes, we can have multiple consumers for the same topic:
+
+	Same group → parallel scaling
+	Different groups → full message copy for each service
 
 
 
