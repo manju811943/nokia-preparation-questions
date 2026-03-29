@@ -1013,7 +1013,68 @@ CSS:
 		| **Parameter** | `@Inject`       | Constructor param | Inject dependency manually           | `constructor(@Inject('API') api)`         |
 		| **Parameter** | `@Optional`     | Constructor param | Dependency optional                  | `@Optional() service`                     |
 
+57. Most important Angular frontend design patterns :
 
+	🔥 1. Component-Based Architecture (Core Angular Pattern)
+			👉 Angular itself is built on this pattern.
+			💡 Idea:
+					Break UI into reusable components.
+			👉 ✔ Reusable
+			👉 ✔ Maintainable
+			👉 ✔ Testable
+
+	🔥 2. Smart vs Dumb Components (Container / Presentational)
+			👉 Very important in real projects.
+			💡 Idea:
+					Smart (Container) → handles API, logic
+					Dumb (Presentational) → only UI + Input/Output
+
+	🔥 3. Service Pattern (Singleton Services)
+			👉 Used everywhere in Angular.
+			💡 Idea:
+					Move business logic & API calls into services
+			👉 ✔ Separation of concerns
+			👉 ✔ Reusability
+			👉 ✔ Testability
+
+	🔥 4. Observer Pattern (RxJS)
+			👉 This is core Angular reactivity.
+			💡 Idea:
+					Components subscribe to data streams.
+					
+					this.claimService.claims$.subscribe(data => {
+					  this.claims = data;
+					});
+					
+			👉 ✔ Real-time updates
+			👉 ✔ Async handling
+
+	🔥 5. State Management Pattern
+			👉 Used in large apps (very important for your experience level)
+			Options:
+				NgRx (Redux pattern)
+				BehaviorSubject (lightweight)
+
+	🔥 6. Dependency Injection (DI Pattern)
+			👉 Angular heavily relies on this.
+				constructor(private claimService: ClaimService) {} or inject()
+			👉 ✔ Loose coupling
+			👉 ✔ Easy testing
+
+	🔥 7. Module Pattern (Feature Modules)
+			👉 Split app into modules
+				@NgModule({
+				  declarations: [ClaimComponent],
+				})
+				export class ClaimModule {}
+			👉 ✔ Lazy loading
+			👉 ✔ Better organization
+
+
+58. How to update update status from Backend to UI dynamically ?	
+		=> To dynamically update UI from backend, we can use polling, WebSockets, or Server-Sent Events. 
+		   For real-time applications, WebSockets are preferred, where backend pushes updates and Angular consumes them using RxJS 
+		   Observables to automatically update the UI.
 				
 	Core Java :
 ===========================================================================================
@@ -9335,7 +9396,7 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 		=>also can see execpetion api calls with red bar, error transaction, rrspective calls
 		=> alert can be configure based on resposne time degradation etc to a mail
 		=> can see logs, metrics, execption, failure, using graph for withing time peroid, like last 72 hours data
-		=> in dahsboard classic where we can see all the peroformace of app like whsts the trend, eg: failure rate, s				service helth , 4xx, 5xx errors
+		=> in dahsboard classic where we can see all the peroformace of app like whsts the trend, eg: failure rate, service helth , 4xx, 5xx 								errors
 		
 	
 325. project quote creation :
@@ -9400,10 +9461,10 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 		
 	
 326. On what basis which message will go to which topic ?
-		We don’t always create separate topics for every event type like Claim Created, Updated, Approved, Rejected, or 		Closed.
+		We don’t always create separate topics for every event type like Claim Created, Updated, Approved, Rejected, or Closed.
 		We design Kafka topics based on business meaning and consumer needs.
-		In most cases, a single topic like claim-events containing an eventType field is sufficient and gives ordering, 		replayability, and simplicity.
-		If different consumers need different subsets of events or different retention, we split topics accordingly. 			Otherwise, 
+		In most cases, a single topic like claim-events containing an eventType field is sufficient and gives ordering, replayability, and simplicity.
+		If different consumers need different subsets of events or different retention, we split topics accordingly.Otherwise, 
 		1 topic per domain entity is the cleanest and most scalable design.
 		
 327. How does Kafka decide which partition within a topic a message goes to ?
@@ -9435,27 +9496,153 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 	Same group → parallel scaling
 	Different groups → full message copy for each service
 
+330.  What is a Lambda? (Quick Recap)
+		👉 A lambda is just a short way to implement a functional interface
 
 
+	=> Internal Working (Important) 
+			👉 Lambda does NOT create an anonymous class like before
+				Instead, Java uses:
+					👉 invokedynamic + Lambda Metafactory
+
+	=> Step-by-step:
+			🟢 Step 1: Compilation
+				Compiler converts lambda into bytecode with invokedynamic instruction
+				👉 Not a normal object creation.
+
+			🟢 Step 2: At Runtime
+				JVM calls Lambda Metafactory
+				It dynamically creates an implementation of the functional interface.
+
+			🟢 Step 3: Object Creation
+				A lightweight function object is created
+
+		=> 🔁 Flow : Lambda → invokedynamic → LambdaMetafactory → Functional Interface Implementation
+
+331. What is Spring Boot Starter ?
+		=> A Spring Boot Starter is a predefined dependency bundle that provides all required libraries for a specific feature.
+		=> Starter = Ready-made dependency package to avoid manual configuration
+
+		=> What Does a Starter Contain?
+				A starter includes:
+					1. Required libraries
+					2. Compatible versions
+					3. Auto-configuration support
+
+		=> 🔥 Common Spring Boot Starters
+				🌐 1. spring-boot-starter-web
+					👉 For building REST APIs
+					Includes:
+						Spring MVC
+						Jackson (JSON)
+						Embedded Tomcat
+
+				💾 2. spring-boot-starter-data-jpa
+					👉 For database operations
+					Includes:
+						Hibernate
+						Spring Data JPA
+						Transaction management
+
+				🔐 3. spring-boot-starter-security
+					👉 For authentication & authorization.
+
+				🧪 4. spring-boot-starter-test
+					👉 For testing
+					Includes:
+						JUnit
+						Mockito
+
+332. what type of microservices architecture we are using in our app ?
+			=> In my project, we implemented an event-driven microservices architecture using an API Gateway pattern. 
+			   Each service like Claim, Fraud, and Payment is independently deployed with its own database. 
+			   Communication is primarily asynchronous using Kafka for scalability and decoupling, 
+			   while synchronous REST calls are used where necessary
+
+			=>  1. Client creates claim
+				2. Claim Service stores data
+				3. Claim Service publishes event to Kafka
+				4. Fraud Service consumes event
+				5. Fraud Service calculates fraud score
+				6. Decision:
+				   → Normal → Claim Processing
+				   → Suspicious → Litigation
+				7. Status pushed back (WebSocket / API)
+
+333. Types of Injections ?
+		1. Constructor Injection (Recommended ⭐) : Object is fully initialized at creation time
+			✔ Why best?
+				Immutable dependencies  -> after object created can not change it's object by mistakanely
+				Easy to test
+				Mandatory dependencies enforced
+
+		2. Setter Injection
+			✔ Use when:
+				Dependency is optional
+				You may change it later
+
+		3. Field Injection @Autowired (Not Recommended)
+			❌ Problems:
+				Hard to test
+				No immutability
+				Hidden dependencies
+
+		=> Why Immutable Dependencies are Important
+				✅ 1. Thread Safety
+					👉 Once set → no accidental changes in multi-threaded apps
+				
+				✅ 2. Predictable Behavior
+					👉 Object always has same dependency
+						No unexpected change during runtime
+
+				✅ 3. Mandatory Dependency
+					👉 If dependency missing → app fails at startup
+						Safer than null at runtime
+
+				✅ 4. Easier Testing
+						new ClaimService(mockFraudService);
+					👉 No need for Spring container
 
 
+	| Feature        | Field Injection | Constructor Injection |
+	| -------------- | --------------- | --------------------- |
+	| Mutable        | ❌ Yes          | ✅ No                  |
+	| Injection time | After creation   | During creation       |
+	| Null safety    | ❌ Risky        | ✅ Safe                |
+	| Testability    | ❌ Hard         | ✅ Easy                |
 
 
+334. What is a Bean Factory Method ?
+	=> A Bean Factory Method is a method used by Spring to create and return a bean object instead of directly instantiating it with new.
+
+	=> Why Use Bean Factory Method ?
+
+		✅ 1. Custom Object Creation
+			@Bean
+			public RestTemplate restTemplate() {
+			    RestTemplate rt = new RestTemplate();
+			    // custom config
+			    return rt;
+			}
+
+		✅ 2. Third-Party Classes
+			👉 When you cannot annotate with @Component
+				@Bean
+				public ObjectMapper objectMapper() {
+				    return new ObjectMapper();
+				}
+
+	=> Bean factory methods provide more control over object creation and are especially useful for configuring 
+	   third-party classes or complex initialization logic that cannot be handled through component scanning
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+335. ways to create threads ?
+		    1. Extending Thread Class :
+			2. Implementing Runnable (Recommended ⭐)
+			3. Using Lambda
+			4. Using Callable (Return Value + Exception Handling)
+			5. Using ExecutorService
+			6. Using CompletableFuture (Async Programming)
 
 
 
@@ -11939,6 +12126,56 @@ but If we want to design to read that data again we can wrute separate listener 
 	System works internally.
 	Only external users can’t reach it.
 
+17. Multi-factor decisioning (rules + scoring + workflow) for claim to move litigation or claim process service :
+
+		1. Claim Amount (Financial Impact)
+				Small claim → fast-track processing
+				High-value claim → stricter validation
+				👉 Example:
+					₹5,000 → auto approve
+					₹10 Lakhs → manual review / litigation
+
+		2. Policy Details
+				Policy age (new vs old)
+				Coverage type
+				Add-ons
+				👉 Example:
+					New policy + large claim → suspicious
+
+		3. Customer Risk Profile
+				Claim history
+				Fraud history
+				Customer tenure
+				👉 Example:
+					Frequent claims → higher risk
+		4. Fraud Score (ML / Rules Engine)
+				Generated by fraud service
+				👉 But:
+					Used as one factor, not the only factor
+
+		5. Incident Details
+				Location
+				Time
+				Police report available?
+				Supporting documents
+				👉 Example:
+					No FIR + high claim → suspicious
+
+		6. Claim Pattern Analysis
+				Same garage repeatedly
+				Same damage pattern
+				Multiple claims in short time
+
+
+18. tables we using app ?
+	1. policy
+	2. customer
+	3. vehicle
+	4. claim_details
+	5. claim_documents
+	6. fraud_details
+	7. audit_log
+		
 
 
 
