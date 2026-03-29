@@ -9331,17 +9331,34 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 			Session cleanup
 
 322 : What are the Sonarcube components and industry‑Standard Quality Gate Thresholds
-	1. Bugs :
- 		Allowed: 0
-		Fail build if: > 0 bugs
-			📌 Because even a single bug in new code lowers reliability.
+	1. Code Quality Issues(Bugs) :
+		=> 👉 Detects logical mistakes
+			Examples:
+				Null pointer risk
+				Wrong condition
+				Infinite loop
+	
+	 		Allowed: 0
+			Fail build if: > 0 bugs
+				📌 Because even a single bug in new code lowers reliability.
 
-	2. Vulnerabilities
+	2. Vulnerabilities :
+		Examples:
+			SQL Injection
+			Hardcoded passwords
+			Unsafe deserialization
+
 		Allowed: 0
 		Fail build if: > 0 vulnerabilities
 			📌 Security is non-negotiable.
 
-	3. Code Smells
+	3. Code Smells :
+		=> 👉 Not bugs, but bad practices
+				Examples:
+					Long methods
+					Duplicate code
+					Hardcoded values
+
 		Allowed: 0 Blocker / 0 Critical / 0 Major
 		Minor smells (very small ones): can be allowed rarely
 		Fail build if: any blocker/critical smell exists
@@ -9363,12 +9380,15 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 		Fail build if duplication > 5%
 			📌 Duplicate code makes maintenance expensive.
 
-	7. Code Complexity (Cyclomatic / Cognitive)
-		New functions must be:
-			Cyclomatic complexity ≤ 10
-			Cognitive complexity ≤ 15
-		If complexity > 15 → requires refactor
-			📌 Keeps code readable & testable.
+	7. Code Complexity (Cyclomatic / Cognitive) :
+	=> 👉 Measures:
+		How complex your method is
+		✔ High complexity → hard to maintain
+			New functions must be:
+				Cyclomatic complexity ≤ 10
+				Cognitive complexity ≤ 15
+			If complexity > 15 → requires refactor
+				📌 Keeps code readable & testable.
 
 
 323. 1. Thread.yield() — a method :
@@ -9644,8 +9664,96 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 			5. Using ExecutorService
 			6. Using CompletableFuture (Async Programming)
 
+336. What is OOM(OutOfMemoryError) Error ?
+		=> OOM (OutOfMemoryError) happens when JVM cannot allocate more memory in heap (or other memory areas).
 
+		=> 🔥 Common Types of OOM in Java :
+				Type								Meaning
+				Java heap space						Heap memory full
+				GC overhead limit exceeded			Too much GC, little progress
+				Metaspace							Class metadata full
 
+		=> Main Causes :
+			1. Memory Leak (Most Dangerous)
+				👉 Objects are not released even when not needed
+
+			=> 👉 Common causes:
+					Static collections
+					Caches without eviction
+					Listeners not removed
+
+			2. Loading Large Data into Memory :
+				List<Claim> claims = repository.findAll();  // millions of rows ❌
+				👉 Fix:
+					Pagination
+					Streaming
+
+			3. Improper Caching
+				Cache keeps growing without limit ❌
+				👉 Fix:
+					Use size limit / eviction (LRU)
+
+			4. Large File Processing
+				Files.readAllBytes(path);  // loads entire file ❌
+				👉 Fix:
+					Use streaming (BufferedReader)
+
+			5. Too Many Threads
+				Creating too many threads → memory exhaustion
+				👉 Fix:
+					Use thread pool (ExecutorService)
+
+			6. Infinite Object Creation
+				while (true) {
+				    new Employee();  // no control ❌
+				}
+
+		=> How to Prevent OOM :
+				✅ 1. Use Pagination
+						Page<Claim> page = repository.findAll(PageRequest.of(0, 100));
+				✅ 2. Limit Cache Size
+				✅ 3. Use Streaming
+						BufferedReader br = new BufferedReader(new FileReader("file.txt"));
+				✅ 4. Proper Thread Pool
+						Executors.newFixedThreadPool(10);
+				✅ 5. Tune JVM
+						-Xms512m
+						-Xmx2g
+				✅ 6. Monitor Memory
+						Heap dump
+						GC logs
+						Tools: VisualVM, JProfiler
+
+337. What is ClassNotFoundException ? -> Occurs at runtime (not compile time)
+		=> ClassNotFoundException occurs when JVM tries to load a class at runtime but cannot find it in the classpath.
+
+	=> When Does It Occurs ?
+
+		✅ 1. Using Class.forName()
+				Class.forName("com.mysql.jdbc.Driver");
+					👉 If driver JAR is missing:
+						ClassNotFoundException ❌
+
+		✅ 2. JDBC Driver Not Available
+				Class.forName("oracle.jdbc.driver.OracleDriver");
+					👉 If dependency not added → exception
+			
+		✅ 3. Dynamic Class Loading
+				ClassLoader.getSystemClassLoader().loadClass("MyClass");
+					👉 If class not present → exception
+			
+		✅ 4. Wrong Class Name
+				Class.forName("com.app.Servic");  // typo ❌
+		✅ 5. Missing Dependency in Classpath
+			👉 Example:
+				Forgot to add JAR
+				Maven dependency missing
+		✅ 6. During Deserialization
+			ObjectInputStream.readObject();
+				👉 If class definition not available → exception
+
+338. How can we constomize configurations ?
+		=> In Spring Boot, we can customize configurations using application.properties or application.yml, profile-based configurations, environment variables, 		   and @ConfigurationProperties for structured binding. We can also override configurations using command-line arguments and define custom beans using 			   @Configuration classes.
 
 
 
