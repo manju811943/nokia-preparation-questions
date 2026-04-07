@@ -4343,7 +4343,12 @@ steams	2. System.out.println(Arrays.stream(arr1)
 
 			} // br.close() is called automatically
 
-
+=>	with catch block :
+		try (BufferedReader br = new BufferedReader(new FileReader("file.txt"))) {
+		    System.out.println(br.readLine());
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
 			✔ Cleaner
 			✔ Safer
 			✔ No memory / resource leaks
@@ -4371,7 +4376,6 @@ steams	2. System.out.println(Arrays.stream(arr1)
 			GROUP BY table_name;
 
 169. Difference between REST and SOAP.
-
 	=> REST is an architectural style that uses HTTP methods and mostly JSON for lightweight communication.
 	=> SOAP is a protocol that uses XML-based messaging with strict standards like WS-Security.
 	=> REST is faster and widely used in microservices, while SOAP is more secure and used in enterprise systems like banking.
@@ -4439,12 +4443,11 @@ steams	2. System.out.println(Arrays.stream(arr1)
 		| Attacks              | CSRF, CORS, XSS protection |
 
 173. Difference between HTTP and HTTPS :
-
 		=> HTTP is an unsecured protocol where data is transferred in plain text.
 		=> HTTPS is the secure version of HTTP that uses SSL/TLS encryption to protect data, 
 		   ensure server authenticity, and prevent tampering.
 		   
-174. Model class validations: 
+174. Model class validations: DTOs
 
 	1. String Validations :
 		@NotEmpty          // Not null AND length > 0
@@ -4865,6 +4868,8 @@ steams	2. System.out.println(Arrays.stream(arr1)
 
 	=> Where Is Cache Data Stored?
 		🔹 Default (If You Do Nothing)
+		1. If No cache provider confgiured -> will store in JVM memory
+		2. If Redis cache confiured -> will store in Redis server
 		
 		👉 In-memory cache (ConcurrentHashMap)
 		✔ Stored inside application memory
@@ -4975,8 +4980,8 @@ steams	2. System.out.println(Arrays.stream(arr1)
 	| ---------------------- | ------------------------------------- | ------------------- |
 	| Level                  | Spring abstraction                    | Core Java           |
 	| Return value           | `void`, `Future`, `CompletableFuture` | `CompletableFuture` |
-	| Chaining               | ❌ Limited                             | ✅ Very powerful     |
-	| Combine multiple tasks | ❌ No                                  | ✅ Yes               |
+	| Chaining               | ❌ Limited                             | ✅ Very powerful  |
+	| Combine multiple tasks | ❌ No                                  | ✅ Yes            |
 	| Error handling         | Basic                                 | Advanced            |
 	| Best for               | Background tasks                      | Parallel workflows  |
 
@@ -5667,7 +5672,7 @@ steams	2. System.out.println(Arrays.stream(arr1)
 			Result handled via callback
 
 210. What is Thread Starvation ?
-	=> Requests are waiting to be processed, but no threads are available to execute them.
+	=> Resources are waiting to be processed, but no threads are available to execute them.
 			Not because CPU is slow —
 			but because all threads are busy or blocked
 
@@ -5764,9 +5769,9 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 
 	| Feature            | CompletableFuture | Structured Concurrency |
 	| ------------------ | ----------------- | ---------------------- |
-	| Parallel execution | ✅                 | ✅                      |
+	| Parallel execution | ✅                 | ✅                   |
 	| Error handling     | Complex           | Clean                  |
-	| Auto cancellation  | ❌ Manual          | ✅ Automatic            |
+	| Auto cancellation  | ❌ Manual          | ✅ Automatic         |
 	| Readability        | Medium            | High                   |
 	| Debugging          | Hard              | Easy                   |
 
@@ -5884,12 +5889,12 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 
 
 215. How you handle deployment tasks ?
-	1. Before deployment, I ensure that my code is production-ready by verifying environment-specific configurations such as application.yml profiles, 
-	   database connections, Kafka topics, cache settings, and third-party API endpoints.
+	1. Before deployment, I ensure that my code is production-ready by verifying environment-specific configurations such 		as application.yml profiles, 
+	   	database connections, Kafka topics, cache settings, and third-party API endpoints.
 
-	2. I make sure database changes are backward-compatible and coordinate schema changes carefully. I also validate that feature flags, timeouts, circuit 					breakers, and cache TTLs are correctly configured for the target environment.
+	2. I make sure database changes are backward-compatible and coordinate schema changes carefully. I also validate that 		feature flags, timeouts, circuit breakers, and cache TTLs are correctly configured for the target environment.
 
-	3. During deployment, I support the DevOps team by verifying the build artifacts, Docker images, and application startup logs. After deployment, I perform 			   smoke testing on critical APIs, monitor logs and metrics, and quickly address issues like 5xx errors, latency spikes, or thread pool exhaustion.
+	3. During deployment, I support the DevOps team by verifying the build artifacts, Docker images, and application startup logs. After deployment, I perform smoke testing on critical APIs, monitor logs and metrics, and quickly address issues like 5xx errors, latency spikes, or thread pool exhaustion.
 
 	4. In case of issues, I help in rollback or hotfix deployments and participate in root cause analysis to prevent recurrence
 
@@ -5909,7 +5914,7 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 217. Explain difference between ExecutorService, ForkJoinPool and CompletableFuture ?
 		=> ExecutorService manages thread pools and executes asynchronous tasks. 
 		=> ForkJoinPool is specialized for recursive divide-and-conquer CPU-intensive tasks using work-stealing. 			   
-		=> CompletableFuture is a higher-level abstraction that enables chaining, combining, and handling asynchronous tasks more elegantly, especially useful 				for parallel REST calls.
+		=> CompletableFuture is a higher-level abstraction that enables chaining, combining, and handling asynchronous tasks more elegantly, especially useful for parallel REST calls.
 
 218. Difference between @Controller, @RestController and @ControllerAdvice.
 	1.  @Controller :
@@ -5946,7 +5951,7 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 						Order + Items fetched in one go
 						DB hit happens immediately
 
-		=> What is LazyInitializationException? eg : failed to lazily initialize a collection of role no session or entity manager
+		=> What is LazyInitializationException? eg : failed to lazily initialize a collection of role no session or entity 		   manager
 
 			Why it happens?
 				Because:
@@ -6573,7 +6578,7 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 				Only provide minimal default behavior
 
 244.  How Do Threads Communicate in Java ?
-		=> hreads communicate by sharing data and coordinating execution.
+		=> threads communicate by sharing data and coordinating execution.
 			There are 3 major mechanisms:
 				1. wait(), notify(), notifyAll() (Classic Way)
 					=> Used for inter-thread communication using object monitor (lock).
@@ -6761,8 +6766,8 @@ so, in Java 21 inriduced called Structured Concurrency – Cleaner & Safer Async
 
 	=> How lambda works internally ?
 		=> Lambda expressions in Java are implemented using the invokedynamic instruction introduced in Java 7. 
-		   The compiler generates a synthetic private method for the lambda body, and at runtime, the JVM uses LambdaMetafactory to dynamically create an 				   implementation of the functional interface. 
-		   Unlike anonymous classes, lambdas do not create separate class files, making them more memory efficient and allowing better JVM optimizations.	
+		   The compiler generates a synthetic private method for the lambda body, and at runtime, the JVM uses 					   LambdaMetafactory to dynamically create an implementation of the functional interface. 
+		   Unlike anonymous classes, lambdas do not create separate class files, making them more memory efficient and 				allowing better JVM optimizations.	
 
 	=> Can Lambda Throw Checked Exception ? : No
 
@@ -6952,7 +6957,7 @@ Step 4: Join Phase
 
 	=> Parallel streams use ForkJoinPool.commonPool(), which is shared globally across the JVM. 
 	   In a Spring Boot application handling multiple concurrent requests, this can lead to thread contention, 
-	   CPU exhaustion, and unpredictable performance. Additionally, parallel streams are not suitable for blocking operations like database or REST calls, 
+	   CPU exhaustion, and unpredictable performance. Additionally, parallel streams are not suitable for blocking 			   operations like database or REST calls, 
 	   which are common in backend services. 
 	   Therefore, it is safer to use a custom ExecutorService or CompletableFuture with a dedicated thread pool 
 	   for better control and scalability.
