@@ -8801,9 +8801,37 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 			=> This behavior is controlled using Propagation.
 	
 		=> Most Important Propagations
-				REQUIRED
-				REQUIRES_NEW
-				SUPPORTS
+				REQUIRED  -> Transactional(propagation = Propagation.REQUIRED)
+						=>  ✔ Join existing transaction
+							✔ If none exists → create a new one
+							✔ Most commonly used
+							✔ Default behavior
+
+				REQUIRES_NEW : @Transactional(propagation = Propagation.REQUIRES_NEW)
+						=> ✔ Always creates a new transaction
+						   ✔ Suspends existing transaction
+
+				SUPPORTS : tional(propagation = Propagation.SUPPORTS)
+						=> ✔ Use existing transaction if present
+						   ✔ If not → run without transaction
+
+				NOT_SUPPORTED : @Transactional(propagation = Propagation.NOT_SUPPORTED)
+						=> ✔ Always runs without a transaction
+						   ✔ Suspends any existing transaction
+
+				MANDATORY : @Transactional(propagation = Propagation.MANDATORY)
+						=> ✔ Must run inside an existing transaction
+						   ✔ Throws exception if none exists
+
+			✅ Propagation Summary Table :
+			Type				Behavior
+			REQUIRED			Join or create
+			REQUIRES_NEW		Always new
+			SUPPORTS			Transaction optional
+			NOT_SUPPORTED		No transaction
+			MANDATORY			Transaction required
+			NEVER				Transaction forbidden
+			NESTED				Savepoint-based
 
 304. How version are maintained in springboot application ?
 	1️⃣ What is a SNAPSHOT Version ?
