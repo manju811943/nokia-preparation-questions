@@ -9788,6 +9788,164 @@ Note : They are stored in the server filesystem (disk), not in system memory.
 338. How can we constomize configurations ?
 		=> In Spring Boot, we can customize configurations using application.properties or application.yml, profile-based configurations, environment variables, 		   and @ConfigurationProperties for structured binding. We can also override configurations using command-line arguments and define custom beans using 			   @Configuration classes.
 
+339.  What is Builder Design Pattern?
+	=> The Builder Design Pattern is a creational design pattern used to construct complex objects step-by-step, instead of using a big constructor with many 			parameters.
+
+	👉 It solves problems like:
+			Too many constructor arguments (constructor overload hell)
+			Optional fields confusion
+			Poor readability
+
+Eg: 🔹 Basic Idea
+		Instead of doing this ❌
+			Policy policy = new Policy("P123", "Health", 500000, 25, "ACTIVE", true, "India");
+
+		👉 Hard to read, error-prone.
+		
+		✅ Using Builder Pattern
+			Policy policy = Policy.builder()
+			        .policyId("P123")
+			        .type("Health")
+			        .sumInsured(500000)
+			        .age(25)
+			        .status("ACTIVE")
+			        .isActive(true)
+			        .country("India")
+			        .build();
+
+340. How to mock static and private methods ?
+
+🔹 Mocking Static Methods
+	=> In modern Java testing, you’ll use Mockito (version 3.4+ or 4+)
+	=> class TestClass {
+	    @Test
+	    void testStaticMock() {
+	        try (MockedStatic<Utility> mocked = mockStatic(Utility.class)) {
+	
+	            mocked.when(Utility::getValue).thenReturn("mocked");
+	
+	            String result = Utility.getValue();
+	
+	            assert result.equals("mocked");
+	        }
+	    }
+	}
+🔑 Key Points
+		Use MockedStatic
+		Works only inside try-with-resources
+		Thread-safe (scoped)
+
+🔹 Mocking Private Methods :
+	👉 Short truth: Mockito does NOT support mocking private methods directly.
+		You have 3 options:
+			✅ Option 1: Test via Public Method (Recommended 👍)
+			class Service {
+			    public String process() {
+			        return privateMethod();
+			    }
+			
+			    private String privateMethod() {
+			        return "real";
+			    }
+			}
+
+			⚠️ Option 2: Use Spy (Partial Mock)
+					You still cannot mock private directly, but you can restructure:
+					Service service = spy(new Service());
+					
+					// if private becomes protected/package-private
+					doReturn("mocked").when(service).someMethod();
+
+			⚠️ Option 3: Use PowerMockito (Legacy Approach)
+
+					If you're stuck with legacy code:
+					
+					@RunWith(PowerMockRunner.class)
+					@PrepareForTest(Service.class)
+					public class ServiceTest {
+					
+					    @Test
+					    public void testPrivateMethod() throws Exception {
+					        Service service = PowerMockito.spy(new Service());
+					
+					        PowerMockito.doReturn("mocked")
+					            .when(service, "privateMethod");
+					
+					        String result = service.process();
+					
+					        assertEquals("mocked", result);
+					    }
+					}
+
+341. What is Diff between Depedencies and dependencyManagement in pom.xml ?
+	🔹 1. <dependencies> (Actual Usage)
+			👉 This is where you add libraries that your project will use directly.
+			    Dependencies here are downloaded and added to classpath
+			    They are available for your code
+			✅ Example
+				<dependencies>
+				    <dependency>
+				        <groupId>org.springframework.boot</groupId>
+				        <artifactId>spring-boot-starter-web</artifactId>
+				    </dependency>
+				</dependencies>
+
+	🔹 2. <dependencyManagement> (Version Control Only)
+			👉 This is used to define versions of dependencies centrally, but NOT include them automatically.
+			
+			It does NOT add dependency to classpath
+			It only controls version
+			Mostly used in parent POMs / multi-module projects
+			✅ Example
+			<dependencyManagement>
+			    <dependencies>
+			        <dependency>
+			            <groupId>org.springframework</groupId>
+			            <artifactId>spring-core</artifactId>
+			            <version>6.0.0</version>
+			        </dependency>
+			    </dependencies>
+			</dependencyManagement>
+			
+			👉 This alone does NOTHING unless used below 👇
+			
+			🔹 Using Managed Dependency
+			<dependencies>
+			    <dependency>
+			        <groupId>org.springframework</groupId>
+			        <artifactId>spring-core</artifactId>
+			    </dependency>
+			</dependencies>
+			
+			👉 Version will be taken from dependencyManagement
+
+342. 🔹 Ways to Create / Declare Optional
+		There are 3 main ways to declare an Optional:
+
+		✅ 1. Optional.of()
+			👉 Use when value is definitely NOT null
+				Optional<String> name = Optional.of("Manju");
+				❌ If value is null → throws NullPointerException
+				✔ Strict, safe when you are sure
+
+		✅ 2. Optional.ofNullable()
+			👉 Use when value can be null
+				String value = null;
+				Optional<String> name = Optional.ofNullable(value);
+				✔ If null → returns empty Optional
+				✔ Most commonly used in real projects
+
+		✅ 3. Optional.empty()
+			👉 Create an empty Optional
+				Optional<String> name = Optional.empty();
+				Represents no value
+				Often used in return statements
+
+	| Method         | Null Allowed? | Behavior            |
+	| -------------- | ------------- | ------------------- |
+	| `of()`         | ❌ No          | Throws Exception    |
+	| `ofNullable()` | ✅ Yes         | Handles null safely |
+	| `empty()`      | ✅ Yes         | No value            |
 
 
 =============================================================================================================
