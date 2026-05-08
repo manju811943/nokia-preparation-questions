@@ -9948,6 +9948,129 @@ Eg: 🔹 Basic Idea
 	| `empty()`      | ✅ Yes         | No value            |
 
 
+343. What is Memory Leak in Java ?
+	=> Memory leak in Java happens when objects are no longer needed by the application but still remain referenced, so Garbage Collector cannot remove them.”
+		As a result:
+			Heap memory keeps increasing
+			Application becomes slow
+			Eventually may throw:
+				OutOfMemoryError
+
+	=> 	Common Causes of Memory Leak
+		1. Static Collections
+			Objects stored in static collections remain in memory throughout application lifecycle.
+			Example:
+				static List<String> list = new ArrayList<>();
+				public void addData() {
+				    list.add("data");
+				}
+			Problem:
+				List keeps growing
+				GC cannot clear it
+
+		2. Unclosed Resources
+			Not closing:
+				Database connections
+				File streams
+				Socket connections
+			Example:
+				FileInputStream fis = new FileInputStream("abc.txt");
+				=>	If not closed → memory/resource leak.
+
+		3. Cache Growing Unlimited
+				Large cache without expiry policy.
+
+		4. Listener / Callback Not Removed
+				Event listeners remain referenced.
+
+		How to Identify Memory Leak
+			Tools used:
+				VisualVM
+				Eclipse MAT
+				JProfiler
+				Heap Dump Analysis
+			We monitor:
+				Heap usage
+				GC activity
+				Object retention
+
+344. What Algorithm Does Garbage Collector Use in Java ?
+	=> Core GC Algorithms
+		1. Mark and Sweep Algorithm
+			Mark Phase :
+				=> GC identifies objects that are still reachable/referenced.
+			
+			Sweep Phase :
+				=> Unreachable objects are removed from heap memory.
+		
+		2. Mark-Sweep-Compact
+			After removing unused objects:
+				JVM compacts memory
+				Reduces fragmentation
+
+		3. Generational Garbage Collection
+			Heap divided into:
+				Young Generation
+				Old Generation
+		
+		Because:
+			Most objects die young
+			Young objects cleaned frequently for better performance.
+
+345. Soft Delete in JPA (Spring Boot) ?
+		=> Soft delete means we don’t physically delete a record from the database. Instead, we mark it as deleted using a flag like isDeleted or status.”
+			This helps to:
+				Keep historical data
+				Avoid accidental data loss
+				Maintain audit trail
+
+		Approach 1: Using isDeleted Flag (Most Common)
+		Approach 2: Using Status Field -> ACTIVE/INACTIVE
+
+346. Dirty Checking in Hibernate ?
+	=> Dirty checking is a Hibernate feature that automatically detects changes made to an entity object and updates the corresponding database record without 			explicitly calling an update query.
+
+	=> How It Works
+		When an entity is loaded:
+			Hibernate keeps a snapshot of the object in the Persistence Context
+			If any field is changed
+			Hibernate compares current state vs original state
+			If changes are found → it automatically executes an UPDATE query
+
+347. AOP (Aspect Oriented Programming):
+	=> AOP is a programming paradigm used in Spring to separate cross-cutting concerns from business logic.
+
+	=> What are Cross-Cutting Concerns?
+		These are functionalities that are used across multiple layers:
+			Examples:
+				Logging
+				Security
+				Transaction management
+				Performance monitoring
+				Exception handling
+		=> Instead of writing them everywhere, we handle them centrally using AOP.
+
+	=> Why AOP is Used
+		Without AOP:
+			Same code repeated in multiple classes
+			Tight coupling
+			Hard to maintain
+		
+		With AOP:
+			Centralized logic
+			Clean business code
+			Better maintainability
+	=> Types of Advice
+		1. @Before
+			Runs before method execution.
+		2. @After
+			Runs after method execution.
+		3. @AfterReturning
+			Runs after successful execution.
+		4. @AfterThrowing
+			Runs when exception occurs.
+		5. @Around (Most powerful)
+			Controls full method execution.
 =============================================================================================================
 
 Round 2:
