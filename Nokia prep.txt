@@ -11130,16 +11130,15 @@ Streram	=> int[] array = Arrays.stream(arr).boxed().filter(n -> n != 0)
 		
 3. get only duplicates in given strings
 
-	  String s1 = "ABC";
-      String s2 = "ADC";
+	   String s1 = "ABC";
+        String s2 = "ADC";
 
-        System.out.println(Arrays.stream(s1.concat(s2).split(""))
-                .collect(Collectors.groupingBy(Function.identity(),Collectors.counting()))
-                .entrySet()
-                .stream()
-				.filter(n-> n.getValue() > 1)
-                .map(n-> n.getKey())
-                .collect(Collectors.joining()));
+        String result = Arrays.stream((s1 + s2).split("")).
+                collect(groupingBy(Function.identity(), counting())).entrySet().stream().
+                filter(n->n.getValue()>1).map(n->n.getKey()).collect(Collectors.joining());
+        System.out.println(result);
+
+
 				
 4. Find the vowels count
 
