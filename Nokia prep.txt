@@ -15,6 +15,9 @@ Nokia :
 	=> Better accessibility
 	=> Easy mainitannce
 	=> Screen reader friendly
+
+
+
 	
 3. DIff between 
 			localstorage      		session storage    			cokies
@@ -11134,7 +11137,7 @@ Streram	=> int[] array = Arrays.stream(arr).boxed().filter(n -> n != 0)
         String s2 = "ADC";
 
         String result = Arrays.stream((s1 + s2).split("")).
-                collect(groupingBy(Function.identity(), counting())).entrySet().stream().
+                collect(groupingBy(Function.identity(),Collectors.counting())).entrySet().stream().
                 filter(n->n.getValue()>1).map(n->n.getKey()).collect(Collectors.joining());
         System.out.println(result);
 
