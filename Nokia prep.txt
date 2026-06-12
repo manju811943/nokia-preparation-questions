@@ -11208,6 +11208,30 @@ Streram	=> int[] array = Arrays.stream(arr).boxed().filter(n -> n != 0)
 			}
 			
 			System.out.println(count);
+or...
+
+ String s = "programming";
+
+        for (int i = 0; i < s.length(); i++) {
+
+            int count = 1;
+
+            // Skip already counted characters
+            if (s.charAt(i) == '*') {
+                continue;
+            }
+
+            for (int j = i + 1; j < s.length(); j++) {
+
+                if (s.charAt(i) == s.charAt(j)) {
+                    count++;
+                }
+            }
+
+            System.out.println(s.charAt(i) + " = " + count);
+        }
+    }
+}
 
 9. sum of givem number
 	  int num = 12345;
